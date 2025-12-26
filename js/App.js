@@ -214,13 +214,30 @@ const App = () => {
             { id: 'home', title: lang === 'tr' ? 'Ana Sayfa' : 'Home', icon: Icons.Activity },
             { id: 'research', title: lang === 'tr' ? 'Kütüphane' : 'Library', icon: Icons.BookOpen },
             { 
+                id: 'running', 
+                title: lang === 'tr' ? 'Koşu' : 'Running', 
+                icon: Icons.Activity,
+                type: 'dropdown',
+                children: [
+                    { id: 'running_perf', title: lang === 'tr' ? 'Performansın Temeli' : 'Performance Fundamentals', icon: Icons.Activity },
+                ]
+            },
+            { 
+                id: 'nutrition', 
+                title: lang === 'tr' ? 'Beslenme' : 'Nutrition', 
+                icon: Icons.Zap,
+                type: 'dropdown',
+                children: [
+                    { id: 'caffeine', title: lang === 'tr' ? 'Kafein Stratejisi' : 'Caffeine Strategy', icon: Icons.Zap },
+                ]
+            },
+            { 
                 id: 'tools', 
                 title: lang === 'tr' ? 'Araçlar' : 'Tools', 
                 icon: Icons.Calculator,
                 type: 'dropdown',
                 children: [
                     { id: 'utmb_lottery', title: lang === 'tr' ? 'UTMB Kura' : 'UTMB Lottery', icon: Icons.Ticket },
-                    { id: 'caffeine', title: lang === 'tr' ? 'Kafein Stratejisi' : 'Caffeine Strategy', icon: Icons.Zap },
                 ]
             },
         ];
@@ -262,6 +279,7 @@ const App = () => {
             case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} lang={lang} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} lang={lang} />;
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
+            case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             default: return <HomePage changePage={setActiveTab} />;
         }
     };
