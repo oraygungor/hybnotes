@@ -18,24 +18,34 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        // CSS Variable kullanarak dinamik renk tanımlıyoruz
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['DC Archia', 'Archer', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif'],
                     },
+                    colors: {
+                        // Dinamik Ana Renk (RGB formatında variable'dan okur)
+                        primary: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                    },
                     animation: {
-                        'fade-in': 'fadeIn 0.5s ease-out',
-                        'slide-in': 'slideIn 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'slide-in': 'slideIn 0.5s ease-out forwards',
+                        'text-shimmer': 'textShimmer 3s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'draw-path': 'drawPath 2s ease-in-out infinite',
                     },
                     keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideIn: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+                        textShimmer: {
+                            '0%': { backgroundPosition: '-200% center' },
+                            '100%': { backgroundPosition: '200% center' },
                         },
-                        slideIn: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        drawPath: {
+                            '0%': { strokeDashoffset: '100' },
+                            '100%': { strokeDashoffset: '0' } 
                         }
                     }
                 }
@@ -44,30 +54,56 @@
     </script>
 
     <style>
+        /* Varsayılan Tema Rengi (Kırmızı) */
+        :root {
+            --primary-rgb: 239 68 68; /* #ef4444 (Red-500) */
+        }
+
+        body {
+            background-color: #0f172a; /* Slate-900 */
+            color: #e2e8f0; /* Slate-200 */
+        }
+
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .prose p { margin-bottom: 1rem; }
         .prose h4 { color: white; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
         input:focus, select:focus { outline: none; }
         
-        /* Slider Özelleştirme (React içi) */
+        /* Slider Özelleştirme */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; margin: 8px 0; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #334155; border-radius: 3px; transition: background 0.2s; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; cursor: pointer; margin-top: -7px; box-shadow: 0 0 0 4px #0f172a; transition: transform 0.1s; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; cursor: pointer; margin-top: -7px; box-shadow: 0 0 0 4px #0f172a; transition: transform 0.1s; background-color: rgb(var(--primary-rgb)); }
         input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.1); }
 
-        /* Renk Varyasyonları */
-        .range-lime::-webkit-slider-thumb { background: #84cc16; }
-        .range-lime:hover::-webkit-slider-runnable-track { background: #3f6212; }
-        .range-blue::-webkit-slider-thumb { background: #3b82f6; }
-        .range-blue:hover::-webkit-slider-runnable-track { background: #1e3a8a; }
-        .range-amber::-webkit-slider-thumb { background: #f59e0b; border-radius: 4px; } 
-        .range-amber:hover::-webkit-slider-runnable-track { background: #78350f; }
-        .range-purple::-webkit-slider-thumb { background: #a855f7; border-radius: 2px; height: 18px; width: 10px; }
-        .range-purple:hover::-webkit-slider-runnable-track { background: #581c87; }
+        /* Shimmer Text Efekti (Dinamik renk için CSS Variable kullanımı) */
+        .animate-shimmer-text {
+            background: linear-gradient(to right, #ffffff 0%, rgb(var(--primary-rgb)) 20%, #ffffff 40%, rgb(var(--primary-rgb)) 60%, #ffffff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: textShimmer 4s linear infinite;
+        }
+
+        .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(var(--primary-rgb), 0.3); }
+        
+        /* Nabız Logo Animasyonu */
+        .pulse-path {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: drawPath 3s linear infinite;
+        }
+        @keyframes drawPath {
+            0% { stroke-dashoffset: 100; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0; }
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200 font-sans">
+<body class="font-sans antialiased">
     
     <div id="root"></div>
 
@@ -94,9 +130,25 @@
             Menu: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
             X: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
             Info: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
-            Ticket: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path></svg>
+            Ticket: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path></svg>,
+            Palette: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path></svg>
         };
 
+        // --- ÖZEL LOGO (Nabız Barı) ---
+        const PulseBarLogo = ({ size = 40 }) => (
+            <svg width={size} height={size} viewBox="0 0 100 100" fill="none" strokeLinecap="round" strokeLinejoin="round" className="text-primary transition-colors duration-300">
+                {/* Ağırlık Plakaları */}
+                <rect x="10" y="30" width="10" height="40" rx="2" fill="currentColor" />
+                <rect x="80" y="30" width="10" height="40" rx="2" fill="currentColor" />
+                {/* Sabit Çizgi */}
+                <path d="M20 50 H35" stroke="white" strokeWidth="4" />
+                <path d="M65 50 H80" stroke="white" strokeWidth="4" />
+                {/* Nabız Animasyonu */}
+                <path d="M35 50 L45 30 L55 70 L65 50" stroke="white" strokeWidth="4" className="pulse-path" fill="none" />
+            </svg>
+        );
+
+        // --- YEDEK VERİLER ---
         const DEFAULT_POSTS = [
           { 
             "id": 5, 
@@ -139,21 +191,38 @@
           }
         ];
 
+        // --- RENK TEMALARI ---
+        const THEMES = [
+            { id: 'red', name: 'Kırmızı', rgb: '239 68 68', hex: '#ef4444' }, // Varsayılan
+            { id: 'lime', name: 'Yeşil', rgb: '132 204 22', hex: '#84cc16' },
+            { id: 'blue', name: 'Mavi', rgb: '59 130 246', hex: '#3b82f6' },
+            { id: 'purple', name: 'Mor', rgb: '168 85 247', hex: '#a855f7' },
+            { id: 'orange', name: 'Turuncu', rgb: '249 115 22', hex: '#f97316' },
+            { id: 'yellow', name: 'Sarı', rgb: '234 179 8', hex: '#eab308' },
+            { id: 'pink', name: 'Pembe', rgb: '236 72 153', hex: '#ec4899' },
+            { id: 'cyan', name: 'Turkuaz', rgb: '6 182 212', hex: '#06b6d4' },
+            { id: 'indigo', name: 'İndigo', rgb: '99 102 241', hex: '#6366f1' },
+            { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
+        ];
+
         const App = () => {
             const [posts, setPosts] = useState(DEFAULT_POSTS);
             const [activeTab, setActiveTab] = useState('home');
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [readingArticle, setReadingArticle] = useState(null);
             const [lang, setLang] = useState('tr');
+            const [activeTheme, setActiveTheme] = useState(THEMES[0]); // Varsayılan Kırmızı
+
+            useEffect(() => {
+                // Tema rengini CSS variable'a ata
+                document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
+            }, [activeTheme]);
 
             useEffect(() => {
                 fetch('posts.json')
-                    .then(res => {
-                        if(res.ok) return res.json();
-                        throw new Error('Dosya okunamadı');
-                    })
+                    .then(res => { if(res.ok) return res.json(); throw new Error(''); })
                     .then(data => setPosts(data))
-                    .catch(err => console.log("Varsayılan veriler kullanılıyor."));
+                    .catch(() => {});
             }, []);
 
             // Çoklu dil menü
@@ -172,9 +241,11 @@
                 },
             ];
 
+            // ... (ArticleDetail, ResearchPage vb. bileşenler aynı kalacak ama renkler css variable'dan okuyacak) ...
+            
             const ArticleDetail = ({ article, goBack, lang }) => (
                 <div className="animate-fade-in pb-20">
-                    <button onClick={goBack} className="mb-6 flex items-center gap-2 text-slate-400 hover:text-lime-400 transition-colors font-bold group text-sm md:text-base">
+                    <button onClick={goBack} className="mb-6 flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base">
                         <Icons.ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> {lang === 'tr' ? 'Kütüphaneye Dön' : 'Back to Library'}
                     </button>
                     <article className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden">
@@ -182,18 +253,18 @@
                             <div className="flex flex-wrap gap-4 text-xs md:text-sm text-slate-400 mb-4 md:mb-6 font-mono">
                                 <span className="flex items-center gap-1"><Icons.Calendar size={12}/> {article.date}</span>
                                 <span className="flex items-center gap-1"><Icons.Clock size={12}/> {article.readTime[lang]}</span>
-                                <span className="bg-lime-500/10 text-lime-400 px-2 py-0.5 md:px-3 md:py-1 rounded-full border border-lime-500/20 font-bold">{article.category[lang]}</span>
+                                <span className="bg-primary/10 text-primary px-2 py-0.5 md:px-3 md:py-1 rounded-full border border-primary/20 font-bold">{article.category[lang]}</span>
                             </div>
                             <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4">{article.title[lang]}</h1>
                         </div>
                         <div className="p-6 md:p-12">
                             <div 
                                 className="prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed space-y-2 md:space-y-4" 
-                                dangerouslySetInnerHTML={{ __html: article.content[lang].replace(/class='math-box'/g, 'class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-lime-500 rounded-r-xl font-mono text-lime-100 text-sm md:text-lg text-center shadow-inner italic"') }} 
+                                dangerouslySetInnerHTML={{ __html: article.content[lang].replace(/class='math-box'/g, `class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-primary rounded-r-xl font-mono text-primary text-opacity-90 text-sm md:text-lg text-center shadow-inner italic"`) }} 
                             />
                             {article.references && article.references.length > 0 && (
                                 <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-slate-700/50">
-                                    <h3 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center gap-2"><Icons.Bookmark size={18} className="text-lime-500"/> {lang === 'tr' ? 'Referanslar' : 'References'}</h3>
+                                    <h3 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center gap-2"><Icons.Bookmark size={18} className="text-primary"/> {lang === 'tr' ? 'Referanslar' : 'References'}</h3>
                                     <ul className="space-y-2 md:space-y-3">
                                         {article.references.map((ref, i) => (
                                             <li key={i} className="text-slate-500 text-xs md:text-sm pl-4 border-l-2 border-slate-700">[{i + 1}] {ref}</li>
@@ -215,10 +286,7 @@
                     return cats;
                 }, [posts, lang]);
 
-                // Reset category when lang changes to avoid stuck filter
-                useEffect(() => {
-                    setSelectedCategory(lang === 'tr' ? "Tümü" : "All");
-                }, [lang]);
+                useEffect(() => { setSelectedCategory(lang === 'tr' ? "Tümü" : "All"); }, [lang]);
 
                 const filteredPosts = posts.filter(post => {
                     const matchesSearch = post.title[lang].toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -236,64 +304,34 @@
                             </div>
                             <div className="relative w-full md:w-80">
                                 <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                                <input 
-                                    type="text" 
-                                    placeholder={lang === 'tr' ? 'Ara...' : 'Search...'} 
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 transition-all placeholder:text-slate-600 text-sm"
-                                />
+                                <input type="text" placeholder={lang === 'tr' ? 'Ara...' : 'Search...'} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-slate-600 text-sm" />
                             </div>
                         </div>
-
                         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                             {categories.map(cat => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setSelectedCategory(cat)}
-                                    className={`whitespace-nowrap px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border ${
-                                        selectedCategory === cat 
-                                        ? 'bg-lime-500 text-slate-900 border-lime-500' 
-                                        : 'bg-slate-800 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-white'
-                                    }`}
-                                >
-                                    {cat}
-                                </button>
+                                <button key={cat} onClick={() => setSelectedCategory(cat)} className={`whitespace-nowrap px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border ${selectedCategory === cat ? 'bg-primary text-slate-900 border-primary' : 'bg-slate-800 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-white'}`}>{cat}</button>
                             ))}
                         </div>
-
                         <div className="grid grid-cols-1 gap-4">
                             {filteredPosts.length > 0 ? (
                                 filteredPosts.map((post) => (
-                                <div 
-                                    key={post.id} 
-                                    onClick={() => onSelect(post)}
-                                    className="bg-slate-800 rounded-2xl p-6 md:p-8 border border-slate-700 hover:border-lime-500 transition-all hover:-translate-y-1 cursor-pointer group shadow-lg flex flex-col md:flex-row gap-4 md:gap-6"
-                                >
+                                <div key={post.id} onClick={() => onSelect(post)} className="bg-slate-800 rounded-2xl p-6 md:p-8 border border-slate-700 hover:border-primary transition-all hover:-translate-y-1 cursor-pointer group shadow-lg flex flex-col md:flex-row gap-4 md:gap-6">
                                     <div className="flex-1">
                                         <div className="flex gap-3 mb-3">
                                             <span className="bg-slate-700 text-slate-300 text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider">{post.category[lang]}</span>
                                             <span className="text-slate-500 text-[10px] md:text-xs font-mono flex items-center gap-1"><Icons.Calendar size={12}/> {post.date}</span>
                                         </div>
-                                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3 group-hover:text-lime-400 transition-colors">
-                                            {post.title[lang]}
-                                        </h3>
-                                        <p className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3">
-                                            {post.summary[lang]}
-                                        </p>
-                                        <div className="flex items-center text-lime-500 text-sm font-bold gap-1">
-                                            {lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                                        </div>
+                                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3 group-hover:text-primary transition-colors">{post.title[lang]}</h3>
+                                        <p className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3">{post.summary[lang]}</p>
+                                        <div className="flex items-center text-primary text-sm font-bold gap-1">{lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" /></div>
                                     </div>
                                 </div>
                                 ))
                             ) : (
                                 <div className="text-center py-20 bg-slate-800/50 rounded-2xl border border-slate-800 border-dashed">
-                                    <div className="inline-flex p-4 bg-slate-800 rounded-full mb-4">
-                                        <Icons.Filter size={32} className="text-slate-600" />
-                                    </div>
+                                    <div className="inline-flex p-4 bg-slate-800 rounded-full mb-4"><Icons.Filter size={32} className="text-slate-600" /></div>
                                     <h3 className="text-xl font-bold text-white mb-2">{lang === 'tr' ? 'Sonuç Bulunamadı' : 'No Results Found'}</h3>
-                                    <button onClick={() => { setSearchTerm(''); setSelectedCategory(lang === 'tr' ? "Tümü" : "All"); }} className="mt-4 text-lime-500 font-bold hover:underline">{lang === 'tr' ? 'Filtreleri Temizle' : 'Clear Filters'}</button>
+                                    <button onClick={() => { setSearchTerm(''); setSelectedCategory(lang === 'tr' ? "Tümü" : "All"); }} className="mt-4 text-primary font-bold hover:underline">{lang === 'tr' ? 'Filtreleri Temizle' : 'Clear Filters'}</button>
                                 </div>
                             )}
                         </div>
@@ -301,112 +339,61 @@
                 );
             };
 
-            const Slider = ({ label, val, min, max, step, unit, colorClass, onChange }) => (
+            const Slider = ({ label, val, min, max, step, unit, onChange }) => (
                 <div className="mb-4">
                     <div className="flex justify-between mb-1 items-end">
                         <span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1">
-                            <span className={`w-2 h-2 rounded-full ${colorClass === 'range-lime' ? 'bg-lime-500' : colorClass === 'range-blue' ? 'bg-blue-500' : colorClass === 'range-amber' ? 'bg-amber-500' : 'bg-purple-500'}`}></span>
-                            {label}
+                            <span className="w-2 h-2 rounded-full bg-primary"></span> {label}
                         </span>
-                        <span className={`${colorClass === 'range-lime' ? 'text-lime-500' : colorClass === 'range-blue' ? 'text-blue-400' : colorClass === 'range-amber' ? 'text-amber-500' : 'text-purple-400'} font-bold text-sm`}>{val} {unit}</span>
+                        <span className="text-primary font-bold text-sm">{val} {unit}</span>
                     </div>
-                    <input type="range" min={min} max={max} step={step} value={val} onChange={(e)=>onChange(parseFloat(e.target.value))} className={colorClass} />
+                    <input type="range" min={min} max={max} step={step} value={val} onChange={(e)=>onChange(parseFloat(e.target.value))} />
                 </div>
             );
 
-            // --- UTMB KURA HESAPLAMA (Global Dil) ---
+            // --- UTMB KURA HESAPLAMA (Global Dil + Renk) ---
             const UTMBLotteryPage = ({ lang }) => {
                 const [race, setRace] = useState('UTMB');
                 const [method, setMethod] = useState('cagr');
                 const [stones, setStones] = useState(1);
                 const chartRef = useRef(null);
                 const chartInstance = useRef(null);
-
-                const data = useMemo(() => ({
-                    UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } },
-                    CCC: { capacity: 1900, demand: { 2023: 5249, 2024: 5400, 2025: 6000 }, meanStones: { 2024: 4.0, 2025: 4.4 } },
-                    OCC: { capacity: 1200, demand: { 2023: 5171, 2024: 6500, 2025: 10000 }, meanStones: { 2024: 2.8, 2025: 3.2 } }
-                }), []);
-
-                const translations = {
-                    en: { title: "UTMB 2026 Lottery", subtitle: "Probability calculator based on 2023-2025 data.", race: "Race", method: "Method", stones: "Running Stones", prob: "Probability", demand: "Demand", mean: "Avg Stones", tableHead: ["Year", "Demand", "Avg"] },
-                    tr: { title: "UTMB 2026 Kura", subtitle: "2023-2025 verilerine dayalı şans hesaplayıcı.", race: "Yarış", method: "Metod", stones: "Taş Sayısı", prob: "Şans", demand: "Talep", mean: "Ort. Taş", tableHead: ["Yıl", "Talep", "Ort"] }
-                };
+                const data = useMemo(() => ({ UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } }, CCC: { capacity: 1900, demand: { 2023: 5249, 2024: 5400, 2025: 6000 }, meanStones: { 2024: 4.0, 2025: 4.4 } }, OCC: { capacity: 1200, demand: { 2023: 5171, 2024: 6500, 2025: 10000 }, meanStones: { 2024: 2.8, 2025: 3.2 } } }), []);
+                const translations = { en: { title: "UTMB 2026 Lottery", subtitle: "Probability calculator based on 2023-2025 data.", race: "Race", method: "Method", stones: "Running Stones", prob: "Probability", demand: "Demand", mean: "Avg Stones", tableHead: ["Year", "Demand", "Avg"] }, tr: { title: "UTMB 2026 Kura", subtitle: "2023-2025 verilerine dayalı şans hesaplayıcı.", race: "Yarış", method: "Metod", stones: "Taş Sayısı", prob: "Şans", demand: "Talep", mean: "Ort. Taş", tableHead: ["Yıl", "Talep", "Ort"] } };
                 const t = translations[lang];
-
                 const cagr = (v1, v2, f = 1) => Math.round(v2 * (1 + (Math.pow(v2 / v1, 1 / 2) - 1) * f));
                 const linear = (v1, v2) => Math.round(v2 + (v2 - v1) / 2);
-                const getDemand = (r, m) => {
-                    const d = data[r].demand;
-                    return m === 'linear' ? linear(d[2023], d[2025]) : m === 'conservative' ? cagr(d[2023], d[2025], 0.7) : m === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
-                };
-                const getMean = (r, m) => {
-                    const mS = data[r].meanStones;
-                    const g = (mS[2025] / mS[2024]) - 1;
-                    return m === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) : m === 'conservative' ? mS[2025] * (1 + g * 0.7) : m === 'optimistic' ? mS[2025] * (1 + g * 1.3) : mS[2025] * (1 + g);
-                };
-                const getProb = (B, N, mean, w) => {
-                    if (w <= 0) return 0;
-                    const T = N * mean + w;
-                    let logNoHit = 0;
-                    const loops = Math.min(B, T - w); 
-                    for (let i = 0; i < loops; i++) logNoHit += Math.log(T - w - i) - Math.log(T - i);
-                    return 1 - Math.exp(logNoHit);
-                };
-
-                const vals = useMemo(() => {
-                    const N = getDemand(race, method), mean = getMean(race, method), B = data[race].capacity;
-                    return { N, mean, B, p: getProb(B, N, mean, stones) };
-                }, [race, method, stones]);
+                const getDemand = (r, m) => { const d = data[r].demand; return m === 'linear' ? linear(d[2023], d[2025]) : m === 'conservative' ? cagr(d[2023], d[2025], 0.7) : m === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1); };
+                const getMean = (r, m) => { const mS = data[r].meanStones; const g = (mS[2025] / mS[2024]) - 1; return m === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) : m === 'conservative' ? mS[2025] * (1 + g * 0.7) : m === 'optimistic' ? mS[2025] * (1 + g * 1.3) : mS[2025] * (1 + g); };
+                const getProb = (B, N, mean, w) => { if (w <= 0) return 0; const T = N * mean + w; let logNoHit = 0; const loops = Math.min(B, T - w); for (let i = 0; i < loops; i++) logNoHit += Math.log(T - w - i) - Math.log(T - i); return 1 - Math.exp(logNoHit); };
+                const vals = useMemo(() => { const N = getDemand(race, method), mean = getMean(race, method), B = data[race].capacity; return { N, mean, B, p: getProb(B, N, mean, stones) }; }, [race, method, stones]);
 
                 useEffect(() => {
                     if (chartInstance.current) chartInstance.current.destroy();
                     if (!chartRef.current) return;
                     const ctx = chartRef.current.getContext('2d');
-                    const { B, N, mean } = vals;
-                    
+                    const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(','); // rgb string
                     const labels = Array.from({length: 20}, (_, i) => i + 1);
-                    const dataPoints = labels.map(w => getProb(B, N, mean, w) * 100);
-                    const colors = labels.map(w => w === stones ? '#84cc16' : 'rgba(132, 204, 22, 0.3)');
+                    const dataPoints = labels.map(w => getProb(vals.B, vals.N, vals.mean, w) * 100);
+                    const colors = labels.map(w => w === stones ? `rgb(${color})` : `rgba(${color}, 0.3)`);
                     const radii = labels.map(w => w === stones ? 6 : 2);
-
-                    chartInstance.current = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels,
-                            datasets: [{ label: '%', data: dataPoints, borderColor: '#84cc16', backgroundColor: 'rgba(132, 204, 22, 0.1)', pointBackgroundColor: colors, pointRadius: radii, fill: true }]
-                        },
-                        options: {
-                            responsive: true, maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true, max: 100 }, x: { display: false } }
-                        }
-                    });
+                    chartInstance.current = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: '%', data: dataPoints, borderColor: `rgb(${color})`, backgroundColor: `rgba(${color}, 0.1)`, pointBackgroundColor: colors, pointRadius: radii, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true, max: 100 }, x: { display: false } } } });
                     return () => { if(chartInstance.current) chartInstance.current.destroy(); };
-                }, [vals, stones]);
+                }, [vals, stones, activeTheme]); // activeTheme dependency to redraw chart on color change
 
                 return (
                     <div className="animate-fade-in relative max-w-7xl mx-auto">
                         <div className="text-center mb-10 pt-2">
-                            <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">UTMB 2026 <span className="text-lime-500">{lang === 'tr' ? 'Kura' : 'Lottery'}</span></h1>
+                            <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">UTMB 2026 <span className="text-primary">{lang === 'tr' ? 'Kura' : 'Lottery'}</span></h1>
                             <p className="text-slate-400 text-sm">{t.subtitle}</p>
                         </div>
                         <div className="grid lg:grid-cols-12 gap-6">
                             <div className="lg:col-span-4 space-y-6">
                                 <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl">
-                                    <div className="mb-4">
-                                        <label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.race}</label>
-                                        <select value={race} onChange={e=>setRace(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2"><option value="UTMB">UTMB</option><option value="CCC">CCC</option><option value="OCC">OCC</option></select>
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.method}</label>
-                                        <select value={method} onChange={e=>setMethod(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2"><option value="cagr">CAGR</option><option value="linear">Linear</option><option value="conservative">Conservative</option><option value="optimistic">Optimistic</option></select>
-                                    </div>
-                                    <Slider label={t.stones} val={stones} min={1} max={50} step={1} unit="" colorClass="range-lime" onChange={setStones} />
-                                    <div className="bg-lime-500/10 border border-lime-500/20 rounded-xl p-4 text-center mt-6">
-                                        <h3 className="text-lime-500 text-xs font-bold uppercase mb-1">{t.prob}</h3>
-                                        <div className="text-4xl font-black text-white">% {(vals.p * 100).toFixed(2)}</div>
-                                    </div>
+                                    <div className="mb-4"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.race}</label><select value={race} onChange={e=>setRace(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 focus:border-primary"><option value="UTMB">UTMB</option><option value="CCC">CCC</option><option value="OCC">OCC</option></select></div>
+                                    <div className="mb-4"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.method}</label><select value={method} onChange={e=>setMethod(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 focus:border-primary"><option value="cagr">CAGR</option><option value="linear">Linear</option><option value="conservative">Conservative</option><option value="optimistic">Optimistic</option></select></div>
+                                    <Slider label={t.stones} val={stones} min={1} max={50} step={1} unit="" onChange={setStones} />
+                                    <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center mt-6"><h3 className="text-primary text-xs font-bold uppercase mb-1">{t.prob}</h3><div className="text-4xl font-black text-white">% {(vals.p * 100).toFixed(2)}</div></div>
                                 </div>
                             </div>
                             <div className="lg:col-span-8 flex flex-col gap-6">
@@ -416,7 +403,7 @@
                                         <div className="font-bold text-slate-500">{t.tableHead[0]}</div><div className="font-bold text-slate-500">{t.tableHead[1]}</div><div className="font-bold text-slate-500">{t.tableHead[2]}</div>
                                         {[2023, 2024, 2025].map(y=>(<React.Fragment key={y}><div>{y}</div><div>{data[race].demand[y]}</div><div>{data[race].meanStones[y]||'-'}</div></React.Fragment>))}
                                         <div className="col-span-3 h-px bg-slate-700 my-2"></div>
-                                        <div className="text-lime-500 font-bold">2026</div><div className="text-white font-bold">{vals.N.toLocaleString()}</div><div className="text-white font-bold">{vals.mean.toFixed(2)}</div>
+                                        <div className="text-primary font-bold">2026</div><div className="text-white font-bold">{vals.N.toLocaleString()}</div><div className="text-white font-bold">{vals.mean.toFixed(2)}</div>
                                     </div>
                                 </div>
                             </div>
@@ -425,117 +412,91 @@
                 );
             };
 
-            // --- KAFEIN STRATEJİSİ (Global Dil) ---
+            // --- KAFEIN STRATEJİSİ (Global Dil + Renk) ---
             const CaffeinePage = ({ lang }) => {
                 const [params, setParams] = useState({ bodyWeight: 70, halfLife: 5, raceStart: '08:00', raceDuration: 8, initialDose: 200, initialDoseTime: -0.5, doseAmount: 75, strategy: 'stay_low' });
                 const canvasRef = useRef(null);
                 const [schedule, setSchedule] = useState([]);
                 const [summary, setSummary] = useState('');
-
-                const translations = {
-                    tr: { strategy_params_title: 'Strateji Parametreleri', body_weight: 'Vücut Ağırlığı', race_start: 'Yarış Başlangıç', race_duration: 'Yarış Süresi', half_life: 'Yarılanma (Genetik)', initial_dose: 'Başlangıç Dozu', initial_dose_time: 'İlk Alım Zamanı', booster_dose: 'Takviye Dozu', strategy: 'Strateji Modu', strategy_low: 'Optimum (Dengeli)', strategy_high: 'Agresif (Yüksek Performans)', sim_title: 'Kişiselleştirilmiş Kafein Simülasyonu', schedule_title: 'Önerilen Alım Takvimi', time: 'Saat', amount: 'Miktar', type: 'Tip', summary: 'Bu plana göre, yarış sırasında yaklaşık her {0} saatte bir takviye kafein önerilir.', summary_none: 'Mevcut ayarlara göre ek takviyeye ihtiyaç yok.', target_zone: 'Hedef Bölge (3-6 mg/kg)' },
-                    en: { strategy_params_title: 'Strategy Parameters', body_weight: 'Body Weight', race_start: 'Race Start', race_duration: 'Race Duration', half_life: 'Half-Life (Genetic)', initial_dose: 'Initial Dose', initial_dose_time: 'Initial Dose Time', booster_dose: 'Booster Dose', strategy: 'Strategy Mode', strategy_low: 'Optimal (Balanced)', strategy_high: 'Aggressive (Performance)', sim_title: 'Personalized Caffeine Simulation', schedule_title: 'Recommended Intake Schedule', time: 'Time', amount: 'Amount', type: 'Type', summary: 'Recommended booster intake approx every {0} hours.', summary_none: 'No booster needed based on current settings.', target_zone: 'Target Zone (3-6 mg/kg)' }
-                };
+                const translations = { tr: { strategy_params_title: 'Strateji Parametreleri', body_weight: 'Vücut Ağırlığı', race_start: 'Yarış Başlangıç', race_duration: 'Yarış Süresi', half_life: 'Yarılanma (Genetik)', initial_dose: 'Başlangıç Dozu', initial_dose_time: 'İlk Alım Zamanı', booster_dose: 'Takviye Dozu', strategy: 'Strateji Modu', strategy_low: 'Optimum (Dengeli)', strategy_high: 'Agresif (Yüksek Performans)', sim_title: 'Kişiselleştirilmiş Kafein Simülasyonu', schedule_title: 'Önerilen Alım Takvimi', time: 'Saat', amount: 'Miktar', type: 'Tip', summary: 'Bu plana göre, yarış sırasında yaklaşık her {0} saatte bir takviye kafein önerilir.', summary_none: 'Mevcut ayarlara göre ek takviyeye ihtiyaç yok.', target_zone: 'Hedef Bölge (3-6 mg/kg)' }, en: { strategy_params_title: 'Strategy Parameters', body_weight: 'Body Weight', race_start: 'Race Start', race_duration: 'Race Duration', half_life: 'Half-Life (Genetic)', initial_dose: 'Initial Dose', initial_dose_time: 'Initial Dose Time', booster_dose: 'Booster Dose', strategy: 'Strategy Mode', strategy_low: 'Optimal (Balanced)', strategy_high: 'Aggressive (Performance)', sim_title: 'Personalized Caffeine Simulation', schedule_title: 'Recommended Intake Schedule', time: 'Time', amount: 'Amount', type: 'Type', summary: 'Recommended booster intake approx every {0} hours.', summary_none: 'No booster needed based on current settings.', target_zone: 'Target Zone (3-6 mg/kg)' } };
                 const t = translations[lang];
-
-                const formatTime = (baseTime, hoursOffset) => {
-                    const newTime = new Date(baseTime.getTime() + hoursOffset * 60 * 60 * 1000);
-                    return newTime.toLocaleTimeString(lang === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
-                };
-                const formatRelTime = (val) => {
-                    const h = Math.floor(Math.abs(val)), m = Math.round((Math.abs(val) - h) * 60);
-                    let txt = (h > 0 ? h + (lang==='tr'?' sa ':' hr ') : '') + (m > 0 ? m + (lang==='tr'?' dk':' min') : '');
-                    return val < 0 ? (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' önce':' before') : (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' sonra':' after');
-                };
+                const formatTime = (baseTime, hoursOffset) => { const newTime = new Date(baseTime.getTime() + hoursOffset * 60 * 60 * 1000); return newTime.toLocaleTimeString(lang === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' }); };
+                const formatRelTime = (val) => { const h = Math.floor(Math.abs(val)), m = Math.round((Math.abs(val) - h) * 60); let txt = (h > 0 ? h + (lang==='tr'?' sa ':' hr ') : '') + (m > 0 ? m + (lang==='tr'?' dk':' min') : ''); return val < 0 ? (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' önce':' before') : (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' sonra':' after'); };
 
                 useEffect(() => {
                     if (!canvasRef.current) return;
                     const ctx = canvasRef.current.getContext('2d');
                     const [sh, sm] = params.raceStart.split(':');
                     const raceDate = new Date(); raceDate.setHours(sh, sm, 0, 0);
-
                     const targetFloor = params.bodyWeight * 3, targetPeak = params.bodyWeight * 6, absorption = 0.5, step = 0.05, k = Math.log(2) / params.halfLife, decay = Math.exp(-k * step);
                     const trigger = params.strategy === 'stay_high' ? targetFloor + (targetPeak - targetFloor) * 0.4 : targetFloor;
-
                     let current = 0, pending = false, nextTime = -1;
                     const labels = [], data = [], events = [];
                     if (params.initialDose > 0) events.push({ time: params.initialDoseTime, amount: params.initialDose, type: 'Initial' });
-
                     const start = Math.min(-2, params.initialDoseTime - 1), end = params.raceDuration + 1, absTime = params.initialDoseTime + absorption;
-
                     for (let t = start; t <= end; t += step) {
-                        let abs = 0;
-                        if (params.initialDose > 0 && t >= params.initialDoseTime && t < absTime) abs = (params.initialDose / absorption) * step;
-                        let boost = 0;
-                        if (pending && t >= nextTime) { boost = params.doseAmount; events.push({ time: nextTime, amount: params.doseAmount, type: 'Booster' }); pending = false; }
-                        current = current * decay + abs + boost;
-                        labels.push(t); data.push(current);
+                        let abs = 0; if (params.initialDose > 0 && t >= params.initialDoseTime && t < absTime) abs = (params.initialDose / absorption) * step;
+                        let boost = 0; if (pending && t >= nextTime) { boost = params.doseAmount; events.push({ time: nextTime, amount: params.doseAmount, type: 'Booster' }); pending = false; }
+                        current = current * decay + abs + boost; labels.push(t); data.push(current);
                         if (t >= absTime && t < params.raceDuration && !pending && current < trigger) { pending = true; nextTime = Math.max(t, Math.ceil(t * 2) / 2); }
                     }
-
                     const cvs = canvasRef.current; cvs.width = cvs.parentElement.clientWidth; cvs.height = cvs.parentElement.clientHeight;
                     const p = { t: 30, r: 30, b: 50, l: 50 }, w = cvs.width - p.l - p.r, h = cvs.height - p.t - p.b;
                     const xMin = labels[0], xMax = labels[labels.length-1], yMax = Math.max(targetPeak * 1.3, Math.max(...data), 200);
                     const gx = (v) => p.l + ((v - xMin) / (xMax - xMin)) * w, gy = (v) => p.t + h - (v / yMax) * h;
+                    const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
 
                     ctx.clearRect(0,0,cvs.width,cvs.height);
                     ctx.strokeStyle = '#334155'; ctx.lineWidth = 1; ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
                     for(let i=0; i<=yMax; i+=100) { const y = gy(i); ctx.beginPath(); ctx.moveTo(p.l, y); ctx.lineTo(p.l+w, y); ctx.stroke(); ctx.fillText(i+'mg', p.l-10, y); }
-                    
-                    ctx.textAlign = 'center';
-                    const xStep = Math.max(1, Math.round((xMax - xMin)/6));
-                    for(let i=Math.ceil(xMin); i<=xMax; i+=xStep) { const x = gx(i); ctx.beginPath(); ctx.moveTo(x, p.t); ctx.lineTo(x, p.t+h); ctx.stroke(); ctx.fillText(formatTime(raceDate, i), x, p.t+h+20); }
-
+                    ctx.textAlign = 'center'; const xStep = Math.max(1, Math.round((xMax - xMin)/6)); for(let i=Math.ceil(xMin); i<=xMax; i+=xStep) { const x = gx(i); ctx.beginPath(); ctx.moveTo(x, p.t); ctx.lineTo(x, p.t+h); ctx.stroke(); ctx.fillText(formatTime(raceDate, i), x, p.t+h+20); }
                     const yTop = gy(targetPeak), yBot = gy(targetFloor);
-                    ctx.fillStyle = 'rgba(132, 204, 22, 0.1)'; ctx.fillRect(p.l, yTop, w, yBot-yTop);
-                    ctx.fillStyle = '#84cc16'; ctx.textAlign = 'left'; ctx.fillText(t.target_zone, p.l+10, yTop+15);
-
+                    ctx.fillStyle = `rgba(${color}, 0.1)`; ctx.fillRect(p.l, yTop, w, yBot-yTop);
+                    ctx.fillStyle = `rgb(${color})`; ctx.textAlign = 'left'; ctx.fillText(t.target_zone, p.l+10, yTop+15);
                     if(labels.length>0) {
                         ctx.beginPath(); ctx.moveTo(gx(labels[0]), gy(data[0])); for(let i=1; i<labels.length; i++) ctx.lineTo(gx(labels[i]), gy(data[i]));
-                        const grad = ctx.createLinearGradient(0, p.t, 0, p.t+h); grad.addColorStop(0, 'rgba(132,204,22,0.4)'); grad.addColorStop(1, 'rgba(132,204,22,0)');
+                        const grad = ctx.createLinearGradient(0, p.t, 0, p.t+h); grad.addColorStop(0, `rgba(${color},0.4)`); grad.addColorStop(1, `rgba(${color},0)`);
                         ctx.fillStyle = grad; ctx.lineTo(gx(labels[labels.length-1]), gy(0)); ctx.lineTo(gx(labels[0]), gy(0)); ctx.fill();
                         ctx.beginPath(); ctx.moveTo(gx(labels[0]), gy(data[0])); for(let i=1; i<labels.length; i++) ctx.lineTo(gx(labels[i]), gy(data[i]));
-                        ctx.strokeStyle = '#84cc16'; ctx.lineWidth = 3; ctx.stroke();
+                        ctx.strokeStyle = `rgb(${color})`; ctx.lineWidth = 3; ctx.stroke();
                     }
-
                     setSchedule(events.sort((a,b)=>a.time-b.time).map(e => ({...e, timeStr: formatTime(raceDate, e.time)})));
                     const boosters = events.filter(e=>e.type==='Booster');
                     if(boosters.length > 1) { let dur = 0; for(let i=1; i<boosters.length; i++) dur += boosters[i].time - boosters[i-1].time; setSummary(t.summary.replace('{0}', (dur/(boosters.length-1)).toFixed(1))); } 
-                    else if(boosters.length === 1) setSummary(t.summary.replace('{0}', params.raceDuration));
-                    else setSummary(t.summary_none);
-                }, [params, lang]);
+                    else if(boosters.length === 1) setSummary(t.summary.replace('{0}', params.raceDuration)); else setSummary(t.summary_none);
+                }, [params, lang, activeTheme]); // Redraw on theme change
 
                 return (
                     <div className="animate-fade-in relative max-w-7xl mx-auto">
                         <div className="text-center mb-10 pt-2">
-                            <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Kafein <span className="text-lime-500">{lang === 'tr' ? 'Stratejisi' : 'Strategy'}</span></h1>
+                            <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Kafein <span className="text-primary">{lang === 'tr' ? 'Stratejisi' : 'Strategy'}</span></h1>
                             <p className="text-slate-400 text-sm">{t.sim_title}</p>
                         </div>
                         <div className="grid lg:grid-cols-12 gap-6">
                             <div className="lg:col-span-4 space-y-6">
                                 <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-lime-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
                                     <h2 className="text-white font-bold mb-6 border-b border-slate-700 pb-4">{t.strategy_params_title}</h2>
-                                    <Slider label={t.body_weight} val={params.bodyWeight} min={40} max={120} step={1} unit="kg" colorClass="range-lime" onChange={v=>setParams(p=>({...p, bodyWeight:v}))} />
-                                    <Slider label={t.race_duration} val={params.raceDuration} min={1} max={30} step={0.5} unit="sa" colorClass="range-lime" onChange={v=>setParams(p=>({...p, raceDuration:v}))} />
+                                    <Slider label={t.body_weight} val={params.bodyWeight} min={40} max={120} step={1} unit="kg" onChange={v=>setParams(p=>({...p, bodyWeight:v}))} />
+                                    <Slider label={t.race_duration} val={params.raceDuration} min={1} max={30} step={0.5} unit="sa" onChange={v=>setParams(p=>({...p, raceDuration:v}))} />
                                     <div className="grid grid-cols-2 gap-4 mb-4">
-                                        <div><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.race_start}</label><input type="time" value={params.raceStart} onChange={e=>setParams(p=>({...p, raceStart:e.target.value}))} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white text-sm"/></div>
-                                        <div><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> {t.half_life}</span></div><input type="range" min={2} max={8} step={0.5} value={params.halfLife} onChange={e=>setParams(p=>({...p, halfLife:parseFloat(e.target.value)}))} className="range-blue" /></div>
+                                        <div><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.race_start}</label><input type="time" value={params.raceStart} onChange={e=>setParams(p=>({...p, raceStart:e.target.value}))} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white text-sm focus:border-primary"/></div>
+                                        <div><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary"></span> {t.half_life}</span></div><input type="range" min={2} max={8} step={0.5} value={params.halfLife} onChange={e=>setParams(p=>({...p, halfLife:parseFloat(e.target.value)}))} /></div>
                                     </div>
                                     <div className="border-t border-slate-700 pt-4">
-                                        <Slider label={t.initial_dose} val={params.initialDose} min={0} max={400} step={10} unit="mg" colorClass="range-amber" onChange={v=>setParams(p=>({...p, initialDose:v}))} />
-                                        <div className="mb-4"><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><span className="w-1 h-3 rounded-sm bg-purple-500"></span> {t.initial_dose_time}</span><span className="text-purple-400 font-bold text-sm">{formatRelTime(params.initialDoseTime)}</span></div><input type="range" min={-2} max={2} step={0.25} value={params.initialDoseTime} onChange={(e)=>setParams(p=>({...p, initialDoseTime:parseFloat(e.target.value)}))} className="range-purple" /></div>
-                                        <Slider label={t.booster_dose} val={params.doseAmount} min={20} max={200} step={5} unit="mg" colorClass="range-amber" onChange={v=>setParams(p=>({...p, doseAmount:v}))} />
+                                        <Slider label={t.initial_dose} val={params.initialDose} min={0} max={400} step={10} unit="mg" onChange={v=>setParams(p=>({...p, initialDose:v}))} />
+                                        <div className="mb-4"><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><span className="w-1 h-3 rounded-sm bg-primary"></span> {t.initial_dose_time}</span><span className="text-primary font-bold text-sm">{formatRelTime(params.initialDoseTime)}</span></div><input type="range" min={-2} max={2} step={0.25} value={params.initialDoseTime} onChange={(e)=>setParams(p=>({...p, initialDoseTime:parseFloat(e.target.value)}))} /></div>
+                                        <Slider label={t.booster_dose} val={params.doseAmount} min={20} max={200} step={5} unit="mg" onChange={v=>setParams(p=>({...p, doseAmount:v}))} />
                                     </div>
-                                    <div><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.strategy}</label><select value={params.strategy} onChange={e=>setParams(p=>({...p, strategy:e.target.value}))} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2"><option value="stay_low">{t.strategy_low}</option><option value="stay_high">{t.strategy_high}</option></select></div>
+                                    <div><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.strategy}</label><select value={params.strategy} onChange={e=>setParams(p=>({...p, strategy:e.target.value}))} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 focus:border-primary"><option value="stay_low">{t.strategy_low}</option><option value="stay_high">{t.strategy_high}</option></select></div>
                                 </div>
                             </div>
                             <div className="lg:col-span-8 flex flex-col gap-6">
                                 <div className="bg-slate-800 border border-slate-700 rounded-3xl p-4 h-[400px]"><canvas ref={canvasRef} className="w-full h-full"></canvas></div>
                                 <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6">
                                     <h3 className="text-white font-bold mb-4">{t.schedule_title}</h3>
-                                    <div className="overflow-x-auto"><table className="w-full text-sm text-left text-slate-300"><thead className="text-xs text-slate-500 uppercase bg-slate-900/50 border-b border-slate-700"><tr><th className="px-6 py-3">{t.time}</th><th className="px-6 py-3">{t.amount}</th><th className="px-6 py-3">{t.type}</th></tr></thead><tbody className="divide-y divide-slate-800">{schedule.map((ev,i)=>(<tr key={i} className="hover:bg-slate-800/50"><td className="px-6 py-4 font-mono">{ev.timeStr}</td><td className="px-6 py-4 font-bold text-white">{ev.amount} mg</td><td className={`px-6 py-4 font-bold ${ev.type==='Initial'?'text-blue-400':'text-lime-400'}`}>{ev.type==='Initial'?(lang==='tr'?'Başlangıç':'Initial'):(lang==='tr'?'Takviye':'Booster')}</td></tr>))}</tbody></table></div>
-                                    <div className="mt-4 p-4 bg-lime-500/10 border border-lime-500/20 rounded-xl text-sm text-lime-200">{summary}</div>
+                                    <div className="overflow-x-auto"><table className="w-full text-sm text-left text-slate-300"><thead className="text-xs text-slate-500 uppercase bg-slate-900/50 border-b border-slate-700"><tr><th className="px-6 py-3">{t.time}</th><th className="px-6 py-3">{t.amount}</th><th className="px-6 py-3">{t.type}</th></tr></thead><tbody className="divide-y divide-slate-800">{schedule.map((ev,i)=>(<tr key={i} className="hover:bg-slate-800/50"><td className="px-6 py-4 font-mono">{ev.timeStr}</td><td className="px-6 py-4 font-bold text-white">{ev.amount} mg</td><td className={`px-6 py-4 font-bold ${ev.type==='Initial'?'text-blue-400':'text-primary'}`}>{ev.type==='Initial'?(lang==='tr'?'Başlangıç':'Initial'):(lang==='tr'?'Takviye':'Booster')}</td></tr>))}</tbody></table></div>
+                                    <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-xl text-sm text-white/90">{summary}</div>
                                 </div>
                             </div>
                         </div>
@@ -545,23 +506,18 @@
 
             const LatestPostsWidget = ({ posts, onSelect, lang }) => {
                 const latest = [...posts].sort((a, b) => b.id - a.id).slice(0, 3);
-                const t = {
-                    title: lang === 'tr' ? 'Son Eklenenler' : 'Latest Posts',
-                    new: lang === 'tr' ? 'Yeni' : 'New',
-                    viewAll: lang === 'tr' ? 'Tümünü Gör' : 'View All'
-                };
-                
+                const t = { title: lang === 'tr' ? 'Son Eklenenler' : 'Latest Posts', new: lang === 'tr' ? 'Yeni' : 'New', viewAll: lang === 'tr' ? 'Tümünü Gör' : 'View All' };
                 return (
-                    <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col h-full">
+                    <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col h-full hover-lift">
                         <div className="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
-                            <h3 className="font-bold text-white flex items-center gap-2"><Icons.FileText size={18} className="text-lime-500"/> {t.title}</h3>
-                            <span className="text-[10px] text-lime-400 bg-lime-500/10 px-2 py-1 rounded-md">{t.new}</span>
+                            <h3 className="font-bold text-white flex items-center gap-2"><Icons.FileText size={18} className="text-primary"/> {t.title}</h3>
+                            <span className="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-md">{t.new}</span>
                         </div>
                         <div className="divide-y divide-slate-700/50">
                             {latest.map(post => (
                                 <div key={post.id} onClick={() => onSelect(post)} className="p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group">
                                     <div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div>
-                                    <div className="text-sm font-medium text-slate-200 group-hover:text-lime-400 transition-colors line-clamp-2">{post.title[lang]}</div>
+                                    <div className="text-sm font-medium text-slate-200 group-hover:text-primary transition-colors line-clamp-2">{post.title[lang]}</div>
                                 </div>
                             ))}
                         </div>
@@ -572,79 +528,59 @@
 
             const HomePage = ({ changePage, posts, onRead, lang }) => {
                 const latestPost = posts.length > 0 ? posts[0] : null;
-
                 return (
                     <div className="space-y-8 animate-fade-in">
                         <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 md:p-12 border border-slate-700 relative overflow-hidden shadow-2xl">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-lime-500/5 rounded-full blur-3xl pointer-events-none"></div>
-                            <h1 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10">HybNotes</h1>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+                            <h1 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10 animate-shimmer-text">HybNotes</h1>
+                            <div className="absolute top-10 left-10 w-40 h-40 bg-primary rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse-slow"></div>
                             <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">{lang === 'tr' ? 'Sporcular için bilimsel analizlerin, tecrübelerin ve makalelerin yer aldığı kişisel bir not defteri.' : 'A personal notebook containing scientific analysis, experiences, and articles for athletes.'}</p>
-                            <button onClick={() => changePage('research')} className="bg-lime-500 text-slate-900 px-6 py-3 rounded-xl font-bold hover:bg-lime-400 transition-colors shadow-lg shadow-lime-500/20">{lang === 'tr' ? 'Kütüphaneye Git' : 'Go to Library'}</button>
+                            <button onClick={() => changePage('research')} className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10">{lang === 'tr' ? 'Kütüphaneye Git' : 'Go to Library'}</button>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div 
-                                    onClick={() => latestPost && onRead(latestPost)}
-                                    className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-lime-500 transition-colors group"
-                                >
+                                <div onClick={() => latestPost && onRead(latestPost)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift">
                                     <div>
-                                        <div className="flex items-center gap-2 text-lime-400 mb-2">
-                                            <Icons.Zap size={20} />
-                                            <span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span>
-                                        </div>
-                                        <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-lime-400 transition-colors">
-                                            {latestPost ? latestPost.title[lang] : 'Loading...'}
-                                        </h3>
-                                        <p className="text-sm text-slate-400 line-clamp-2">
-                                            {latestPost ? latestPost.summary[lang] : ''}
-                                        </p>
+                                        <div className="flex items-center gap-2 text-primary mb-2"><Icons.Zap size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span></div>
+                                        <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-primary transition-colors">{latestPost ? latestPost.title[lang] : 'Loading...'}</h3>
+                                        <p className="text-sm text-slate-400 line-clamp-2">{latestPost ? latestPost.summary[lang] : ''}</p>
                                     </div>
-                                    <div className="mt-4 flex items-center text-xs font-bold text-slate-500 group-hover:text-white transition-colors">
-                                        {lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={14} className="ml-1" />
-                                    </div>
+                                    <div className="mt-4 flex items-center text-xs font-bold text-slate-500 group-hover:text-white transition-colors">{lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={14} className="ml-1" /></div>
                                 </div>
-
-                                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between">
+                                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between hover-lift">
                                     <div>
-                                        <div className="flex items-center gap-2 text-blue-400 mb-2">
-                                            <Icons.Info size={20} />
-                                            <span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Biliyor Muydunuz?' : 'Did You Know?'}</span>
-                                        </div>
-                                        <p className="text-slate-300 text-sm leading-relaxed">
-                                            {lang === 'tr' ? '"Zone 2 antrenmanları, yağ oksidasyonunu maksimize ederek ultra mesafelerde glikojen depolarını korumanın anahtarıdır."' : '"Zone 2 training is key to preserving glycogen stores in ultra distances by maximizing fat oxidation."'}
-                                        </p>
+                                        <div className="flex items-center gap-2 text-blue-400 mb-2"><Icons.Info size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Biliyor Muydunuz?' : 'Did You Know?'}</span></div>
+                                        <p className="text-slate-300 text-sm leading-relaxed">{lang === 'tr' ? '"Zone 2 antrenmanları, yağ oksidasyonunu maksimize ederek ultra mesafelerde glikojen depolarını korumanın anahtarıdır."' : '"Zone 2 training is key to preserving glycogen stores in ultra distances by maximizing fat oxidation."'}</p>
                                     </div>
-                                    <div className="mt-4 text-xs text-slate-500">
-                                        #AntrenmanBilimi
-                                    </div>
+                                    <div className="mt-4 text-xs text-slate-500">#AntrenmanBilimi</div>
                                 </div>
                             </div>
-                            <div className="md:col-span-1 h-full min-h-[250px]"><LatestPostsWidget posts={posts} onSelect={onRead} lang={lang} /></div>
+                            <div className="md:col-span-1 h-full min-h-[250px] hover-lift"><LatestPostsWidget posts={posts} onSelect={onRead} lang={lang} /></div>
                         </div>
                     </div>
                 );
             };
 
-            const NavBar = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }) => {
-                const [openDropdown, setOpenDropdown] = useState(null);
+            const NavBar = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen, activeTheme, setActiveTheme }) => {
+                const [showPalette, setShowPalette] = useState(false);
                 return (
                     <nav className="fixed top-0 w-full z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
                         <div className="max-w-7xl mx-auto px-4 md:px-8">
                             <div className="flex items-center justify-between h-20">
                                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('home')}>
-                                    <div className="w-10 h-10 bg-lime-500 rounded-xl flex items-center justify-center text-slate-900"><Icons.Activity size={22} strokeWidth={3} /></div>
+                                    <PulseBarLogo size={32} />
                                     <span className="text-2xl font-black text-white tracking-tighter hidden md:block">HybNotes</span>
                                 </div>
                                 <div className="hidden md:flex items-center gap-1">
                                     {MENU_ITEMS.map((item) => (
-                                        <div key={item.id} className="relative group" onMouseEnter={() => item.children && setOpenDropdown(item.id)} onMouseLeave={() => setOpenDropdown(null)}>
-                                            <button onClick={() => !item.children && setActiveTab(item.id)} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id ? 'text-lime-400 bg-lime-500/10' : 'text-slate-400 hover:text-white'}`}>
+                                        <div key={item.id} className="relative group">
+                                            <button onClick={() => !item.children && setActiveTab(item.id)} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}>
                                                 <item.icon size={18} /> {item.title} {item.children && <Icons.ChevronDown size={14}/>}
                                             </button>
-                                            {item.children && openDropdown === item.id && (
-                                                <div className="absolute top-full left-0 w-56 pt-2 z-50">
+                                            {item.children && (
+                                                <div className="absolute top-full left-0 w-56 pt-2 hidden group-hover:block">
                                                     <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">
-                                                        {item.children.map((subItem) => (<button key={subItem.id} onClick={() => { setActiveTab(subItem.id); setOpenDropdown(null); }} className="w-full text-left px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3"><subItem.icon size={16} /> {subItem.title}</button>))}
+                                                        {item.children.map((subItem) => (<button key={subItem.id} onClick={() => setActiveTab(subItem.id)} className="w-full text-left px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3"><subItem.icon size={16} /> {subItem.title}</button>))}
                                                     </div>
                                                 </div>
                                             )}
@@ -652,11 +588,21 @@
                                     ))}
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
-                                        <button onClick={() => setLang('tr')} className={`px-2 py-1 text-xs font-bold rounded transition-colors ${lang === 'tr' ? 'bg-lime-500 text-slate-900' : 'text-slate-400 hover:text-white'}`}>TR</button>
-                                        <button onClick={() => setLang('en')} className={`px-2 py-1 text-xs font-bold rounded transition-colors ${lang === 'en' ? 'bg-lime-500 text-slate-900' : 'text-slate-400 hover:text-white'}`}>EN</button>
+                                    <div className="relative">
+                                        <button onClick={() => setShowPalette(!showPalette)} className="p-2 text-slate-400 hover:text-white rounded-lg transition-colors"><Icons.Palette size={20} /></button>
+                                        {showPalette && (
+                                            <div className="absolute top-full right-0 mt-2 p-2 bg-slate-800 border border-slate-700 rounded-xl shadow-xl grid grid-cols-5 gap-2 w-48 z-50">
+                                                {THEMES.map(t => (
+                                                    <button key={t.id} onClick={() => { setActiveTheme(t); setShowPalette(false); }} className={`w-6 h-6 rounded-full border-2 ${activeTheme.id === t.id ? 'border-white scale-110' : 'border-transparent hover:scale-110'} transition-transform`} style={{ backgroundColor: t.hex }} title={t.name}></button>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
-                                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 text-slate-300 hover:text-lime-400">{isMenuOpen ? <Icons.X size={28} /> : <Icons.Menu size={28} />}</button>
+                                    <div className="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
+                                        <button onClick={() => setLang('tr')} className={`px-2 py-1 text-xs font-bold rounded transition-colors ${lang === 'tr' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'}`}>TR</button>
+                                        <button onClick={() => setLang('en')} className={`px-2 py-1 text-xs font-bold rounded transition-colors ${lang === 'en' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'}`}>EN</button>
+                                    </div>
+                                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 text-slate-300 hover:text-primary">{isMenuOpen ? <Icons.X size={28} /> : <Icons.Menu size={28} />}</button>
                                 </div>
                             </div>
                         </div>
@@ -667,10 +613,10 @@
                                         {item.children ? (
                                             <div className="bg-slate-800/50 rounded-xl p-2">
                                                 <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase flex items-center gap-2"><item.icon size={14}/> {item.title}</div>
-                                                {item.children.map(sub => (<button key={sub.id} onClick={() => {setActiveTab(sub.id); setIsMenuOpen(false);}} className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 ${activeTab === sub.id ? 'text-lime-400 bg-lime-500/10' : ''}`}>{sub.title}</button>))}
+                                                {item.children.map(sub => (<button key={sub.id} onClick={() => {setActiveTab(sub.id); setIsMenuOpen(false);}} className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}>{sub.title}</button>))}
                                             </div>
                                         ) : (
-                                            <button onClick={() => {setActiveTab(item.id); setIsMenuOpen(false);}} className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold ${activeTab === item.id ? 'bg-lime-500 text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}><item.icon size={24} /> {item.title}</button>
+                                            <button onClick={() => {setActiveTab(item.id); setIsMenuOpen(false);}} className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold ${activeTab === item.id ? 'bg-primary text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}><item.icon size={24} /> {item.title}</button>
                                         )}
                                     </div>
                                 ))}
@@ -691,8 +637,8 @@
             };
 
             return (
-                <div className="min-h-screen bg-slate-900 text-slate-200 font-sans selection:bg-lime-500/30">
-                    <NavBar activeTab={activeTab} setActiveTab={(tab) => { setActiveTab(tab); setReadingArticle(null); }} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+                <div className="min-h-screen bg-slate-900 text-slate-200 font-sans selection:bg-primary/30">
+                    <NavBar activeTab={activeTab} setActiveTab={(tab) => { setActiveTab(tab); setReadingArticle(null); }} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} activeTheme={activeTheme} setActiveTheme={setActiveTheme} />
                     <main className="pt-24 pb-20 px-4 md:px-8 max-w-6xl mx-auto min-h-screen">{renderContent()}</main>
                 </div>
             );
