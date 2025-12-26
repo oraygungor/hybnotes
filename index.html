@@ -188,10 +188,10 @@
             const [lang, setLang] = useState('tr');
             const [activeTheme, setActiveTheme] = useState(THEMES[0]);
             const [user, setUser] = useState(null);
+            const [isSettingsLoaded, setIsSettingsLoaded] = useState(false);
 
-            // --- AUTH & DATA SYNC ---
+            // --- AUTH INITIALIZATION ---
             useEffect(() => {
-                if (!auth) return;
                 const initAuth = async () => {
                     try {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -206,7 +206,7 @@
                 return () => unsubscribe();
             }, []);
 
-            // --- LOAD DATA ---
+            // --- LOAD DATA (Posts & Facts) ---
             useEffect(() => {
                 fetch('posts.json')
                     .then(res => res.ok ? res.json() : [])
@@ -217,38 +217,46 @@
                     .then(res => res.ok ? res.json() : [])
                     .then(data => {
                         setFacts(data);
-                        if (data.length) {
-                            setCurrentFact(data[Math.floor(Math.random() * data.length)]);
-                        }
+                        if (data.length) setCurrentFact(data[Math.floor(Math.random() * data.length)]);
                     })
                     .catch(() => {});
             }, []);
 
-            // --- THEME SYNC ---
+            // --- LOAD PERSISTENT SETTINGS ---
             useEffect(() => {
                 if (!user || !db) return;
                 const loadSettings = async () => {
                     try {
-                        const settingsRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('settings');
-                        const snapshot = await settingsRef.get();
-                        const themeDoc = snapshot.docs.find(d => d.id === 'theme');
-                        if (themeDoc) {
-                            const savedThemeId = themeDoc.data().id;
-                            const found = THEMES.find(t => t.id === savedThemeId);
-                            if (found) setActiveTheme(found);
+                        const settingsRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings');
+                        const doc = await settingsRef.get();
+                        if (doc.exists) {
+                            const data = doc.data();
+                            if (data.themeId) {
+                                const found = THEMES.find(t => t.id === data.themeId);
+                                if (found) setActiveTheme(found);
+                            }
+                            if (data.lang) setLang(data.lang);
                         }
-                    } catch (e) {}
+                        setIsSettingsLoaded(true);
+                    } catch (e) {
+                        console.error("Load settings error", e);
+                        setIsSettingsLoaded(true);
+                    }
                 };
                 loadSettings();
             }, [user]);
 
+            // --- SAVE SETTINGS ON CHANGE ---
             useEffect(() => {
                 document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
-                if (user && db) {
-                    db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('settings').doc('theme').set({ id: activeTheme.id })
-                      .catch(e => console.error("Save theme failed", e));
+                // Sadece veriler yüklendikten sonra (ilk default değerleri DB'ye yazmamak için) kaydetme yap
+                if (user && db && isSettingsLoaded) {
+                    db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings').set({
+                        themeId: activeTheme.id,
+                        lang: lang
+                    }).catch(e => console.error("Save settings failed", e));
                 }
-            }, [activeTheme, user]);
+            }, [activeTheme, lang, user, isSettingsLoaded]);
 
             const MENU_ITEMS = [
                 { id: 'home', title: lang === 'tr' ? 'Ana Sayfa' : 'Home', icon: Icons.Activity },
@@ -329,10 +337,14 @@
                 const translations = { en: { title: "UTMB 2026 Lottery", subtitle: "Probability calculator based on 2023-2025 data.", race: "Race", method: "Method", stones: "Running Stones", prob: "Probability", demand: "Demand", mean: "Avg Stones", tableHead: ["Year", "Demand", "Avg"] }, tr: { title: "UTMB 2026 Kura", subtitle: "2023-2025 verilerine dayalı şans hesaplayıcı.", race: "Yarış", method: "Metod", stones: "Taş Sayısı", prob: "Şans", demand: "Talep", mean: "Ort. Taş", tableHead: ["Yıl", "Talep", "Ort"] } };
                 const t = translations[lang];
                 const cagr = (v1, v2, f = 1) => Math.round(v2 * (1 + (Math.pow(v2 / v1, 1 / 2) - 1) * f));
-                const getDemand = (r, m) => { const d = data[r].demand; return m === 'linear' ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) : m === 'conservative' ? cagr(d[2023], d[2025], 0.7) : m === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1); };
-                const getMean = (r, m) => { const mS = data[r].meanStones; const g = (mS[2025] / mS[2024]) - 1; return m === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) : m === 'conservative' ? mS[2025] * (1 + g * 0.7) : m === 'optimistic' ? mS[2025] * (1 + g * 1.3) : mS[2025] * (1 + g); };
                 const getProb = (B, N, mean, w) => { if (w <= 0) return 0; const T = N * mean + w; let logNoHit = 0; const loops = Math.min(B, T - w); for (let i = 0; i < loops; i++) logNoHit += Math.log(T - w - i) - Math.log(T - i); return 1 - Math.exp(logNoHit); };
-                const vals = useMemo(() => { const N = getDemand(race, method), mean = getMean(race, method), B = data[race].capacity; return { N, mean, B, p: getProb(B, N, mean, stones) }; }, [race, method, stones]);
+                const vals = useMemo(() => { 
+                    const d = data[race].demand;
+                    const N = method === 'linear' ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) : method === 'conservative' ? cagr(d[2023], d[2025], 0.7) : method === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
+                    const mS = data[race].meanStones;
+                    const mean = method === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) : mS[2025] * (1 + (mS[2025] / mS[2024] - 1) * (method === 'conservative' ? 0.7 : method === 'optimistic' ? 1.3 : 1));
+                    return { N, mean, B: data[race].capacity, p: getProb(data[race].capacity, N, mean, stones) };
+                }, [race, method, stones]);
                 
                 useEffect(() => {
                     if (chartInstance.current) chartInstance.current.destroy();
@@ -397,7 +409,6 @@
                     const yMax = Math.max(targetPeak * 1.3, Math.max(...data), 200);
                     const gx = (v) => p.l + ((v - xMin) / (xMax - xMin)) * w, gy = (v) => p.t + h - (v / yMax) * h;
                     const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
-
                     ctx.clearRect(0,0,cvs.width,cvs.height);
                     ctx.strokeStyle = '#334155'; ctx.lineWidth = 1; ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
                     for(let i=0; i<=yMax; i+=100) { const y = gy(i); ctx.beginPath(); ctx.moveTo(p.l, y); ctx.lineTo(p.l+w, y); ctx.stroke(); ctx.fillText(i+'mg', p.l-10, y); }
@@ -416,7 +427,6 @@
                     if(boosters.length > 1) { let dur = 0; for(let i=1; i<boosters.length; i++) dur += boosters[i].time - boosters[i-1].time; setSummary(t.summary.replace('{0}', (dur/(boosters.length-1)).toFixed(1))); } 
                     else if(boosters.length === 1) setSummary(t.summary.replace('{0}', params.raceDuration)); else setSummary(t.summary_none);
                 }, [params, lang, activeTheme]);
-
                 return (
                     <div className="animate-fade-in relative max-w-7xl mx-auto">
                         <div className="text-center mb-10 pt-2"><h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Kafein <span className="text-primary">{lang === 'tr' ? 'Stratejisi' : 'Strategy'}</span></h1><p className="text-slate-400 text-sm">{t.sim_title}</p></div>
