@@ -98,9 +98,45 @@
         };
 
         const DEFAULT_POSTS = [
-          { "id": 5, "title": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak", "category": "Antrenman Bilimi", "date": "28 Ekim 2024", "readTime": "6 dk", "summary": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.", "content": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır. Ancak bu formül, dinlenik nabzı (Resting HR) hesaba katmadığı için sporcuları yanlış yönlendirebilir.</p><div class='math-box'>Hedef Nabız = ((Maks Nabız - Dinlenik Nabız) × %Yoğunluk) + Dinlenik Nabız</div><p>Bu formül, özellikle dinlenik nabzı düşük olan dayanıklılık sporcuları için çok daha hassas sonuçlar verir.</p>", "references": ["Karvonen M, Kentala E. (1957). The effects of training on heart rate."] },
-          { "id": 4, "title": "Ultra Maratonlarda Sodyum Alım Stratejileri", "category": "Beslenme", "date": "20 Ekim 2024", "readTime": "8 dk", "summary": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.", "content": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir. Terle kaybedilen tuzu yerine koymak performansın sürdürülebilirliği için şarttır.</p>", "references": ["Hoffman, M. D. (2014). Sodium intake during an ultramarathon."] },
-          { "id": 3, "title": "Mitokondriyal Biyogenez ve Zone 2", "category": "Fizyoloji", "date": "15 Ekim 2024", "readTime": "12 dk", "summary": "Düşük yoğunluklu antrenmanların laktat temizleme kapasitesini nasıl artırdığına dair yeni bulgular.", "content": "<p>Mitokondri, hücrenin enerji santralidir. Zone 2 antrenmanları, Tip 1 kas liflerindeki mitokondri yoğunluğunu artırarak yağ yakım kapasitesini maksimize eder.</p>", "references": ["San-Millán, I. (2018). Assessment of Metabolic Flexibility."] }
+          { 
+            "id": 5, 
+            "date": "2024-10-28", 
+            "readTime": { "tr": "6 dk", "en": "6 min" }, 
+            "category": { "tr": "Antrenman Bilimi", "en": "Training Science" }, 
+            "title": { "tr": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak", "en": "Karvonen Formula: Calculating Heart Rate Zones Correctly" },
+            "summary": { "tr": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.", "en": "Why is the classic (220-Age) formula flawed? Truly personalized zone calculation using the Heart Rate Reserve (HRR) method." },
+            "content": { 
+                "tr": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır. Ancak bu formül, dinlenik nabzı (Resting HR) hesaba katmadığı için sporcuları yanlış yönlendirebilir.</p><div class='math-box'>Hedef Nabız = ((Maks Nabız - Dinlenik Nabız) × %Yoğunluk) + Dinlenik Nabız</div><p>Bu formül, özellikle dinlenik nabzı düşük olan dayanıklılık sporcuları için çok daha hassas sonuçlar verir.</p>",
+                "en": "<p>Most sports watches use the '220 - Age' formula by default. However, this formula can mislead athletes as it does not account for Resting HR.</p><div class='math-box'>Target HR = ((Max HR - Resting HR) × %Intensity) + Resting HR</div><p>This formula provides much more precise results, especially for endurance athletes with low resting heart rates.</p>"
+            },
+            "references": ["Karvonen M, Kentala E. (1957). The effects of training on heart rate."] 
+          },
+          { 
+            "id": 4, 
+            "date": "2024-10-20", 
+            "readTime": { "tr": "8 dk", "en": "8 min" }, 
+            "category": { "tr": "Beslenme", "en": "Nutrition" }, 
+            "title": { "tr": "Ultra Maratonlarda Sodyum Alım Stratejileri", "en": "Sodium Intake Strategies in Ultra Marathons" },
+            "summary": { "tr": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.", "en": "Hourly mg calculations to reduce hyponatremia risk and maintain performance in long races." },
+            "content": {
+                "tr": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir. Terle kaybedilen tuzu yerine koymak performansın sürdürülebilirliği için şarttır.</p>",
+                "en": "<p>Drinking only water during long races can be fatal. Replacing salt lost through sweat is essential for sustainability of performance.</p>"
+            },
+            "references": ["Hoffman, M. D. (2014). Sodium intake during an ultramarathon."] 
+          },
+          { 
+            "id": 3, 
+            "date": "2024-10-15", 
+            "readTime": { "tr": "12 dk", "en": "12 min" }, 
+            "category": { "tr": "Fizyoloji", "en": "Physiology" }, 
+            "title": { "tr": "Mitokondriyal Biyogenez ve Zone 2", "en": "Mitochondrial Biogenesis and Zone 2" },
+            "summary": { "tr": "Düşük yoğunluklu antrenmanların laktat temizleme kapasitesini nasıl artırdığına dair yeni bulgular.", "en": "New findings on how low-intensity training increases lactate clearance capacity." },
+            "content": {
+                "tr": "<p>Mitokondri, hücrenin enerji santralidir. Zone 2 antrenmanları, Tip 1 kas liflerindeki mitokondri yoğunluğunu artırarak yağ yakım kapasitesini maksimize eder.</p>",
+                "en": "<p>Mitochondria are the powerhouse of the cell. Zone 2 training maximizes fat burning capacity by increasing mitochondrial density in Type 1 muscle fibers.</p>"
+            },
+            "references": ["San-Millán, I. (2018). Assessment of Metabolic Flexibility."] 
+          }
         ];
 
         const App = () => {
@@ -109,6 +145,16 @@
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [readingArticle, setReadingArticle] = useState(null);
             const [lang, setLang] = useState('tr');
+
+            useEffect(() => {
+                fetch('posts.json')
+                    .then(res => {
+                        if(res.ok) return res.json();
+                        throw new Error('Dosya okunamadı');
+                    })
+                    .then(data => setPosts(data))
+                    .catch(err => console.log("Varsayılan veriler kullanılıyor."));
+            }, []);
 
             // Çoklu dil menü
             const MENU_ITEMS = [
@@ -126,30 +172,131 @@
                 },
             ];
 
-            const ArticleDetail = ({ article, goBack }) => (
+            const ArticleDetail = ({ article, goBack, lang }) => (
                 <div className="animate-fade-in pb-20">
                     <button onClick={goBack} className="mb-6 flex items-center gap-2 text-slate-400 hover:text-lime-400 transition-colors font-bold group text-sm md:text-base">
                         <Icons.ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> {lang === 'tr' ? 'Kütüphaneye Dön' : 'Back to Library'}
                     </button>
                     <article className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden">
                         <div className="p-6 md:p-12 border-b border-slate-700 bg-slate-800/50">
-                            <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4">{article.title}</h1>
+                            <div className="flex flex-wrap gap-4 text-xs md:text-sm text-slate-400 mb-4 md:mb-6 font-mono">
+                                <span className="flex items-center gap-1"><Icons.Calendar size={12}/> {article.date}</span>
+                                <span className="flex items-center gap-1"><Icons.Clock size={12}/> {article.readTime[lang]}</span>
+                                <span className="bg-lime-500/10 text-lime-400 px-2 py-0.5 md:px-3 md:py-1 rounded-full border border-lime-500/20 font-bold">{article.category[lang]}</span>
+                            </div>
+                            <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4">{article.title[lang]}</h1>
                         </div>
-                        <div className="p-6 md:p-12 prose prose-invert max-w-none text-slate-300" dangerouslySetInnerHTML={{ __html: article.content }} />
+                        <div className="p-6 md:p-12">
+                            <div 
+                                className="prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed space-y-2 md:space-y-4" 
+                                dangerouslySetInnerHTML={{ __html: article.content[lang].replace(/class='math-box'/g, 'class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-lime-500 rounded-r-xl font-mono text-lime-100 text-sm md:text-lg text-center shadow-inner italic"') }} 
+                            />
+                            {article.references && article.references.length > 0 && (
+                                <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-slate-700/50">
+                                    <h3 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center gap-2"><Icons.Bookmark size={18} className="text-lime-500"/> {lang === 'tr' ? 'Referanslar' : 'References'}</h3>
+                                    <ul className="space-y-2 md:space-y-3">
+                                        {article.references.map((ref, i) => (
+                                            <li key={i} className="text-slate-500 text-xs md:text-sm pl-4 border-l-2 border-slate-700">[{i + 1}] {ref}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
                     </article>
                 </div>
             );
 
-            const ResearchPage = ({ posts, onSelect }) => {
+            const ResearchPage = ({ posts, onSelect, lang }) => {
                 const [searchTerm, setSearchTerm] = useState("");
-                const filteredPosts = posts.filter(post => post.title.toLowerCase().includes(searchTerm.toLowerCase()));
+                const [selectedCategory, setSelectedCategory] = useState("All");
+
+                const categories = useMemo(() => {
+                    const cats = [lang === 'tr' ? "Tümü" : "All", ...new Set(posts.map(p => p.category[lang]))];
+                    return cats;
+                }, [posts, lang]);
+
+                // Reset category when lang changes to avoid stuck filter
+                useEffect(() => {
+                    setSelectedCategory(lang === 'tr' ? "Tümü" : "All");
+                }, [lang]);
+
+                const filteredPosts = posts.filter(post => {
+                    const matchesSearch = post.title[lang].toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                          post.summary[lang].toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchesCategory = (selectedCategory === "Tümü" || selectedCategory === "All") || post.category[lang] === selectedCategory;
+                    return matchesSearch && matchesCategory;
+                });
+
                 return (
                     <div className="space-y-8 animate-fade-in min-h-[600px]">
-                        <div className="flex justify-between items-end">
-                            <h2 className="text-3xl font-black text-white">{lang === 'tr' ? 'Kütüphane' : 'Library'}</h2>
-                            <div className="relative w-80"><Icons.Search className="absolute left-3 top-3 text-slate-500" size={18} /><input type="text" placeholder={lang === 'tr' ? 'Ara...' : 'Search...'} value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 pl-10 text-white focus:border-lime-500 focus:outline-none"/></div>
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                            <div>
+                                <h2 className="text-3xl md:text-4xl font-black text-white mb-2">{lang === 'tr' ? 'Kütüphane' : 'Library'}</h2>
+                                <p className="text-slate-400 text-sm md:text-base">{lang === 'tr' ? `Toplam ${posts.length} makale ve analiz.` : `Total ${posts.length} articles and analysis.`}</p>
+                            </div>
+                            <div className="relative w-full md:w-80">
+                                <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                                <input 
+                                    type="text" 
+                                    placeholder={lang === 'tr' ? 'Ara...' : 'Search...'} 
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 transition-all placeholder:text-slate-600 text-sm"
+                                />
+                            </div>
                         </div>
-                        <div className="grid gap-4">{filteredPosts.map(post=>(<div key={post.id} onClick={()=>onSelect(post)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 cursor-pointer hover:border-lime-500 transition-colors"><h3 className="text-xl font-bold text-white mb-2">{post.title}</h3><p className="text-slate-400 text-sm">{post.summary}</p></div>))}</div>
+
+                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                            {categories.map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setSelectedCategory(cat)}
+                                    className={`whitespace-nowrap px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border ${
+                                        selectedCategory === cat 
+                                        ? 'bg-lime-500 text-slate-900 border-lime-500' 
+                                        : 'bg-slate-800 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-white'
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            {filteredPosts.length > 0 ? (
+                                filteredPosts.map((post) => (
+                                <div 
+                                    key={post.id} 
+                                    onClick={() => onSelect(post)}
+                                    className="bg-slate-800 rounded-2xl p-6 md:p-8 border border-slate-700 hover:border-lime-500 transition-all hover:-translate-y-1 cursor-pointer group shadow-lg flex flex-col md:flex-row gap-4 md:gap-6"
+                                >
+                                    <div className="flex-1">
+                                        <div className="flex gap-3 mb-3">
+                                            <span className="bg-slate-700 text-slate-300 text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider">{post.category[lang]}</span>
+                                            <span className="text-slate-500 text-[10px] md:text-xs font-mono flex items-center gap-1"><Icons.Calendar size={12}/> {post.date}</span>
+                                        </div>
+                                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3 group-hover:text-lime-400 transition-colors">
+                                            {post.title[lang]}
+                                        </h3>
+                                        <p className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3">
+                                            {post.summary[lang]}
+                                        </p>
+                                        <div className="flex items-center text-lime-500 text-sm font-bold gap-1">
+                                            {lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                        </div>
+                                    </div>
+                                </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-20 bg-slate-800/50 rounded-2xl border border-slate-800 border-dashed">
+                                    <div className="inline-flex p-4 bg-slate-800 rounded-full mb-4">
+                                        <Icons.Filter size={32} className="text-slate-600" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-white mb-2">{lang === 'tr' ? 'Sonuç Bulunamadı' : 'No Results Found'}</h3>
+                                    <button onClick={() => { setSearchTerm(''); setSelectedCategory(lang === 'tr' ? "Tümü" : "All"); }} className="mt-4 text-lime-500 font-bold hover:underline">{lang === 'tr' ? 'Filtreleri Temizle' : 'Clear Filters'}</button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 );
             };
@@ -396,7 +543,7 @@
                 );
             };
 
-            const LatestPostsWidget = ({ posts, onSelect }) => {
+            const LatestPostsWidget = ({ posts, onSelect, lang }) => {
                 const latest = [...posts].sort((a, b) => b.id - a.id).slice(0, 3);
                 const t = {
                     title: lang === 'tr' ? 'Son Eklenenler' : 'Latest Posts',
@@ -414,7 +561,7 @@
                             {latest.map(post => (
                                 <div key={post.id} onClick={() => onSelect(post)} className="p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group">
                                     <div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div>
-                                    <div className="text-sm font-medium text-slate-200 group-hover:text-lime-400 transition-colors line-clamp-2">{post.title}</div>
+                                    <div className="text-sm font-medium text-slate-200 group-hover:text-lime-400 transition-colors line-clamp-2">{post.title[lang]}</div>
                                 </div>
                             ))}
                         </div>
@@ -423,7 +570,7 @@
                 );
             };
 
-            const HomePage = ({ changePage, posts, onRead }) => {
+            const HomePage = ({ changePage, posts, onRead, lang }) => {
                 const latestPost = posts.length > 0 ? posts[0] : null;
 
                 return (
@@ -446,10 +593,10 @@
                                             <span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span>
                                         </div>
                                         <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-lime-400 transition-colors">
-                                            {latestPost ? latestPost.title : 'Loading...'}
+                                            {latestPost ? latestPost.title[lang] : 'Loading...'}
                                         </h3>
                                         <p className="text-sm text-slate-400 line-clamp-2">
-                                            {latestPost ? latestPost.summary : ''}
+                                            {latestPost ? latestPost.summary[lang] : ''}
                                         </p>
                                     </div>
                                     <div className="mt-4 flex items-center text-xs font-bold text-slate-500 group-hover:text-white transition-colors">
@@ -472,7 +619,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div className="md:col-span-1 h-full min-h-[250px]"><LatestPostsWidget posts={posts} onSelect={onRead} /></div>
+                            <div className="md:col-span-1 h-full min-h-[250px]"><LatestPostsWidget posts={posts} onSelect={onRead} lang={lang} /></div>
                         </div>
                     </div>
                 );
@@ -535,8 +682,8 @@
 
             const renderContent = () => {
                 switch (activeTab) {
-                    case 'home': return <HomePage changePage={setActiveTab} posts={posts} onRead={(post) => { setReadingArticle(post); setActiveTab('research'); }} />;
-                    case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} />;
+                    case 'home': return <HomePage changePage={setActiveTab} posts={posts} onRead={(post) => { setReadingArticle(post); setActiveTab('research'); }} lang={lang} />;
+                    case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} lang={lang} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} lang={lang} />;
                     case 'utmb_lottery': return <UTMBLotteryPage lang={lang} />;
                     case 'caffeine': return <CaffeinePage lang={lang} />;
                     default: return <HomePage changePage={setActiveTab} />;
