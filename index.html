@@ -32,14 +32,6 @@
                     },
                     colors: {
                         primary: 'rgb(var(--primary-rgb) / <alpha-value>)',
-                        utmb: {
-                            bg: '#0e1224',
-                            card: '#141a33',
-                            border: '#2a335a',
-                            accent: '#4fd1c5',
-                            ink: '#e7ecff',
-                            muted: '#a9b3d9'
-                        }
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.6s ease-out forwards',
@@ -115,16 +107,16 @@
         }
 
         /* Latex Formula Styling */
-        .latex-formula { display: flex; align-items: center; justify-content: center; font-family: "Times New Roman", Times, serif; font-size: 20px; color: #e7ecff; margin: 15px 0; flex-wrap: wrap; }
-        .latex-formula .op { font-size: 20px; margin: 0 0.5em; color: #a9b3d9; }
+        .latex-formula { display: flex; align-items: center; justify-content: center; font-family: "Times New Roman", Times, serif; font-size: 20px; color: #e2e8f0; margin: 15px 0; flex-wrap: wrap; }
+        .latex-formula .op { font-size: 20px; margin: 0 0.5em; color: #94a3b8; }
         .product-notation { display: inline-grid; grid-template-areas: "upper" "symbol" "lower"; text-align: center; margin-right: 5px; }
-        .prod-symbol { grid-area: symbol; font-size: 38px; line-height: 1; color: #4fd1c5; }
+        .prod-symbol { grid-area: symbol; font-size: 38px; line-height: 1; color: rgb(var(--primary-rgb)); }
         .prod-limit-upper { grid-area: upper; font-size: 12px; line-height: 1; }
         .prod-limit-lower { grid-area: lower; font-size: 12px; line-height: 1; }
         .fraction { display: inline-grid; grid-template-areas: "num" "den"; text-align: center; margin: 0 5px; }
-        .numerator { grid-area: num; padding: 3px 5px; font-family: ui-monospace, monospace; font-size: 16px; border-bottom: 1px solid #a9b3d9; }
+        .numerator { grid-area: num; padding: 3px 5px; font-family: ui-monospace, monospace; font-size: 16px; border-bottom: 1px solid #94a3b8; }
         .denominator { grid-area: den; padding: 3px 5px; font-family: ui-monospace, monospace; font-size: 16px; }
-        .numerator span, .denominator span { color: #4fd1c5; font-weight: 700; }
+        .numerator span, .denominator span { color: rgb(var(--primary-rgb)); font-weight: 700; }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -209,10 +201,15 @@
             const [activeTab, setActiveTab] = useState('home');
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [readingArticle, setReadingArticle] = useState(null);
-            const [lang, setLang] = useState('tr');
-            const [activeTheme, setActiveTheme] = useState(THEMES[0]);
             const [user, setUser] = useState(null);
             const [isSettingsLoaded, setIsSettingsLoaded] = useState(false);
+
+            // --- STATE INITIALIZATION WITH LOCALSTORAGE ---
+            const [lang, setLang] = useState(() => localStorage.getItem('hybnotes_lang') || 'tr');
+            const [activeTheme, setActiveTheme] = useState(() => {
+                const saved = localStorage.getItem('hybnotes_theme');
+                return THEMES.find(t => t.id === saved) || THEMES[0];
+            });
 
             // --- AUTH ---
             useEffect(() => {
@@ -237,15 +234,17 @@
                 fetch('biliyormuydunuz.json').then(r=>r.ok?r.json():[]).then(d=>{setFacts(d);if(d.length)setCurrentFact(d[Math.floor(Math.random()*d.length)]);}).catch(()=>{});
             }, []);
 
-            // --- PREFERENCES ---
+            // --- PREFERENCES (Only detect IP if NOT in LocalStorage) ---
             useEffect(() => {
                 if (!user || !db) {
-                  if (!isSettingsLoaded) {
+                  // If local storage is empty, try IP detection
+                  if (!isSettingsLoaded && !localStorage.getItem('hybnotes_lang')) {
                     const detectLang = async () => {
                       try {
                         const geoResponse = await fetch('https://ipapi.co/json/');
                         const geoData = await geoResponse.json();
-                        if (geoData.country_code === 'TR') setLang('tr'); else setLang('en');
+                        const detected = geoData.country_code === 'TR' ? 'tr' : 'en';
+                        setLang(detected);
                       } catch (err) {}
                       setIsSettingsLoaded(true);
                     };
@@ -253,28 +252,20 @@
                   }
                   return;
                 }
-                const loadSettings = async () => {
-                    try {
-                        const doc = await db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings').get();
-                        if (doc.exists) {
-                            const data = doc.data();
-                            if (data.themeId) { const found = THEMES.find(t => t.id === data.themeId); if (found) setActiveTheme(found); }
-                            if (data.lang) setLang(data.lang);
-                        } else {
-                            try {
-                                const geoResponse = await fetch('https://ipapi.co/json/');
-                                const geoData = await geoResponse.json();
-                                if (geoData.country_code === 'TR') setLang('tr'); else setLang('en');
-                            } catch (err) {}
-                        }
-                    } catch (e) {} finally { setIsSettingsLoaded(true); }
-                };
-                loadSettings();
+                
+                // If cloud storage is available, we can sync, but local storage takes precedence for initialization
+                // This part is kept for future syncing but we rely on local storage for immediate render
+                setIsSettingsLoaded(true); 
             }, [user]);
 
+            // --- SAVE SETTINGS (LocalStorage Priority) ---
             useEffect(() => {
                 document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
                 document.documentElement.lang = lang; // Fix for uppercase I/İ issue
+                
+                localStorage.setItem('hybnotes_lang', lang);
+                localStorage.setItem('hybnotes_theme', activeTheme.id);
+
                 if (user && db && isSettingsLoaded) {
                     db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings').set({ themeId: activeTheme.id, lang: lang }).catch(()=>{});
                 }
@@ -291,7 +282,7 @@
                     type: 'dropdown',
                     children: [
                         { id: 'utmb_lottery', title: lang === 'tr' ? 'UTMB Kura' : 'UTMB Lottery', icon: Icons.Ticket },
-                        { id: 'caffeine', title: lang === 'tr' ? 'Kafein Stratejisi' : 'Caffeine Strategy', icon: Icons.Zap },
+                        { id: 'caffeine', title: 'Caffeine Strategy', icon: Icons.Zap },
                     ]
                 },
             ];
@@ -321,7 +312,7 @@
 
             const ResearchPage = ({ posts, onSelect, lang }) => {
                 const [searchTerm, setSearchTerm] = useState("");
-                const ALL_CATEGORY = "ALL_CATEGORY"; // Constant key ensures filtering works regardless of language
+                const ALL_CATEGORY = "ALL_CATEGORY"; 
                 const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORY);
                 const [sortOption, setSortOption] = useState("newest");
 
@@ -571,14 +562,14 @@
                                 y: { 
                                     beginAtZero: true, 
                                     max: 100, 
-                                    grid: { color: 'rgba(169, 179, 217, 0.2)' }, 
-                                    ticks: { color: '#a9b3d9' },
-                                    title: { display: true, text: t.yAxisLabel, color: '#8ec5ff' }
+                                    grid: { color: 'rgba(148, 163, 184, 0.1)' }, 
+                                    ticks: { color: '#94a3b8' },
+                                    title: { display: true, text: t.yAxisLabel, color: '#94a3b8' }
                                 }, 
                                 x: { 
                                     grid: { display: false },
-                                    ticks: { color: '#a9b3d9' },
-                                    title: { display: true, text: t.xAxisLabel, color: '#8ec5ff' }
+                                    ticks: { color: '#94a3b8' },
+                                    title: { display: true, text: t.xAxisLabel, color: '#94a3b8' }
                                 } 
                             } 
                         } 
@@ -587,26 +578,26 @@
                 }, [vals, stones, t, activeTheme]);
 
                 return (
-                    <div className="bg-[#0e1224] text-[#e7ecff] rounded-[14px] p-6 max-w-[1100px] mx-auto border border-[#2a335a] shadow-2xl animate-fade-in font-sans">
+                    <div className="bg-slate-800 text-slate-200 rounded-3xl p-6 max-w-[1100px] mx-auto border border-slate-700 shadow-2xl animate-fade-in font-sans">
                         <div className="text-center mb-6">
-                            <h1 className="text-2xl md:text-3xl font-bold mb-2">{t.title}</h1>
-                            <div className="text-[#a9b3d9] text-sm md:text-base">{t.subtitle}</div>
+                            <h1 className="text-2xl md:text-3xl font-black mb-2">{t.title}</h1>
+                            <div className="text-slate-400 text-sm md:text-base">{t.subtitle}</div>
                         </div>
 
                         <div className="grid lg:grid-cols-[300px_1fr] gap-5 mb-5">
                             {/* Controls */}
-                            <div className="bg-[#141a33] border border-[#2a335a] rounded-[14px] p-5 flex flex-col gap-4 shadow-lg">
+                            <div className="bg-slate-900 border border-slate-700 rounded-3xl p-5 flex flex-col gap-4 shadow-lg">
                                 <div className="flex flex-col gap-1.5">
-                                    <label className="text-sm font-medium text-[#a9b3d9]">{t.raceLabel}</label>
-                                    <select value={race} onChange={e=>setRace(e.target.value)} className="w-full bg-[#0d1230] border border-[#2a335a] text-[#e7ecff] p-2.5 rounded-[10px] focus:outline-none focus:border-primary">
+                                    <label className="text-xs font-bold text-slate-400 uppercase">{t.raceLabel}</label>
+                                    <select value={race} onChange={e=>setRace(e.target.value)} className="w-full bg-slate-800 border border-slate-700 text-white p-2.5 rounded-xl focus:outline-none focus:border-primary">
                                         <option value="UTMB">{t.utmbOption}</option>
                                         <option value="CCC">{t.cccOption}</option>
                                         <option value="OCC">{t.occOption}</option>
                                     </select>
                                 </div>
                                 <div className="flex flex-col gap-1.5">
-                                    <label className="text-sm font-medium text-[#a9b3d9]">{t.methodLabel}</label>
-                                    <select value={method} onChange={e=>setMethod(e.target.value)} className="w-full bg-[#0d1230] border border-[#2a335a] text-[#e7ecff] p-2.5 rounded-[10px] focus:outline-none focus:border-primary">
+                                    <label className="text-xs font-bold text-slate-400 uppercase">{t.methodLabel}</label>
+                                    <select value={method} onChange={e=>setMethod(e.target.value)} className="w-full bg-slate-800 border border-slate-700 text-white p-2.5 rounded-xl focus:outline-none focus:border-primary">
                                         <option value="cagr">{t.cagrOption}</option>
                                         <option value="linear">{t.linearOption}</option>
                                         <option value="conservative">{t.conservativeOption}</option>
@@ -616,24 +607,24 @@
                                 <Slider label={t.stonesLabelPrefix} val={stones} min={1} max={50} step={1} unit="" onChange={setStones} />
 
                                 <div className="grid grid-cols-2 gap-3 mt-2">
-                                    <div className="col-span-2 bg-[linear-gradient(135deg,rgba(var(--primary-rgb),0.1),rgba(var(--primary-rgb),0.05))] border border-primary rounded-[10px] p-3 text-center">
-                                        <h3 className="m-0 mb-2 text-[13px] text-[#a9b3d9] font-medium uppercase">{t.probLabel}</h3>
-                                        <div className="text-[32px] md:text-[38px] font-bold leading-none text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]">% {(vals.p * 100).toFixed(2)}</div>
+                                    <div className="col-span-2 bg-primary/10 border border-primary/20 rounded-xl p-3 text-center">
+                                        <h3 className="m-0 mb-2 text-[10px] text-primary font-bold uppercase tracking-wider">{t.probLabel}</h3>
+                                        <div className="text-[32px] md:text-[38px] font-black leading-none text-white">% {(vals.p * 100).toFixed(2)}</div>
                                     </div>
-                                    <div className="bg-[#0c1129] border border-[#2a335a] rounded-[10px] p-3 text-center">
-                                        <h3 className="m-0 mb-2 text-[13px] text-[#a9b3d9] font-medium uppercase">{t.demandLabel}</h3>
-                                        <div className="text-xl md:text-2xl font-bold leading-none text-[#e7ecff]">{vals.N.toLocaleString(t.locale)}</div>
+                                    <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
+                                        <h3 className="m-0 mb-2 text-[10px] text-slate-500 font-bold uppercase">{t.demandLabel}</h3>
+                                        <div className="text-xl md:text-2xl font-bold leading-none text-white">{vals.N.toLocaleString(t.locale)}</div>
                                     </div>
-                                    <div className="bg-[#0c1129] border border-[#2a335a] rounded-[10px] p-3 text-center">
-                                        <h3 className="m-0 mb-2 text-[13px] text-[#a9b3d9] font-medium uppercase">{t.avgStonesLabel}</h3>
-                                        <div className="text-xl md:text-2xl font-bold leading-none text-[#e7ecff]">{vals.mean.toFixed(2)}</div>
+                                    <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
+                                        <h3 className="m-0 mb-2 text-[10px] text-slate-500 font-bold uppercase">{t.avgStonesLabel}</h3>
+                                        <div className="text-xl md:text-2xl font-bold leading-none text-white">{vals.mean.toFixed(2)}</div>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Chart */}
-                            <div className="bg-[#141a33] border border-[#2a335a] rounded-[14px] p-2.5 h-[400px] md:h-auto flex flex-col relative shadow-lg">
-                                <div className="bg-[#0c1129] rounded-[10px] p-2.5 flex-grow relative min-h-[300px]">
+                            <div className="bg-slate-900 border border-slate-700 rounded-3xl p-4 h-[400px] shadow-lg w-full overflow-hidden">
+                                <div className="flex-grow relative w-full h-full min-h-[300px]">
                                     <canvas ref={chartRef}></canvas>
                                 </div>
                             </div>
@@ -641,38 +632,38 @@
 
                         <div className="grid md:grid-cols-2 gap-5">
                             {/* Data Table */}
-                            <div className="bg-[#141a33] border border-[#2a335a] rounded-[14px] p-5 shadow-lg">
-                                <h3 className="text-[#e7ecff] font-bold mb-4">{t.dataTitle}</h3>
-                                <table className="w-full border-separate border-spacing-y-1">
+                            <div className="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-lg">
+                                <h3 className="text-white font-bold mb-4">{t.dataTitle}</h3>
+                                <table className="w-full border-separate border-spacing-y-1 text-sm">
                                     <thead>
                                         <tr>
-                                            <th className="bg-[#2a335a] text-[#8ec5ff] text-[13px] uppercase p-2.5 text-left rounded-l-[10px]">{t.tableYear}</th>
-                                            <th className="bg-[#2a335a] text-[#8ec5ff] text-[13px] uppercase p-2.5 text-right">{t.tableDemand}</th>
-                                            <th className="bg-[#2a335a] text-[#8ec5ff] text-[13px] uppercase p-2.5 text-right rounded-r-[10px]">{t.tableAvgStones}</th>
+                                            <th className="text-slate-500 text-[10px] uppercase font-bold p-2 text-left">{t.tableYear}</th>
+                                            <th className="text-slate-500 text-[10px] uppercase font-bold p-2 text-right">{t.tableDemand}</th>
+                                            <th className="text-slate-500 text-[10px] uppercase font-bold p-2 text-right">{t.tableAvgStones}</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="text-slate-300">
                                         {[2023, 2024, 2025].map(y => (
-                                            <tr key={y}>
-                                                <td className="bg-[#0c1129] p-2.5 rounded-l-[10px]">{y}</td>
-                                                <td className="bg-[#0c1129] p-2.5 text-right">{data[race].demand[y].toLocaleString(t.locale)}</td>
-                                                <td className="bg-[#0c1129] p-2.5 text-right rounded-r-[10px]">{data[race].meanStones[y] ? data[race].meanStones[y].toFixed(2) : '-'}</td>
+                                            <tr key={y} className="bg-slate-800/50">
+                                                <td className="p-2 rounded-l-lg">{y}</td>
+                                                <td className="p-2 text-right font-mono">{data[race].demand[y].toLocaleString(t.locale)}</td>
+                                                <td className="p-2 text-right font-mono rounded-r-lg">{data[race].meanStones[y] ? data[race].meanStones[y].toFixed(2) : '-'}</td>
                                             </tr>
                                         ))}
-                                        <tr>
-                                            <td className="bg-[#0c1129] p-2.5 rounded-l-[10px] font-bold text-[#8ec5ff]">{t.tableProjection}</td>
-                                            <td className="bg-[#0c1129] p-2.5 text-right font-bold text-[#8ec5ff]">{vals.N.toLocaleString(t.locale)}</td>
-                                            <td className="bg-[#0c1129] p-2.5 text-right rounded-r-[10px] font-bold text-[#8ec5ff]">{vals.mean.toFixed(2)}</td>
+                                        <tr className="bg-primary/10">
+                                            <td className="p-2 rounded-l-lg font-bold text-primary">{t.tableProjection}</td>
+                                            <td className="p-2 text-right font-bold text-white font-mono">{vals.N.toLocaleString(t.locale)}</td>
+                                            <td className="p-2 text-right font-bold text-white font-mono rounded-r-lg">{vals.mean.toFixed(2)}</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
 
                             {/* Formula */}
-                            <div className="bg-[#141a33] border border-[#2a335a] rounded-[14px] p-5 shadow-lg">
-                                <h3 className="text-[#e7ecff] font-bold mb-4">{t.modelTitle}</h3>
-                                <div className="bg-[#0c1129] rounded-[10px] p-4 font-mono text-[#cde2ff] text-sm leading-relaxed mb-4">
-                                    <div className="mb-2 text-[#8ec5ff] font-sans font-bold">{t.formulaTitle}</div>
+                            <div className="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-lg">
+                                <h3 className="text-white font-bold mb-4">{t.modelTitle}</h3>
+                                <div className="bg-slate-800 rounded-xl p-4 font-mono text-slate-300 text-sm leading-relaxed mb-4 border border-slate-700">
+                                    <div className="mb-2 text-slate-500 text-xs font-bold uppercase font-sans">{t.formulaTitle}</div>
                                     <div className="latex-formula">
                                         <span>p</span> <span className="op">=</span> <span>1</span> <span className="op">−</span>
                                         <div className="product-notation">
@@ -688,15 +679,15 @@
                                     <div className="text-[1.2em] font-bold text-primary mt-2 text-center">p = % {(vals.p * 100).toFixed(2)}</div>
                                 </div>
 
-                                <dl className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-1.5 text-sm">
-                                    <dt className="font-mono text-[#8ec5ff] font-bold">p</dt><dd className="text-[#a9b3d9] m-0">{t.defP}</dd>
-                                    <dt className="font-mono text-[#8ec5ff] font-bold">w</dt><dd className="text-[#a9b3d9] m-0">{t.defW} <span className="text-primary font-bold ml-1">({t.defValW} {stones})</span></dd>
-                                    <dt className="font-mono text-[#8ec5ff] font-bold">B</dt><dd className="text-[#a9b3d9] m-0">{t.defB} <span className="text-primary font-bold ml-1">({t.defValB} {vals.B})</span></dd>
-                                    <dt className="font-mono text-[#8ec5ff] font-bold">T</dt><dd className="text-[#a9b3d9] m-0">{t.defT} <span className="text-primary font-bold ml-1">({t.defValT} {Math.round(vals.T).toLocaleString(t.locale)})</span></dd>
+                                <dl className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-1.5 text-xs">
+                                    <dt className="font-mono text-slate-400 font-bold">p</dt><dd className="text-slate-500 m-0">{t.defP}</dd>
+                                    <dt className="font-mono text-slate-400 font-bold">w</dt><dd className="text-slate-500 m-0">{t.defW} <span className="text-primary font-bold ml-1">({t.defValW} {stones})</span></dd>
+                                    <dt className="font-mono text-slate-400 font-bold">B</dt><dd className="text-slate-500 m-0">{t.defB} <span className="text-primary font-bold ml-1">({t.defValB} {vals.B})</span></dd>
+                                    <dt className="font-mono text-slate-400 font-bold">T</dt><dd className="text-slate-500 m-0">{t.defT} <span className="text-primary font-bold ml-1">({t.defValT} {Math.round(vals.T).toLocaleString(t.locale)})</span></dd>
                                 </dl>
 
-                                <div className="mt-4 text-xs text-[#a9b3d9]">
-                                    <b className="text-[#e7ecff] block mb-1">{t.noteTitle}</b>
+                                <div className="mt-4 text-[10px] text-slate-500 bg-slate-800/50 p-2 rounded-lg border border-slate-800">
+                                    <b className="text-slate-400 block mb-1">{t.noteTitle}</b>
                                     <span dangerouslySetInnerHTML={{__html: t.noteText}}></span>
                                 </div>
                             </div>
@@ -848,7 +839,7 @@
                     for (let i = 0; i <= yMax; i += 50) {
                         if (i % 100 === 0) {
                             const y = getY(i);
-                            ctx.fillStyle = '#a9b3d9';
+                            ctx.fillStyle = '#94a3b8';
                             ctx.fillText(i + 'mg', padding.left - 10, y);
                             ctx.strokeStyle = '#334155';
                             ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left + chartW, y); ctx.stroke();
@@ -860,7 +851,7 @@
                     const xStep = Math.max(1, Math.round((xMax - xMin) / 6));
                     for (let i = Math.ceil(xMin); i <= xMax; i += xStep) {
                         const x = getX(i);
-                        ctx.fillStyle = '#a9b3d9';
+                        ctx.fillStyle = '#94a3b8';
                         ctx.fillText(formatTime(raceDate, i), x, padding.top + chartH + 10);
                         ctx.strokeStyle = '#334155';
                         ctx.beginPath(); ctx.moveTo(x, padding.top); ctx.lineTo(x, padding.top + chartH); ctx.stroke();
@@ -908,55 +899,56 @@
                 }, [params, lang, activeTheme]);
 
                 return (
-                    <div className="bg-[#2a2a2a] text-[#e0e0e0] p-6 rounded-2xl max-w-[1400px] mx-auto shadow-2xl border border-[#444] animate-fade-in">
+                    <div className="bg-slate-800 text-slate-200 p-6 rounded-3xl max-w-[1400px] mx-auto shadow-2xl border border-slate-700 animate-fade-in">
+                        <div className="text-center mb-10 pt-2"><h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Caffeine Strategy</h1></div>
                         <div className="grid lg:grid-cols-[350px_1fr] gap-8">
                             {/* LEFT PANEL */}
                             <div className="flex flex-col gap-6">
-                                <div className="border-b border-[#444] pb-4">
+                                <div className="border-b border-slate-700 pb-4">
                                     <h2 className="text-xl font-bold text-white mb-2">{t.strategy_params_title}</h2>
                                 </div>
                                 <div className="grid gap-4">
                                     <Slider label={t.body_weight_label} val={params.bodyWeight} min={40} max={120} step={1} unit="kg" onChange={v => setParams(p=>({...p, bodyWeight: parseFloat(v)}))} />
-                                    <div className="flex flex-col"><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.race_start_label}</label><input type="time" value={params.raceStart} onChange={e=>setParams(p=>({...p, raceStart: e.target.value}))} className="bg-[#333] border border-[#555] text-[#e0e0e0] rounded-lg p-2.5 focus:outline-none focus:border-primary w-full"/></div>
+                                    <div className="flex flex-col"><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.race_start_label}</label><input type="time" value={params.raceStart} onChange={e=>setParams(p=>({...p, raceStart: e.target.value}))} className="bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:border-primary w-full"/></div>
                                     <Slider label={t.race_duration_label} val={params.raceDuration} min={1} max={30} step={0.5} unit="sa" onChange={v => setParams(p=>({...p, raceDuration: parseFloat(v)}))} />
                                     <Slider label={t.half_life_label} val={params.halfLife} min={2} max={10} step={0.5} unit="sa" onChange={v => setParams(p=>({...p, halfLife: parseFloat(v)}))} />
-                                    <div className="h-px bg-[#444] my-2"></div>
+                                    <div className="h-px bg-slate-700 my-2"></div>
                                     <Slider label={t.initial_dose_label} val={params.initialDose} min={0} max={500} step={10} unit="mg" onChange={v => setParams(p=>({...p, initialDose: parseFloat(v)}))} />
                                     <div className="mb-4"><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase">{t.initial_dose_time_label}</span><span className="text-primary font-bold text-sm">{formatRelTime(params.initialDoseTime)}</span></div><input type="range" min={-2} max={2} step={0.25} value={params.initialDoseTime} onChange={(e)=>setParams(p=>({...p, initialDoseTime:parseFloat(e.target.value)}))} /></div>
                                     <Slider label={t.booster_dose_label} val={params.doseAmount} min={20} max={200} step={5} unit="mg" onChange={v => setParams(p=>({...p, doseAmount: parseFloat(v)}))} />
                                     <div className="flex flex-col">
-                                        <label className="text-sm font-semibold text-[#b0b0b0] mb-1">{t.strategy_label}</label>
-                                        <select value={params.strategy} onChange={e=>setParams(p=>({...p, strategy: e.target.value}))} className="bg-[#333] border border-[#555] text-[#e0e0e0] rounded-lg p-2.5 focus:outline-none focus:border-primary">
+                                        <label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.strategy_label}</label>
+                                        <select value={params.strategy} onChange={e=>setParams(p=>({...p, strategy: e.target.value}))} className="bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:border-primary">
                                             <option value="stay_low">{t.strategy_low}</option>
                                             <option value="stay_high">{t.strategy_high}</option>
                                         </select>
                                     </div>
-                                    <button onClick={runSimulation} className="bg-primary hover:opacity-90 text-white font-bold py-3 rounded-lg transition-opacity mt-2">{t.calculate_btn}</button>
+                                    <button onClick={runSimulation} className="bg-primary hover:opacity-90 text-white font-bold py-3 rounded-lg transition-opacity mt-2 shadow-lg shadow-primary/20">{t.calculate_btn}</button>
                                 </div>
                             </div>
 
                             {/* RIGHT PANEL */}
                             <div className="flex flex-col gap-6">
-                                <div className="bg-[#1a1a1a] rounded-xl border border-[#444] p-4 flex flex-col h-[400px]">
+                                <div className="bg-slate-900 border border-slate-700 rounded-3xl p-4 h-[400px] shadow-lg w-full overflow-hidden">
                                     <h3 className="text-center font-bold text-white mb-2">{t.simulation_title}</h3>
                                     <div className="flex-grow relative w-full h-full">
                                         <canvas ref={canvasRef} className="w-full h-full"></canvas>
                                     </div>
                                 </div>
 
-                                <div className="bg-[#1a1a1a] rounded-xl border border-[#444] p-6">
+                                <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-lg">
                                     <h3 className="text-white font-bold mb-4">{t.schedule_title}</h3>
                                     <div className="overflow-x-auto">
-                                        <table className="w-full text-left border-collapse">
+                                        <table className="w-full text-left border-collapse text-sm">
                                             <thead>
-                                                <tr className="border-b border-[#444] text-[#888]">
+                                                <tr className="border-b border-slate-700 text-slate-500 uppercase text-xs">
                                                     <th className="p-3">{t.table_header_time}</th>
                                                     <th className="p-3">{t.table_header_amount}</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody className="text-slate-300">
                                                 {schedule.map((row, i) => (
-                                                    <tr key={i} className="border-b border-[#444] last:border-0 hover:bg-[#2a2a2a]">
+                                                    <tr key={i} className="border-b border-slate-700 last:border-0 hover:bg-slate-800/50">
                                                         <td className="p-3 font-mono text-primary">{row.timeStr}</td>
                                                         <td className="p-3 font-bold">{row.amount} mg</td>
                                                     </tr>
@@ -964,12 +956,12 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <p className="mt-4 text-[#b0b0b0] italic text-sm" dangerouslySetInnerHTML={{__html: summary}}></p>
+                                    <p className="mt-4 text-slate-400 italic text-sm" dangerouslySetInnerHTML={{__html: summary}}></p>
                                 </div>
 
-                                <footer className="pt-6 border-t border-[#444] text-xs text-[#888]">
-                                    <p className="italic text-[#b0b0b0] mb-4">{t.disclaimer}</p>
-                                    <p className="font-bold mb-2">{t.references}:</p>
+                                <footer className="pt-6 border-t border-slate-700 text-xs text-slate-500">
+                                    <p className="italic text-slate-400 mb-4">{t.disclaimer}</p>
+                                    <p className="font-bold mb-2 text-white">{t.references}:</p>
                                     <ul className="list-none space-y-2">
                                         <li>1. Grgic, J., Mikulic, P., & Schoenfeld, B. J. (2024). Effects of Acute Ingestion of Caffeine Capsules on Muscle Strength and Muscle Endurance. <em>Nutrients</em>.</li>
                                         <li>2. Lin YS, Weibel J, Landolt HP, et al. (2022). Time to Recover From Daily Caffeine Intake. <em>Frontiers in Nutrition</em>.</li>
