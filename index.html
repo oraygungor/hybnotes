@@ -98,9 +98,9 @@
         };
 
         const DEFAULT_POSTS = [
-          { "id": 5, "title": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak", "category": "Antrenman Bilimi", "date": "28 Ekim 2024", "readTime": "6 dk", "summary": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.", "content": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır...</p>", "references": ["Karvonen M, Kentala E. (1957)."] },
-          { "id": 4, "title": "Ultra Maratonlarda Sodyum Alım Stratejileri", "category": "Beslenme", "date": "20 Ekim 2024", "readTime": "8 dk", "summary": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.", "content": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir...</p>", "references": ["Hoffman, M. D. (2014)."] },
-          { "id": 3, "title": "Mitokondriyal Biyogenez ve Zone 2", "category": "Fizyoloji", "date": "15 Ekim 2024", "readTime": "12 dk", "summary": "Düşük yoğunluklu antrenmanların laktat temizleme kapasitesini nasıl artırdığına dair yeni bulgular.", "content": "<p>Mitokondri, hücrenin enerji santralidir...</p>", "references": ["San-Millán, I. (2018)."] }
+          { "id": 5, "title": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak", "category": "Antrenman Bilimi", "date": "28 Ekim 2024", "readTime": "6 dk", "summary": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.", "content": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır. Ancak bu formül, dinlenik nabzı (Resting HR) hesaba katmadığı için sporcuları yanlış yönlendirebilir.</p><div class='math-box'>Hedef Nabız = ((Maks Nabız - Dinlenik Nabız) × %Yoğunluk) + Dinlenik Nabız</div><p>Bu formül, özellikle dinlenik nabzı düşük olan dayanıklılık sporcuları için çok daha hassas sonuçlar verir.</p>", "references": ["Karvonen M, Kentala E. (1957). The effects of training on heart rate."] },
+          { "id": 4, "title": "Ultra Maratonlarda Sodyum Alım Stratejileri", "category": "Beslenme", "date": "20 Ekim 2024", "readTime": "8 dk", "summary": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.", "content": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir. Terle kaybedilen tuzu yerine koymak performansın sürdürülebilirliği için şarttır.</p>", "references": ["Hoffman, M. D. (2014). Sodium intake during an ultramarathon."] },
+          { "id": 3, "title": "Mitokondriyal Biyogenez ve Zone 2", "category": "Fizyoloji", "date": "15 Ekim 2024", "readTime": "12 dk", "summary": "Düşük yoğunluklu antrenmanların laktat temizleme kapasitesini nasıl artırdığına dair yeni bulgular.", "content": "<p>Mitokondri, hücrenin enerji santralidir. Zone 2 antrenmanları, Tip 1 kas liflerindeki mitokondri yoğunluğunu artırarak yağ yakım kapasitesini maksimize eder.</p>", "references": ["San-Millán, I. (2018). Assessment of Metabolic Flexibility."] }
         ];
 
         const App = () => {
@@ -423,23 +423,60 @@
                 );
             };
 
-            const HomePage = ({ changePage }) => (
-                <div className="space-y-8 animate-fade-in">
-                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 md:p-12 border border-slate-700 relative overflow-hidden shadow-2xl">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-lime-500/5 rounded-full blur-3xl pointer-events-none"></div>
-                        <h1 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10">HybNotes <span className="text-lime-500">Dashboard</span></h1>
-                        <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">{lang === 'tr' ? 'Sporcu veri tabanı, hesaplama araçları ve bilimsel analizler tek bir yerde.' : 'Athlete database, calculation tools, and scientific analysis in one place.'}</p>
-                        <button onClick={() => changePage('research')} className="bg-lime-500 text-slate-900 px-6 py-3 rounded-xl font-bold hover:bg-lime-400 transition-colors shadow-lg shadow-lime-500/20">{lang === 'tr' ? 'Kütüphaneye Git' : 'Go to Library'}</button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between"><div><Icons.Activity className="text-lime-400 mb-2" /><div className="text-2xl md:text-3xl font-bold text-white">58.4</div><div className="text-sm text-slate-500">VO2 Max ({lang === 'tr' ? 'Tahmini' : 'Est.'})</div></div><div className="mt-4 w-full bg-slate-700 h-1.5 rounded-full"><div className="bg-lime-500 w-[70%] h-full rounded-full"></div></div></div>
-                            <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between"><div><Icons.BookOpen className="text-blue-400 mb-2" /><div className="text-2xl md:text-3xl font-bold text-white">{posts.length}</div><div className="text-sm text-slate-500">{lang === 'tr' ? 'Yayınlanmış Makale' : 'Published Articles'}</div></div></div>
+            const HomePage = ({ changePage, posts, onRead }) => {
+                const latestPost = posts.length > 0 ? posts[0] : null;
+
+                return (
+                    <div className="space-y-8 animate-fade-in">
+                        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 md:p-12 border border-slate-700 relative overflow-hidden shadow-2xl">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-lime-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                            <h1 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10">HybNotes</h1>
+                            <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">{lang === 'tr' ? 'Sporcular için bilimsel analizlerin, tecrübelerin ve makalelerin yer aldığı kişisel bir not defteri.' : 'A personal notebook containing scientific analysis, experiences, and articles for athletes.'}</p>
+                            <button onClick={() => changePage('research')} className="bg-lime-500 text-slate-900 px-6 py-3 rounded-xl font-bold hover:bg-lime-400 transition-colors shadow-lg shadow-lime-500/20">{lang === 'tr' ? 'Kütüphaneye Git' : 'Go to Library'}</button>
                         </div>
-                        <div className="md:col-span-1 h-full min-h-[250px]"><LatestPostsWidget posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} /></div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div 
+                                    onClick={() => latestPost && onRead(latestPost)}
+                                    className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-lime-500 transition-colors group"
+                                >
+                                    <div>
+                                        <div className="flex items-center gap-2 text-lime-400 mb-2">
+                                            <Icons.Zap size={20} />
+                                            <span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-lime-400 transition-colors">
+                                            {latestPost ? latestPost.title : 'Loading...'}
+                                        </h3>
+                                        <p className="text-sm text-slate-400 line-clamp-2">
+                                            {latestPost ? latestPost.summary : ''}
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 flex items-center text-xs font-bold text-slate-500 group-hover:text-white transition-colors">
+                                        {lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={14} className="ml-1" />
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex items-center gap-2 text-blue-400 mb-2">
+                                            <Icons.Info size={20} />
+                                            <span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Biliyor Muydunuz?' : 'Did You Know?'}</span>
+                                        </div>
+                                        <p className="text-slate-300 text-sm leading-relaxed">
+                                            {lang === 'tr' ? '"Zone 2 antrenmanları, yağ oksidasyonunu maksimize ederek ultra mesafelerde glikojen depolarını korumanın anahtarıdır."' : '"Zone 2 training is key to preserving glycogen stores in ultra distances by maximizing fat oxidation."'}
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 text-xs text-slate-500">
+                                        #AntrenmanBilimi
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="md:col-span-1 h-full min-h-[250px]"><LatestPostsWidget posts={posts} onSelect={onRead} /></div>
+                        </div>
                     </div>
-                </div>
-            );
+                );
+            };
 
             const NavBar = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }) => {
                 const [openDropdown, setOpenDropdown] = useState(null);
@@ -498,7 +535,7 @@
 
             const renderContent = () => {
                 switch (activeTab) {
-                    case 'home': return <HomePage changePage={setActiveTab} />;
+                    case 'home': return <HomePage changePage={setActiveTab} posts={posts} onRead={(post) => { setReadingArticle(post); setActiveTab('research'); }} />;
                     case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} />;
                     case 'utmb_lottery': return <UTMBLotteryPage lang={lang} />;
                     case 'caffeine': return <CaffeinePage lang={lang} />;
