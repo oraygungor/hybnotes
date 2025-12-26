@@ -206,7 +206,7 @@
                 return () => unsubscribe();
             }, []);
 
-            // --- LOAD DATA (Posts & Facts) ---
+            // --- LOAD DATA ---
             useEffect(() => {
                 fetch('posts.json')
                     .then(res => res.ok ? res.json() : [])
@@ -229,6 +229,7 @@
                     try {
                         const settingsRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings');
                         const doc = await settingsRef.get();
+                        
                         if (doc.exists) {
                             const data = doc.data();
                             if (data.themeId) {
@@ -236,8 +237,22 @@
                                 if (found) setActiveTheme(found);
                             }
                             if (data.lang) setLang(data.lang);
+                            setIsSettingsLoaded(true);
+                        } else {
+                            // --- IP TABANLI DİL TESPİTİ (İlk kez giren kullanıcı için) ---
+                            try {
+                                const geoResponse = await fetch('https://ipapi.co/json/');
+                                const geoData = await geoResponse.json();
+                                if (geoData.country_code === 'TR') {
+                                    setLang('tr');
+                                } else {
+                                    setLang('en');
+                                }
+                            } catch (err) {
+                                console.log("Geolocation failed, using default.");
+                            }
+                            setIsSettingsLoaded(true);
                         }
-                        setIsSettingsLoaded(true);
                     } catch (e) {
                         console.error("Load settings error", e);
                         setIsSettingsLoaded(true);
@@ -249,7 +264,6 @@
             // --- SAVE SETTINGS ON CHANGE ---
             useEffect(() => {
                 document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
-                // Sadece veriler yüklendikten sonra (ilk default değerleri DB'ye yazmamak için) kaydetme yap
                 if (user && db && isSettingsLoaded) {
                     db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings').set({
                         themeId: activeTheme.id,
@@ -499,7 +513,7 @@
                                     {MENU_ITEMS.map((item) => (
                                         <div key={item.id} className="relative group">
                                             <button onClick={() => !item.children && setActiveTab(item.id)} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}><item.icon size={18} /> {item.title} {item.children && <Icons.ChevronDown size={14}/>}</button>
-                                            {item.children && (<div className="absolute top-full left-0 w-56 pt-2 hidden group-hover:block"><div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">{item.children.map((subItem) => (<button key={subItem.id} onClick={() => setActiveTab(subItem.id)} className="w-full text-left px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3"><subItem.icon size={16} /> {subItem.title}</button>))}</div></div>)}
+                                            {item.children && (<div className="absolute top-full left-0 w-56 pt-2 hidden group-hover:block"><div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">{item.children.map((subItem) => (<button key={subItem.id} onClick={() => { setActiveTab(subItem.id); setReadingArticle(null); }} className="w-full text-left px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3"><subItem.icon size={16} /> {subItem.title}</button>))}</div></div>)}
                                         </div>
                                     ))}
                                 </div>
