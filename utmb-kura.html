@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UTMB 2026 Kura Şansı Hesaplayıcı</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['DC Archia', 'Archer', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif'],
+                },
+                colors: {
+                    slate: {
+                        800: '#1e293b',
+                        900: '#0f172a',
+                    },
+                    lime: {
+                        400: '#a3e635',
+                        500: '#84cc16',
+                    }
+                }
+            }
+        }
+    }
+</script>
+<style>
+    body { background-color: #0f172a; color: #e2e8f0; }
+    .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 1rem; }
+    
+    /* Range Slider Özelleştirme */
+    input[type=range] {
+        -webkit-appearance: none;
+        width: 100%;
+        background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 16px;
+        width: 16px;
+        border-radius: 50%;
+        background: #84cc16; /* Lime-500 */
+        cursor: pointer;
+        margin-top: -6px;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 4px;
+        cursor: pointer;
+        background: #334155;
+        border-radius: 2px;
+    }
+
+    /* LaTeX benzeri formül stilleri */
+    .latex-formula { font-family: "Times New Roman", Times, serif; }
+    .fraction { display: inline-block; text-align: center; vertical-align: middle; margin: 0 0.2em; }
+    .numerator { border-bottom: 1px solid #94a3b8; display: block; padding: 0 0.2em; }
+    .denominator { display: block; padding: 0 0.2em; }
+    .product-notation { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin-right: 0.2em; }
+    .prod-symbol { font-size: 1.5em; line-height: 1; }
+    .prod-limit { font-size: 0.7em; }
+</style>
+</head>
+<body class="font-sans antialiased min-h-screen p-4 md:p-8">
+
+<div class="max-w-6xl mx-auto relative">
+    
+    <!-- Dil Değiştirici -->
+    <div class="absolute top-0 right-0 bg-slate-800 border border-slate-700 rounded-lg p-1 z-10">
+        <button id="lang-en" class="px-3 py-1 text-xs font-bold text-slate-400 hover:text-white rounded transition-colors">EN</button>
+        <button id="lang-tr" class="px-3 py-1 text-xs font-bold bg-lime-500 text-slate-900 rounded shadow-lg shadow-lime-500/20">TR</button>
+    </div>
+
+    <!-- Başlık -->
+    <div class="text-center mb-10 pt-4">
+        <h1 class="text-3xl md:text-4xl font-black text-white mb-2" data-lang-key="title">UTMB 2026 Kura Şansı Hesaplayıcı</h1>
+        <p class="text-slate-400 max-w-2xl mx-auto" data-lang-key="subtitle">2023→2025 verilerine dayanarak 2026 için tahmini kura olasılıklarını gösterir.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+        
+        <!-- Sol Panel: Kontroller -->
+        <div class="lg:col-span-4 space-y-6">
+            <div class="card p-6 shadow-xl">
+                <!-- Inputs -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2" data-lang-key="raceLabel">Yarış</label>
+                        <select id="race" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 focus:border-lime-500 focus:outline-none transition-colors">
+                            <option value="UTMB">UTMB (2300 Kişi)</option>
+                            <option value="CCC">CCC (1900 Kişi)</option>
+                            <option value="OCC">OCC (1200 Kişi)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2" data-lang-key="methodLabel">Tahmin Metodu</label>
+                        <select id="method" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 focus:border-lime-500 focus:outline-none transition-colors">
+                            <option value="cagr">CAGR (Önerilen)</option>
+                            <option value="linear">Doğrusal (Linear)</option>
+                            <option value="conservative">Temkinli (Conservative)</option>
+                            <option value="optimistic">İyimser (Optimistic)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-bold text-slate-400 uppercase" data-lang-key="stonesLabelPrefix">Taş Sayısı</label>
+                            <span id="stoneVal" class="text-lime-500 font-black text-xl">1</span>
+                        </div>
+                        <input id="stones" type="range" min="1" max="50" value="1" step="1">
+                    </div>
+                </div>
+
+                <!-- KPI Kartları -->
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <div class="col-span-2 bg-lime-500/10 border border-lime-500/20 rounded-xl p-4 text-center">
+                        <h3 class="text-lime-500 text-xs font-bold uppercase mb-1" data-lang-key="probLabel">Tahmini Olasılık</h3>
+                        <div class="text-4xl font-black text-white" id="prob">% 0.00</div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-700 rounded-xl p-3 text-center">
+                        <h3 class="text-slate-500 text-[10px] font-bold uppercase mb-1" data-lang-key="demandLabel">2026 Talep</h3>
+                        <div class="text-lg font-bold text-slate-200" id="dem">—</div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-700 rounded-xl p-3 text-center">
+                        <h3 class="text-slate-500 text-[10px] font-bold uppercase mb-1" data-lang-key="avgStonesLabel">Ort. Taş</h3>
+                        <div class="text-lg font-bold text-slate-200" id="mean">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ Panel: Grafik -->
+        <div class="lg:col-span-8">
+            <div class="card p-4 h-full min-h-[400px] flex flex-col">
+                <div class="relative flex-grow w-full h-full">
+                    <canvas id="chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Alt Bölüm: Tablo ve Formül -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Tablo -->
+        <div class="card p-6">
+            <h3 class="text-white font-bold mb-4 flex items-center gap-2" data-lang-key="dataTitle">Geçmiş Veriler & Projeksiyon</h3>
+            <div id="tables" class="overflow-x-auto"></div>
+        </div>
+
+        <!-- Formül -->
+        <div class="card p-6">
+            <h3 class="text-white font-bold mb-4" data-lang-key="modelTitle">Hesaplama Modeli</h3>
+            
+            <div class="bg-slate-900 rounded-xl p-4 border border-slate-700 mb-4">
+                <div class="text-xs text-slate-400 mb-2" data-lang-key="formulaTitle">Hipergeometrik Dağılım Formülü:</div>
+                <div class="latex-formula text-xl md:text-2xl text-slate-200 flex flex-wrap justify-center items-center">
+                    <span class="text-lime-500 font-bold mr-2">p</span> = 1 − 
+                    <div class="product-notation mx-2">
+                        <span class="prod-limit">B-1</span>
+                        <span class="prod-symbol text-lime-500">∏</span>
+                        <span class="prod-limit">i=0</span>
+                    </div>
+                    <div class="fraction">
+                        <span class="numerator">(T − <span class="text-lime-500">w</span> − i)</span>
+                        <span class="denominator">(T − i)</span>
+                    </div>
+                </div>
+                <div class="text-center mt-3 text-lg font-mono text-lime-500" id="f_p_exact">p = % 0.00</div>
+            </div>
+
+            <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+                <dt class="font-mono font-bold text-lime-500">p</dt><dd class="text-slate-400" data-lang-key="defP">Kazanma olasılığı</dd>
+                <dt class="font-mono font-bold text-lime-500">w</dt><dd class="text-slate-400"><span data-lang-key="defW">Taş sayınız</span> <span id="def-val-w" class="text-white font-bold ml-1"></span></dd>
+                <dt class="font-mono font-bold text-lime-500">B</dt><dd class="text-slate-400"><span data-lang-key="defB">Kapasite</span> <span id="def-val-b" class="text-white font-bold ml-1"></span></dd>
+                <dt class="font-mono font-bold text-lime-500">T</dt><dd class="text-slate-400"><span data-lang-key="defT">Toplam Taş (Havuz)</span> <span id="def-val-t" class="text-white font-bold ml-1"></span></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- VERİ VE MANTIK ---
+const data = {
+  UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } },
+  CCC: { capacity: 1900, demand: { 2023: 5249, 2024: 5400, 2025: 6000 }, meanStones: { 2024: 4.0, 2025: 4.4 } },
+  OCC: { capacity: 1200, demand: { 2023: 5171, 2024: 6500, 2025: 10000 }, meanStones: { 2024: 2.8, 2025: 3.2 } }
+};
+
+function cagr(v1, v2, f = 1) { const g = Math.pow(v2 / v1, 1 / 2) - 1; return Math.round(v2 * (1 + g * f)); }
+function linear(v1, v2) { const s = (v2 - v1) / 2; return Math.round(v2 + s); }
+function demand(r, m) {
+  const d = data[r].demand;
+  return m == 'linear' ? linear(d[2023], d[2025]) :
+         m == 'conservative' ? cagr(d[2023], d[2025], 0.7) :
+         m == 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
+}
+function meanStone(r, m) {
+  const mS = data[r].meanStones;
+  const g = (mS[2025] / mS[2024]) - 1;
+  return m == 'linear' ? mS[2025] + (mS[2025] - mS[2024]) :
+         m == 'conservative' ? mS[2025] * (1 + g * 0.7) :
+         m == 'optimistic' ? mS[2025] * (1 + g * 1.3) : mS[2025] * (1 + g);
+}
+function prob(B, N, mean, w) {
+  if (w <= 0) return 0;
+  if (w > 50) w = 50;
+  const T = N * mean + w;
+  let logNoHit = 0;
+  const loops = Math.min(B, T - w); 
+  for (let i = 0; i < loops; i++) {
+    logNoHit += Math.log(T - w - i) - Math.log(T - i);
+    if (T - i <= 0 || T - w - i <= 0) break;
+  }
+  return 1 - Math.exp(logNoHit);
+}
+function pct(p) { return (p * 100).toFixed(2) + '%'; }
+
+// --- DİL DESTEĞİ ---
+let currentLang = 'TR';
+const translations = {
+  EN: {
+    title: "UTMB 2026 Lottery Chance Calculator",
+    subtitle: "Interactively displays estimated 2026 lottery probabilities based on 2023→2025 data.",
+    raceLabel: "Race",
+    methodLabel: "Projection Method",
+    stonesLabelPrefix: "Running Stones",
+    probLabel: "Estimated Probability",
+    demandLabel: "2026 Demand",
+    avgStonesLabel: "Avg. Stones",
+    dataTitle: "Historical Data & Projection",
+    modelTitle: "Calculation Model",
+    formulaTitle: "Hypergeometric Distribution Formula:",
+    defP: "Probability of winning",
+    defW: "Your stones",
+    defB: "Race capacity",
+    defT: "Total stones in pool",
+    tableCols: ["Year", "Demand", "Avg. Stones"],
+    projectionRow: "2026 (Proj.)"
+  },
+  TR: {
+    title: "UTMB 2026 Kura Şansı Hesaplayıcı",
+    subtitle: "2023→2025 verilerine dayanarak 2026 için tahmini kura olasılıklarını gösterir.",
+    raceLabel: "Yarış",
+    methodLabel: "Tahmin Metodu",
+    stonesLabelPrefix: "Taş Sayısı",
+    probLabel: "Tahmini Olasılık",
+    demandLabel: "2026 Talep",
+    avgStonesLabel: "Ort. Taş",
+    dataTitle: "Geçmiş Veriler & Projeksiyon",
+    modelTitle: "Hesaplama Modeli",
+    formulaTitle: "Hipergeometrik Dağılım Formülü:",
+    defP: "Kazanma olasılığı",
+    defW: "Sizin taş sayınız",
+    defB: "Yarış kapasitesi",
+    defT: "Havuzdaki toplam taş",
+    tableCols: ["Yıl", "Talep", "Ort. Taş"],
+    projectionRow: "2026 (Tahmin)"
+  }
+};
+
+function setLanguage(lang) {
+  currentLang = lang;
+  const t = translations[lang];
+  document.querySelectorAll('[data-lang-key]').forEach(el => {
+    if(t[el.dataset.langKey]) el.innerText = t[el.dataset.langKey];
+  });
+  
+  // Buton stilleri
+  document.getElementById('lang-en').className = lang === 'EN' ? "px-3 py-1 text-xs font-bold bg-lime-500 text-slate-900 rounded shadow-lg shadow-lime-500/20" : "px-3 py-1 text-xs font-bold text-slate-400 hover:text-white rounded transition-colors";
+  document.getElementById('lang-tr').className = lang === 'TR' ? "px-3 py-1 text-xs font-bold bg-lime-500 text-slate-900 rounded shadow-lg shadow-lime-500/20" : "px-3 py-1 text-xs font-bold text-slate-400 hover:text-white rounded transition-colors";
+
+  update();
+}
+
+// --- CHART.JS ---
+const ctx = document.getElementById('chart').getContext('2d');
+let chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [{
+      label: 'Şans (%)',
+      data: [],
+      borderColor: '#84cc16', // Lime-500
+      backgroundColor: 'rgba(132, 204, 22, 0.1)',
+      borderWidth: 3,
+      tension: 0.4,
+      pointBackgroundColor: [],
+      pointRadius: [],
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+    scales: {
+      y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true, max: 100 },
+      x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+    }
+  }
+});
+
+function update() {
+  const race = document.getElementById('race').value;
+  const stones = parseInt(document.getElementById('stones').value);
+  const method = document.getElementById('method').value;
+  const t = translations[currentLang];
+
+  document.getElementById('stoneVal').innerText = stones;
+
+  const N = demand(race, method);
+  const mean = meanStone(race, method);
+  const B = data[race].capacity;
+  const T = N * mean + stones;
+  const p = prob(B, N, mean, stones);
+
+  // Update KPIs
+  document.getElementById('prob').innerText = pct(p);
+  document.getElementById('dem').innerText = N.toLocaleString();
+  document.getElementById('mean').innerText = mean.toFixed(2);
+  document.getElementById('f_p_exact').innerText = "p = " + pct(p);
+
+  document.getElementById('def-val-w').innerText = ": " + stones;
+  document.getElementById('def-val-b').innerText = ": " + B;
+  document.getElementById('def-val-t').innerText = ": ~" + Math.round(T).toLocaleString();
+
+  // Update Chart
+  let labels = [], vals = [], pointColors = [], radii = [];
+  for(let w=1; w<=30; w++) { // 30'a kadar gösterelim grafikte
+    labels.push(w);
+    vals.push(prob(B, N, mean, w)*100);
+    if(w === stones) { pointColors.push('#84cc16'); radii.push(6); } 
+    else { pointColors.push('rgba(132, 204, 22, 0.5)'); radii.push(0); }
+  }
+  chart.data.labels = labels;
+  chart.data.datasets[0].data = vals;
+  chart.data.datasets[0].pointBackgroundColor = pointColors;
+  chart.data.datasets[0].pointRadius = radii;
+  chart.update();
+
+  // Update Table
+  let html = `<table class="w-full text-sm text-right text-slate-300">
+    <thead><tr class="text-slate-500 border-b border-slate-700">
+        <th class="py-2 text-left">${t.tableCols[0]}</th><th>${t.tableCols[1]}</th><th>${t.tableCols[2]}</th>
+    </tr></thead><tbody>`;
+  [2023, 2024, 2025].forEach(y => {
+    html += `<tr class="border-b border-slate-800/50">
+        <td class="py-2 text-left text-slate-400 font-mono">${y}</td>
+        <td>${data[race].demand[y].toLocaleString()}</td>
+        <td>${data[race].meanStones[y] ? data[race].meanStones[y].toFixed(1) : '-'}</td>
+    </tr>`;
+  });
+  html += `<tr class="text-lime-500 font-bold bg-lime-500/5">
+    <td class="py-2 text-left">${t.projectionRow}</td>
+    <td>${N.toLocaleString()}</td>
+    <td>${mean.toFixed(2)}</td>
+  </tr></tbody></table>`;
+  document.getElementById('tables').innerHTML = html;
+}
+
+document.getElementById('stones').addEventListener('input', update);
+['race', 'method'].forEach(id => document.getElementById(id).addEventListener('change', update));
+document.getElementById('lang-en').addEventListener('click', () => setLanguage('EN'));
+document.getElementById('lang-tr').addEventListener('click', () => setLanguage('TR'));
+
+setLanguage('TR');
+
+</script>
+</body>
+</html>
