@@ -1,52 +1,59 @@
 [
   {
     "id": 5,
-    "title": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak",
-    "category": "Antrenman Bilimi",
-    "date": "28 Ekim 2024",
-    "readTime": "6 dk",
-    "summary": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.",
-    "content": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır. Ancak bu formül, dinlenik nabzı (Resting HR) hesaba katmadığı için sporcuları yanlış yönlendirebilir.</p><div class='math-box'>Hedef Nabız = ((Maks Nabız - Dinlenik Nabız) × %Yoğunluk) + Dinlenik Nabız</div><p>Bu formül, özellikle dinlenik nabzı düşük olan dayanıklılık sporcuları için çok daha hassas sonuçlar verir.</p>",
+    "date": "2024-10-28",
+    "readTime": { "tr": "6 dk", "en": "6 min" },
+    "category": { "tr": "Antrenman Bilimi", "en": "Training Science" },
+    "title": {
+      "tr": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak",
+      "en": "Karvonen Formula: Calculating Heart Rate Zones Correctly"
+    },
+    "summary": {
+      "tr": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.",
+      "en": "Why is the classic (220-Age) formula flawed? Truly personalized zone calculation using the Heart Rate Reserve (HRR) method."
+    },
+    "content": {
+      "tr": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır. Ancak bu formül, dinlenik nabzı (Resting HR) hesaba katmadığı için sporcuları yanlış yönlendirebilir.</p><div class='math-box'>Hedef Nabız = ((Maks Nabız - Dinlenik Nabız) × %Yoğunluk) + Dinlenik Nabız</div><p>Bu formül, özellikle dinlenik nabzı düşük olan dayanıklılık sporcuları için çok daha hassas sonuçlar verir.</p>",
+      "en": "<p>Most sports watches use the '220 - Age' formula by default. However, this formula can mislead athletes as it does not account for Resting HR.</p><div class='math-box'>Target HR = ((Max HR - Resting HR) × %Intensity) + Resting HR</div><p>This formula provides much more precise results, especially for endurance athletes with low resting heart rates.</p>"
+    },
     "references": ["Karvonen M, Kentala E. (1957). The effects of training on heart rate."]
   },
   {
     "id": 4,
-    "title": "Ultra Maratonlarda Sodyum Alım Stratejileri",
-    "category": "Beslenme",
-    "date": "20 Ekim 2024",
-    "readTime": "8 dk",
-    "summary": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.",
-    "content": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir. Terle kaybedilen tuzu yerine koymak performansın sürdürülebilirliği için şarttır.</p>",
+    "date": "2024-10-20",
+    "readTime": { "tr": "8 dk", "en": "8 min" },
+    "category": { "tr": "Beslenme", "en": "Nutrition" },
+    "title": {
+      "tr": "Ultra Maratonlarda Sodyum Alım Stratejileri",
+      "en": "Sodium Intake Strategies in Ultra Marathons"
+    },
+    "summary": {
+      "tr": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.",
+      "en": "Hourly mg calculations to reduce hyponatremia risk and maintain performance in long races."
+    },
+    "content": {
+      "tr": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir. Terle kaybedilen tuzu yerine koymak performansın sürdürülebilirliği için şarttır.</p>",
+      "en": "<p>Drinking only water during long races can be fatal. Replacing salt lost through sweat is essential for sustainability of performance.</p>"
+    },
     "references": ["Hoffman, M. D. (2014). Sodium intake during an ultramarathon."]
   },
   {
     "id": 3,
-    "title": "Mitokondriyal Biyogenez ve Zone 2",
-    "category": "Fizyoloji",
-    "date": "15 Ekim 2024",
-    "readTime": "12 dk",
-    "summary": "Düşük yoğunluklu antrenmanların laktat temizleme kapasitesini nasıl artırdığına dair yeni bulgular.",
-    "content": "<p>Mitokondri, hücrenin enerji santralidir. Zone 2 antrenmanları, Tip 1 kas liflerindeki mitokondri yoğunluğunu artırarak yağ yakım kapasitesini maksimize eder.</p>",
+    "date": "2024-10-15",
+    "readTime": { "tr": "12 dk", "en": "12 min" },
+    "category": { "tr": "Fizyoloji", "en": "Physiology" },
+    "title": {
+      "tr": "Mitokondriyal Biyogenez ve Zone 2",
+      "en": "Mitochondrial Biogenesis and Zone 2"
+    },
+    "summary": {
+      "tr": "Düşük yoğunluklu antrenmanların laktat temizleme kapasitesini nasıl artırdığına dair yeni bulgular.",
+      "en": "New findings on how low-intensity training increases lactate clearance capacity."
+    },
+    "content": {
+      "tr": "<p>Mitokondri, hücrenin enerji santralidir. Zone 2 antrenmanları, Tip 1 kas liflerindeki mitokondri yoğunluğunu artırarak yağ yakım kapasitesini maksimize eder.</p>",
+      "en": "<p>Mitochondria are the powerhouse of the cell. Zone 2 training maximizes fat burning capacity by increasing mitochondrial density in Type 1 muscle fibers.</p>"
+    },
     "references": ["San-Millán, I. (2018). Assessment of Metabolic Flexibility."]
-  },
-  {
-    "id": 2,
-    "title": "Karbon Fiber Ayakkabılar: Hile mi Teknoloji mi?",
-    "category": "Ekipman",
-    "date": "10 Ekim 2024",
-    "readTime": "5 dk",
-    "summary": "Enerji geri dönüşümü sağlayan plakalı ayakkabıların koşu ekonomisine %4'lük etkisi.",
-    "content": "<p>Vaporfly serisi ile başlayan devrim, mekanik doping tartışmalarını da beraberinde getirdi.</p>",
-    "references": ["Hoogkamer, W. (2018). A Comparison of the Energetic Cost of Running."]
-  },
-  {
-    "id": 1,
-    "title": "Uyku ve Toparlanma: 8 Saat Yeterli mi?",
-    "category": "Recovery",
-    "date": "05 Ekim 2024",
-    "readTime": "4 dk",
-    "summary": "Sporcular için uyku kalitesi süreden daha önemli olabilir mi? REM uykusunun önemi.",
-    "content": "<p>Derin uyku (REM olmayan evre 3), büyüme hormonunun salgılandığı evredir.</p>",
-    "references": []
   }
 ]
