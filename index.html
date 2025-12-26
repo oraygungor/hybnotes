@@ -12,9 +12,6 @@
     <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Chart.js (UTMB Kura Grafiği için) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -49,18 +46,6 @@
         .prose p { margin-bottom: 1rem; }
         .prose h4 { color: white; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
         input:focus { outline: none; }
-        
-        /* LaTeX formül stilleri */
-        .latex-formula { font-family: "Times New Roman", Times, serif; }
-        .fraction { display: inline-block; text-align: center; vertical-align: middle; margin: 0 0.2em; }
-        .numerator { border-bottom: 1px solid #94a3b8; display: block; padding: 0 0.2em; }
-        .denominator { display: block; padding: 0 0.2em; }
-        .product-notation { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin-right: 0.2em; }
-        
-        /* Range Slider */
-        input[type=range] { -webkit-appearance: none; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #84cc16; cursor: pointer; margin-top: -6px; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-200 font-sans">
@@ -368,233 +353,16 @@
                 );
             };
 
-            // --- UTMB KURA HESAPLAMA (YENİ) ---
+            // --- UTMB KURA HESAPLAMA (IFRAME İLE) ---
             const UTMBLotteryPage = () => {
-                const [lang, setLang] = useState('TR');
-                const [race, setRace] = useState('UTMB');
-                const [method, setMethod] = useState('cagr');
-                const [stones, setStones] = useState(1);
-                const chartRef = useRef(null);
-                const chartInstance = useRef(null);
-
-                const data = useMemo(() => ({
-                    UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } },
-                    CCC: { capacity: 1900, demand: { 2023: 5249, 2024: 5400, 2025: 6000 }, meanStones: { 2024: 4.0, 2025: 4.4 } },
-                    OCC: { capacity: 1200, demand: { 2023: 5171, 2024: 6500, 2025: 10000 }, meanStones: { 2024: 2.8, 2025: 3.2 } }
-                }), []);
-
-                const translations = {
-                    EN: {
-                        title: "UTMB 2026 Lottery Calculator", subtitle: "Estimated probabilities based on 2023-2025 data.",
-                        race: "Race", method: "Method", stones: "Running Stones",
-                        prob: "Probability", demand: "2026 Demand", mean: "Avg Stones",
-                        chartTitle: "Probability by Stones", modelTitle: "Hypergeometric Formula",
-                        defP: "Win Probability", defW: "Your Stones", defB: "Capacity", defT: "Total Pool",
-                        tableHeaders: ["Year", "Demand", "Avg Stones"], proj: "2026 (Proj.)"
-                    },
-                    TR: {
-                        title: "UTMB 2026 Kura Hesaplayıcı", subtitle: "2023-2025 verilerine dayalı tahmini şans.",
-                        race: "Yarış", method: "Metod", stones: "Taş Sayısı",
-                        prob: "Kazanma Şansı", demand: "2026 Talep", mean: "Ort. Taş",
-                        chartTitle: "Taş Sayısına Göre Şans", modelTitle: "Hipergeometrik Formül",
-                        defP: "Kazanma Olasılığı", defW: "Sizin Taşınız", defB: "Kapasite", defT: "Toplam Havuz",
-                        tableHeaders: ["Yıl", "Talep", "Ort. Taş"], proj: "2026 (Tahmin)"
-                    }
-                };
-                const t = translations[lang];
-
-                // Helper Functions
-                const cagr = (v1, v2, f = 1) => { const g = Math.pow(v2 / v1, 1 / 2) - 1; return Math.round(v2 * (1 + g * f)); };
-                const linear = (v1, v2) => { const s = (v2 - v1) / 2; return Math.round(v2 + s); };
-                const getDemand = (r, m) => {
-                    const d = data[r].demand;
-                    return m === 'linear' ? linear(d[2023], d[2025]) :
-                           m === 'conservative' ? cagr(d[2023], d[2025], 0.7) :
-                           m === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
-                };
-                const getMean = (r, m) => {
-                    const mS = data[r].meanStones;
-                    const g = (mS[2025] / mS[2024]) - 1;
-                    return m === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) :
-                           m === 'conservative' ? mS[2025] * (1 + g * 0.7) :
-                           m === 'optimistic' ? mS[2025] * (1 + g * 1.3) : mS[2025] * (1 + g);
-                };
-                const getProb = (B, N, mean, w) => {
-                    if (w <= 0) return 0;
-                    if (w > 50) w = 50;
-                    const T = N * mean + w;
-                    let logNoHit = 0;
-                    const loops = Math.min(B, T - w); 
-                    for (let i = 0; i < loops; i++) {
-                        logNoHit += Math.log(T - w - i) - Math.log(T - i);
-                        if (T - i <= 0 || T - w - i <= 0) break;
-                    }
-                    return 1 - Math.exp(logNoHit);
-                };
-
-                const currentValues = useMemo(() => {
-                    const N = getDemand(race, method);
-                    const mean = getMean(race, method);
-                    const B = data[race].capacity;
-                    const p = getProb(B, N, mean, stones);
-                    const T = N * mean + stones;
-                    return { N, mean, B, p, T };
-                }, [race, method, stones, data]);
-
-                // Chart Effect
-                useEffect(() => {
-                    if (chartInstance.current) chartInstance.current.destroy();
-                    if (!chartRef.current) return;
-
-                    const ctx = chartRef.current.getContext('2d');
-                    const { B, N, mean } = currentValues;
-                    
-                    let labels = [], vals = [], pointColors = [], radii = [];
-                    for(let w=1; w<=25; w++) {
-                        labels.push(w);
-                        vals.push(getProb(B, N, mean, w) * 100);
-                        if(w === stones) { pointColors.push('#84cc16'); radii.push(6); } 
-                        else { pointColors.push('rgba(132, 204, 22, 0.5)'); radii.push(0); }
-                    }
-
-                    chartInstance.current = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: t.prob + ' (%)',
-                                data: vals,
-                                borderColor: '#84cc16',
-                                backgroundColor: 'rgba(132, 204, 22, 0.1)',
-                                borderWidth: 3,
-                                tension: 0.4,
-                                pointBackgroundColor: pointColors,
-                                pointRadius: radii,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-                            scales: {
-                                y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true, max: 100 },
-                                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-                            }
-                        }
-                    });
-
-                    return () => { if(chartInstance.current) chartInstance.current.destroy(); };
-                }, [currentValues, stones, t.prob]);
-
                 return (
-                    <div className="space-y-6 animate-fade-in relative">
-                        {/* Language Switcher */}
-                        <div className="absolute top-0 right-0 z-10">
-                             <div className="bg-slate-800 border border-slate-700 rounded-lg p-1 flex gap-1">
-                                <button onClick={() => setLang('EN')} className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${lang === 'EN' ? 'bg-lime-500 text-slate-900' : 'text-slate-400 hover:text-white'}`}>EN</button>
-                                <button onClick={() => setLang('TR')} className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${lang === 'TR' ? 'bg-lime-500 text-slate-900' : 'text-slate-400 hover:text-white'}`}>TR</button>
-                             </div>
-                        </div>
-
-                        <div className="text-center mb-10">
-                            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-2">UTMB 2026 <span className="text-lime-500">Kura</span></h1>
-                            <p className="text-slate-400 max-w-2xl mx-auto">{t.subtitle}</p>
-                        </div>
-
-                        <div className="grid lg:grid-cols-12 gap-6">
-                            {/* Controls */}
-                            <div className="lg:col-span-4 space-y-6">
-                                <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700 shadow-xl">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">{t.race}</label>
-                                            <select value={race} onChange={(e) => setRace(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 focus:border-lime-500 focus:outline-none">
-                                                <option value="UTMB">UTMB (2300)</option>
-                                                <option value="CCC">CCC (1900)</option>
-                                                <option value="OCC">OCC (1200)</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">{t.method}</label>
-                                            <select value={method} onChange={(e) => setMethod(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 focus:border-lime-500 focus:outline-none">
-                                                <option value="cagr">CAGR (Recommended)</option>
-                                                <option value="linear">Linear</option>
-                                                <option value="conservative">Conservative</option>
-                                                <option value="optimistic">Optimistic</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <div className="flex justify-between items-center mb-2">
-                                                <label className="text-xs font-bold text-slate-400 uppercase">{t.stones}</label>
-                                                <span className="text-lime-500 font-black text-xl">{stones}</span>
-                                            </div>
-                                            <input type="range" min="1" max="50" value={stones} onChange={(e) => setStones(parseInt(e.target.value))} />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-3 mt-6">
-                                        <div className="col-span-2 bg-lime-500/10 border border-lime-500/20 rounded-xl p-4 text-center">
-                                            <h3 className="text-lime-500 text-xs font-bold uppercase mb-1">{t.prob}</h3>
-                                            <div className="text-4xl font-black text-white">% {(currentValues.p * 100).toFixed(2)}</div>
-                                        </div>
-                                        <div className="bg-slate-900 border border-slate-700 rounded-xl p-3 text-center">
-                                            <h3 className="text-slate-500 text-[10px] font-bold uppercase mb-1">{t.demand}</h3>
-                                            <div className="text-lg font-bold text-slate-200">{currentValues.N.toLocaleString()}</div>
-                                        </div>
-                                        <div className="bg-slate-900 border border-slate-700 rounded-xl p-3 text-center">
-                                            <h3 className="text-slate-500 text-[10px] font-bold uppercase mb-1">{t.mean}</h3>
-                                            <div className="text-lg font-bold text-slate-200">{currentValues.mean.toFixed(2)}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Chart */}
-                            <div className="lg:col-span-8">
-                                <div className="bg-slate-800 rounded-3xl p-4 h-full min-h-[400px] border border-slate-700 relative">
-                                    <canvas ref={chartRef}></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Bottom Section */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700">
-                                <table className="w-full text-sm text-right text-slate-300">
-                                    <thead><tr className="text-slate-500 border-b border-slate-700"><th className="py-2 text-left">{t.tableHeaders[0]}</th><th>{t.tableHeaders[1]}</th><th>{t.tableHeaders[2]}</th></tr></thead>
-                                    <tbody>
-                                        {[2023, 2024, 2025].map(y => (
-                                            <tr key={y} className="border-b border-slate-800/50">
-                                                <td className="py-2 text-left text-slate-400 font-mono">{y}</td>
-                                                <td>{data[race].demand[y].toLocaleString()}</td>
-                                                <td>{data[race].meanStones[y] ? data[race].meanStones[y].toFixed(1) : '-'}</td>
-                                            </tr>
-                                        ))}
-                                        <tr className="text-lime-500 font-bold bg-lime-500/5">
-                                            <td className="py-2 text-left">{t.proj}</td>
-                                            <td>{currentValues.N.toLocaleString()}</td>
-                                            <td>{currentValues.mean.toFixed(2)}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700">
-                                <h3 className="text-white font-bold mb-4">{t.modelTitle}</h3>
-                                <div className="bg-slate-900 rounded-xl p-4 border border-slate-700 mb-4 flex justify-center">
-                                     <div className="latex-formula text-lg md:text-xl text-slate-200 flex flex-wrap justify-center items-center">
-                                        <span className="text-lime-500 font-bold mr-2">p</span> = 1 − 
-                                        <div className="product-notation mx-2"><span className="prod-limit">B-1</span><span className="prod-symbol text-lime-500">∏</span><span className="prod-limit">i=0</span></div>
-                                        <div className="fraction"><span className="numerator">(T − <span className="text-lime-500">w</span> − i)</span><span className="denominator">(T − i)</span></div>
-                                    </div>
-                                </div>
-                                <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-                                    <dt className="font-mono font-bold text-lime-500">p</dt><dd className="text-slate-400">{t.defP}</dd>
-                                    <dt className="font-mono font-bold text-lime-500">w</dt><dd className="text-slate-400">{t.defW}: <strong className="text-white">{stones}</strong></dd>
-                                    <dt className="font-mono font-bold text-lime-500">B</dt><dd className="text-slate-400">{t.defB}: <strong className="text-white">{currentValues.B}</strong></dd>
-                                    <dt className="font-mono font-bold text-lime-500">T</dt><dd className="text-slate-400">{t.defT}: <strong className="text-white">~{Math.round(currentValues.T).toLocaleString()}</strong></dd>
-                                </dl>
-                            </div>
-                        </div>
+                    <div className="w-full h-screen max-h-[1200px] animate-fade-in">
+                        <iframe 
+                            src="utmb-kura.html" 
+                            title="UTMB 2026 Kura Hesaplayıcı"
+                            className="w-full h-full border-0 rounded-3xl shadow-2xl bg-slate-900"
+                            style={{ minHeight: '800px' }}
+                        />
                     </div>
                 );
             };
