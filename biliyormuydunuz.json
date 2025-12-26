@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "tag": "Antrenman",
+    "text": {
+      "tr": "Zone 2 antrenmanları, yağ oksidasyonunu maksimize ederek ultra mesafelerde glikojen depolarını korumanın anahtarıdır.",
+      "en": "Zone 2 training is key to preserving glycogen stores in ultra distances by maximizing fat oxidation."
+    }
+  },
+  {
+    "id": 2,
+    "tag": "Fizyoloji",
+    "text": {
+      "tr": "Maksimum nabız (220-Yaş) formülü kişiden kişiye %10-15 oranında sapma gösterebilir; en iyisi bir performans testidir.",
+      "en": "The maximum heart rate (220-Age) formula can deviate by 10-15% per individual; a performance test is best."
+    }
+  },
+  {
+    "id": 3,
+    "tag": "Beslenme",
+    "text": {
+      "tr": "Vücut, egzersiz sırasında saatte ortalama 60-90 gram arasında karbonhidratı işleyebilir.",
+      "en": "The body can process an average of 60-90 grams of carbohydrates per hour during exercise."
+    }
+  },
+  {
+    "id": 4,
+    "tag": "Toparlanma",
+    "text": {
+      "tr": "Uyku sırasında salgılanan büyüme hormonu, kas onarımı ve mitokondriyal gelişim için en kritik faktördür.",
+      "en": "Growth hormone secreted during sleep is the most critical factor for muscle repair and mitochondrial development."
+    }
+  }
+]
