@@ -137,7 +137,6 @@
                     icon: Icons.Calculator,
                     type: 'dropdown',
                     children: [
-                        { id: 'utmb', title: 'UTMB Efor', icon: Icons.TrendingUp },
                         { id: 'utmb_lottery', title: 'UTMB Kura', icon: Icons.Ticket },
                         { id: 'caffeine', title: 'Kafein Grafiği', icon: Icons.Zap },
                     ]
@@ -293,66 +292,6 @@
                 );
             };
 
-            // --- UTMB EFOR HESAPLAMA ---
-            const UTMBPage = () => {
-                const [distance, setDistance] = useState('');
-                const [elevation, setElevation] = useState('');
-                const [result, setResult] = useState(null);
-
-                const calculate = (e) => {
-                    e.preventDefault();
-                    if(!distance || !elevation) return;
-                    const d = parseFloat(distance);
-                    const el = parseFloat(elevation);
-                    const kmEffort = d + (el / 100);
-                    let category = "";
-                    let stones = 0;
-                    if (kmEffort < 20) { category = "Başlangıç"; stones = 0; } 
-                    else if (kmEffort < 45) { category = "20K"; stones = 1; } 
-                    else if (kmEffort < 75) { category = "50K"; stones = 2; } 
-                    else if (kmEffort < 115) { category = "100K"; stones = 3; } 
-                    else { category = "100M"; stones = 4; }
-                    setResult({ kmEffort, category, stones });
-                };
-
-                return (
-                  <div className="space-y-6 animate-fade-in">
-                    <div className="text-center mb-10">
-                        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-2">UTMB <span className="text-lime-500">Efor Hesaplayıcı</span></h1>
-                        <p className="text-slate-400 max-w-2xl mx-auto">Koşacağınız mesafenin ve yüksekliğin UTMB Endeksi kategorisindeki karşılığını hesaplayın.</p>
-                    </div>
-                    <div className="grid md:grid-cols-5 gap-8">
-                        <div className="md:col-span-3">
-                             <div className="bg-slate-800 rounded-3xl p-6 md:p-8 border border-slate-700 shadow-xl">
-                                <div className="flex items-center gap-2 mb-6 text-lime-500 font-bold border-b border-slate-700 pb-4"><Icons.Calculator size={20} /> Yarış Verileri</div>
-                                <form onSubmit={calculate} className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div><label className="block text-sm font-medium text-slate-300 mb-2">Mesafe (km)</label><div className="relative"><input type="number" step="0.1" required value={distance} onChange={(e) => setDistance(e.target.value)} placeholder="Örn: 42.5" className="w-full bg-slate-900 border border-slate-600 rounded-xl py-3 px-4 text-white focus:border-lime-500 focus:ring-1 focus:ring-lime-500 transition-all placeholder:text-slate-600" /><span className="absolute right-4 top-3 text-slate-500 text-sm font-bold">km</span></div></div>
-                                        <div><label className="block text-sm font-medium text-slate-300 mb-2">Kazanılan İrtifa (m+)</label><div className="relative"><input type="number" step="10" required value={elevation} onChange={(e) => setElevation(e.target.value)} placeholder="Örn: 2500" className="w-full bg-slate-900 border border-slate-600 rounded-xl py-3 px-4 text-white focus:border-lime-500 focus:ring-1 focus:ring-lime-500 transition-all placeholder:text-slate-600" /><span className="absolute right-4 top-3 text-slate-500 text-sm font-bold">m</span></div></div>
-                                    </div>
-                                    <button type="submit" className="w-full bg-lime-500 text-slate-900 py-4 rounded-xl font-black hover:bg-lime-400 transition-all transform hover:scale-[1.01] shadow-lg shadow-lime-500/20 text-lg">HESAPLA</button>
-                                </form>
-                                {result && (
-                                    <div className="mt-8 pt-8 border-t border-slate-700 animate-slide-in">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="bg-slate-900 rounded-2xl p-4 text-center border border-slate-700"><span className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Km-Efor Değeri</span><span className="block text-3xl font-black text-white">{result.kmEffort.toFixed(1)}</span></div>
-                                            <div className="bg-lime-500/10 rounded-2xl p-4 text-center border border-lime-500/30"><span className="block text-lime-500 text-xs font-bold uppercase tracking-wider mb-1">UTMB Kategorisi</span><span className="block text-3xl font-black text-lime-400">{result.category}</span></div>
-                                        </div>
-                                        <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl flex gap-3"><div className="mt-1"><Icons.Zap size={20} className="text-yellow-500" /></div><div><p className="text-yellow-200 text-sm">Bu bir UTMB World Series yarışı ise, bitirdiğinizde hesabınıza <strong className="text-yellow-400 ml-1">{result.stones} Running Stone</strong> eklenecektir.</p></div></div>
-                                    </div>
-                                )}
-                             </div>
-                        </div>
-                        <div className="md:col-span-2 space-y-4">
-                             <div className="bg-slate-800 p-5 rounded-2xl border border-slate-700"><div className="w-8 h-8 bg-lime-500/20 text-lime-400 rounded-lg flex items-center justify-center mb-3 font-bold text-sm">20K</div><h4 className="font-bold text-white mb-1">20K Kategorisi</h4><p className="text-sm text-slate-400">Genellikle 20km ile 40km arası veya düşük irtifalı kısa yarışlar.</p></div>
-                             <div className="bg-slate-800 p-5 rounded-2xl border border-slate-700"><div className="w-8 h-8 bg-lime-500/20 text-lime-400 rounded-lg flex items-center justify-center mb-3 font-bold text-sm">50K</div><h4 className="font-bold text-white mb-1">50K Kategorisi</h4><p className="text-sm text-slate-400">45km ile 75km arası efora denk gelen orta mesafe yarışlar.</p></div>
-                             <div className="bg-slate-800 p-5 rounded-2xl border border-slate-700"><div className="w-8 h-8 bg-lime-500/20 text-lime-400 rounded-lg flex items-center justify-center mb-3 font-bold text-sm">100K</div><h4 className="font-bold text-white mb-1">100K & 100M</h4><p className="text-sm text-slate-400">75km üzeri ve çok yüksek irtifalı ultra maraton yarışları.</p></div>
-                        </div>
-                    </div>
-                  </div>
-                );
-            };
-
             // --- UTMB KURA HESAPLAMA (IFRAME İLE) ---
             const UTMBLotteryPage = () => {
                 return (
@@ -368,9 +307,13 @@
             };
 
             const CaffeinePage = () => (
-                <div className="bg-slate-800 rounded-3xl p-6 md:p-8 border border-slate-700 animate-fade-in">
-                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">Kafein Metabolizması</h2>
-                    <div className="h-64 flex items-end justify-between gap-2">{[100, 85, 70, 60, 50, 42, 35, 90, 75, 62, 50, 40].map((h, i) => (<div key={i} style={{ height: `${h}%` }} className={`w-full rounded-t-lg ${i === 7 ? 'bg-yellow-400' : 'bg-slate-700 hover:bg-lime-500'} transition-colors`}></div>))}</div>
+                <div className="w-full h-screen max-h-[1200px] animate-fade-in">
+                    <iframe 
+                        src="kafein-stratejisi.html" 
+                        title="Kafein Stratejisi"
+                        className="w-full h-full border-0 rounded-3xl shadow-2xl bg-slate-900"
+                        style={{ minHeight: '800px' }}
+                    />
                 </div>
             );
 
@@ -443,7 +386,6 @@
                 switch (activeTab) {
                     case 'home': return <HomePage changePage={setActiveTab} />;
                     case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} />;
-                    case 'utmb': return <UTMBPage />;
                     case 'utmb_lottery': return <UTMBLotteryPage />;
                     case 'caffeine': return <CaffeinePage />;
                     default: return <HomePage changePage={setActiveTab} />;
