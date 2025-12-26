@@ -112,18 +112,20 @@
         const { useState, useEffect, useMemo, useRef } = React;
 
         // --- FIREBASE INITIALIZATION ---
-        let auth, db, firebaseApp;
+        let auth = null, db = null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'hybnotes-app';
 
         try {
             if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                 const firebaseConfig = JSON.parse(__firebase_config);
-                firebaseApp = firebase.initializeApp(firebaseConfig);
+                if (firebase.apps.length === 0) {
+                    firebase.initializeApp(firebaseConfig);
+                }
                 auth = firebase.auth();
                 db = firebase.firestore();
             }
         } catch (e) {
-            console.error("Firebase init failed:", e);
+            console.warn("Firebase config not available or failed to parse. Cloud storage disabled.");
         }
 
         // --- İKON KÜTÜPHANESİ ---
@@ -192,6 +194,7 @@
 
             // --- AUTH INITIALIZATION ---
             useEffect(() => {
+                if (!auth) return;
                 const initAuth = async () => {
                     try {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -199,7 +202,7 @@
                         } else {
                             await auth.signInAnonymously();
                         }
-                    } catch (e) { console.error("Auth error", e); }
+                    } catch (e) { console.warn("Auth initial failure", e); }
                 };
                 initAuth();
                 const unsubscribe = auth.onAuthStateChanged(setUser);
@@ -224,7 +227,23 @@
 
             // --- LOAD PERSISTENT SETTINGS ---
             useEffect(() => {
-                if (!user || !db) return;
+                if (!user || !db) {
+                  // If no cloud support, try IP detection once
+                  if (!isSettingsLoaded) {
+                    const detectLang = async () => {
+                      try {
+                        const geoResponse = await fetch('https://ipapi.co/json/');
+                        const geoData = await geoResponse.json();
+                        if (geoData.country_code === 'TR') setLang('tr');
+                        else setLang('en');
+                      } catch (err) {}
+                      setIsSettingsLoaded(true);
+                    };
+                    detectLang();
+                  }
+                  return;
+                }
+
                 const loadSettings = async () => {
                     try {
                         const settingsRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings');
@@ -237,24 +256,16 @@
                                 if (found) setActiveTheme(found);
                             }
                             if (data.lang) setLang(data.lang);
-                            setIsSettingsLoaded(true);
                         } else {
-                            // --- IP TABANLI DİL TESPİTİ (İlk kez giren kullanıcı için) ---
                             try {
                                 const geoResponse = await fetch('https://ipapi.co/json/');
                                 const geoData = await geoResponse.json();
-                                if (geoData.country_code === 'TR') {
-                                    setLang('tr');
-                                } else {
-                                    setLang('en');
-                                }
-                            } catch (err) {
-                                console.log("Geolocation failed, using default.");
-                            }
-                            setIsSettingsLoaded(true);
+                                if (geoData.country_code === 'TR') setLang('tr');
+                                else setLang('en');
+                            } catch (err) {}
                         }
+                        setIsSettingsLoaded(true);
                     } catch (e) {
-                        console.error("Load settings error", e);
                         setIsSettingsLoaded(true);
                     }
                 };
@@ -419,14 +430,12 @@
                     }
                     const cvs = canvasRef.current; cvs.width = cvs.parentElement.clientWidth; cvs.height = cvs.parentElement.clientHeight;
                     const p = { t: 30, r: 30, b: 50, l: 50 }, w = cvs.width - p.l - p.r, h = cvs.height - p.t - p.b;
-                    const xMin = labels[0], xMax = labels[labels.length-1];
-                    const yMax = Math.max(targetPeak * 1.3, Math.max(...data), 200);
-                    const gx = (v) => p.l + ((v - xMin) / (xMax - xMin)) * w, gy = (v) => p.t + h - (v / yMax) * h;
+                    const gx = (v) => p.l + ((v - labels[0]) / (labels[labels.length-1] - labels[0])) * w, gy = (v) => p.t + h - (v / Math.max(targetPeak * 1.3, Math.max(...data), 200)) * h;
                     const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
                     ctx.clearRect(0,0,cvs.width,cvs.height);
                     ctx.strokeStyle = '#334155'; ctx.lineWidth = 1; ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-                    for(let i=0; i<=yMax; i+=100) { const y = gy(i); ctx.beginPath(); ctx.moveTo(p.l, y); ctx.lineTo(p.l+w, y); ctx.stroke(); ctx.fillText(i+'mg', p.l-10, y); }
-                    ctx.textAlign = 'center'; const xStep = Math.max(1, Math.round((xMax - xMin)/6)); for(let i=Math.ceil(xMin); i<=xMax; i+=xStep) { const x = gx(i); ctx.beginPath(); ctx.moveTo(x, p.t); ctx.lineTo(x, p.t+h); ctx.stroke(); ctx.fillText(formatTime(raceDate, i), x, p.t+h+20); }
+                    for(let i=0; i<=targetPeak*1.5; i+=100) { const y = gy(i); ctx.beginPath(); ctx.moveTo(p.l, y); ctx.lineTo(p.l+w, y); ctx.stroke(); ctx.fillText(i+'mg', p.l-10, y); }
+                    ctx.textAlign = 'center'; const xStep = Math.max(1, Math.round((labels[labels.length-1] - labels[0])/6)); for(let i=Math.ceil(labels[0]); i<=labels[labels.length-1]; i+=xStep) { const x = gx(i); ctx.beginPath(); ctx.moveTo(x, p.t); ctx.lineTo(x, p.t+h); ctx.stroke(); ctx.fillText(formatTime(raceDate, i), x, p.t+h+20); }
                     ctx.fillStyle = `rgba(${color}, 0.1)`; ctx.fillRect(p.l, gy(targetPeak), w, gy(targetFloor)-gy(targetPeak));
                     ctx.fillStyle = `rgb(${color})`; ctx.textAlign = 'left'; ctx.fillText(t.target_zone, p.l+10, gy(targetPeak)+15);
                     if(labels.length>0) {
