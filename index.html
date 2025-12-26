@@ -12,6 +12,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- MathJax (Formüller İçin) -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <!-- Firebase (İsteğe bağlı, kodda kontrolü var) -->
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
@@ -85,6 +94,7 @@
     <script type="text/babel" src="js/Shared.js"></script>
     <script type="text/babel" src="js/UTMBLottery.js"></script>
     <script type="text/babel" src="js/CaffeineStrategy.js"></script>
+    <script type="text/babel" src="js/RunningPerformance.js"></script>
     <script type="text/babel" src="js/App.js"></script>
     <script type="text/babel" src="js/Data.js"></script>
 </body>
