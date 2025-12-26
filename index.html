@@ -157,14 +157,13 @@
           { "id": 3, "date": "2024-10-15", "readTime": { "tr": "12 dk", "en": "12 min" }, "category": { "tr": "Fizyoloji", "en": "Physiology" }, "title": { "tr": "Mitokondriyal Biyogenez ve Zone 2", "en": "Mitochondrial Biogenesis and Zone 2" }, "summary": { "tr": "Düşük yoğunluklu antrenmanların laktat temizleme kapasitesini nasıl artırdığına dair yeni bulgular.", "en": "New findings on how low-intensity training increases lactate clearance capacity." }, "content": { "tr": "<p>Mitokondri, hücrenin enerji santralidir...</p>", "en": "<p>Mitochondria are the powerhouse of the cell...</p>" }, "references": ["San-Millán, I. (2018)."] }
         ];
 
-        // --- RENK TEMALARI ---
         const THEMES = [
             { id: 'red', name: 'Kırmızı', rgb: '239 68 68', hex: '#ef4444' },
             { id: 'lime', name: 'Yeşil', rgb: '132 204 22', hex: '#84cc16' },
             { id: 'blue', name: 'Mavi', rgb: '59 130 246', hex: '#3b82f6' },
             { id: 'purple', name: 'Mor', rgb: '168 85 247', hex: '#a855f7' },
             { id: 'orange', name: 'Turuncu', rgb: '249 115 22', hex: '#f97316' },
-            { id: 'yellow', name: 'Altın Sarısı', rgb: '234 179 8', hex: '#eab308' }, // Güncellendi
+            { id: 'yellow', name: 'Altın Sarısı', rgb: '234 179 8', hex: '#eab308' },
             { id: 'pink', name: 'Pembe', rgb: '236 72 153', hex: '#ec4899' },
             { id: 'cyan', name: 'Turkuaz', rgb: '6 182 212', hex: '#06b6d4' },
             { id: 'indigo', name: 'İndigo', rgb: '99 102 241', hex: '#6366f1' },
@@ -173,6 +172,8 @@
 
         const App = () => {
             const [posts, setPosts] = useState(DEFAULT_POSTS);
+            const [facts, setFacts] = useState([]);
+            const [currentFact, setCurrentFact] = useState(null);
             const [activeTab, setActiveTab] = useState('home');
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [readingArticle, setReadingArticle] = useState(null);
@@ -196,7 +197,25 @@
                 return () => unsubscribe();
             }, []);
 
-            // --- LOAD SAVED THEME ---
+            // --- LOAD DATA ---
+            useEffect(() => {
+                fetch('posts.json')
+                    .then(res => res.ok ? res.json() : [])
+                    .then(data => setPosts(data.length ? data : DEFAULT_POSTS))
+                    .catch(() => setPosts(DEFAULT_POSTS));
+
+                fetch('biliyormuydunuz.json')
+                    .then(res => res.ok ? res.json() : [])
+                    .then(data => {
+                        setFacts(data);
+                        if (data.length) {
+                            setCurrentFact(data[Math.floor(Math.random() * data.length)]);
+                        }
+                    })
+                    .catch(() => {});
+            }, []);
+
+            // --- THEME SYNC ---
             useEffect(() => {
                 if (!user) return;
                 const loadSettings = async () => {
@@ -205,21 +224,18 @@
                         const snapshot = await settingsRef.get();
                         const themeDoc = snapshot.docs.find(d => d.id === 'theme');
                         if (themeDoc) {
-                            const savedThemeId = themeDoc.data().id;
-                            const found = THEMES.find(t => t.id === savedThemeId);
+                            const found = THEMES.find(t => t.id === themeDoc.data().id);
                             if (found) setActiveTheme(found);
                         }
-                    } catch (e) { console.error("Load theme error", e); }
+                    } catch (e) {}
                 };
                 loadSettings();
             }, [user]);
 
-            // --- SAVE THEME ON CHANGE ---
             useEffect(() => {
                 document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
                 if (user) {
-                    db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('settings').doc('theme').set({ id: activeTheme.id })
-                      .catch(e => console.error("Save theme error", e));
+                    db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('settings').doc('theme').set({ id: activeTheme.id });
                 }
             }, [activeTheme, user]);
 
@@ -302,21 +318,21 @@
                 const translations = { en: { title: "UTMB 2026 Lottery", subtitle: "Probability calculator based on 2023-2025 data.", race: "Race", method: "Method", stones: "Running Stones", prob: "Probability", demand: "Demand", mean: "Avg Stones", tableHead: ["Year", "Demand", "Avg"] }, tr: { title: "UTMB 2026 Kura", subtitle: "2023-2025 verilerine dayalı şans hesaplayıcı.", race: "Yarış", method: "Metod", stones: "Taş Sayısı", prob: "Şans", demand: "Talep", mean: "Ort. Taş", tableHead: ["Yıl", "Talep", "Ort"] } };
                 const t = translations[lang];
                 const cagr = (v1, v2, f = 1) => Math.round(v2 * (1 + (Math.pow(v2 / v1, 1 / 2) - 1) * f));
-                const linear = (v1, v2) => Math.round(v2 + (v2 - v1) / 2);
-                const getDemand = (r, m) => { const d = data[r].demand; return m === 'linear' ? linear(d[2023], d[2025]) : m === 'conservative' ? cagr(d[2023], d[2025], 0.7) : m === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1); };
+                const getDemand = (r, m) => { const d = data[r].demand; return m === 'linear' ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) : m === 'conservative' ? cagr(d[2023], d[2025], 0.7) : m === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1); };
                 const getMean = (r, m) => { const mS = data[r].meanStones; const g = (mS[2025] / mS[2024]) - 1; return m === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) : m === 'conservative' ? mS[2025] * (1 + g * 0.7) : m === 'optimistic' ? mS[2025] * (1 + g * 1.3) : mS[2025] * (1 + g); };
                 const getProb = (B, N, mean, w) => { if (w <= 0) return 0; const T = N * mean + w; let logNoHit = 0; const loops = Math.min(B, T - w); for (let i = 0; i < loops; i++) logNoHit += Math.log(T - w - i) - Math.log(T - i); return 1 - Math.exp(logNoHit); };
                 const vals = useMemo(() => { const N = getDemand(race, method), mean = getMean(race, method), B = data[race].capacity; return { N, mean, B, p: getProb(B, N, mean, stones) }; }, [race, method, stones]);
+                
                 useEffect(() => {
                     if (chartInstance.current) chartInstance.current.destroy();
                     if (!chartRef.current) return;
                     const ctx = chartRef.current.getContext('2d');
                     const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
                     const labels = Array.from({length: 20}, (_, i) => i + 1);
-                    const colors = labels.map(w => w === stones ? `rgb(${color})` : `rgba(${color}, 0.3)`);
-                    chartInstance.current = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: '%', data: labels.map(w => getProb(vals.B, vals.N, vals.mean, w) * 100), borderColor: `rgb(${color})`, backgroundColor: `rgba(${color}, 0.1)`, pointBackgroundColor: colors, pointRadius: labels.map(w => w === stones ? 6 : 2), fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true, max: 100 }, x: { display: false } } } });
-                    return () => { if(chartInstance.current) chartInstance.current.destroy(); };
+                    chartInstance.current = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: '%', data: labels.map(w => getProb(vals.B, vals.N, vals.mean, w) * 100), borderColor: `rgb(${color})`, backgroundColor: `rgba(${color}, 0.1)`, pointBackgroundColor: labels.map(w => w === stones ? `rgb(${color})` : `rgba(${color}, 0.3)`), pointRadius: labels.map(w => w === stones ? 6 : 2), fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true, max: 100 }, x: { display: false } } } });
+                    return () => chartInstance.current?.destroy();
                 }, [vals, stones, activeTheme]);
+                
                 return (
                     <div className="animate-fade-in relative max-w-7xl mx-auto">
                         <div className="text-center mb-10 pt-2"><h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">UTMB 2026 <span className="text-primary">{lang === 'tr' ? 'Kura' : 'Lottery'}</span></h1><p className="text-slate-400 text-sm">{t.subtitle}</p></div>
@@ -347,6 +363,7 @@
                 const t = translations[lang];
                 const formatTime = (baseTime, hoursOffset) => { const newTime = new Date(baseTime.getTime() + hoursOffset * 60 * 60 * 1000); return newTime.toLocaleTimeString(lang === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' }); };
                 const formatRelTime = (val) => { const h = Math.floor(Math.abs(val)), m = Math.round((Math.abs(val) - h) * 60); let txt = (h > 0 ? h + (lang==='tr'?' sa ':' hr ') : '') + (m > 0 ? m + (lang==='tr'?' dk':' min') : ''); return val < 0 ? (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' önce':' before') : (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' sonra':' after'); };
+                
                 useEffect(() => {
                     if (!canvasRef.current) return;
                     const ctx = canvasRef.current.getContext('2d');
@@ -372,7 +389,6 @@
                     ctx.strokeStyle = '#334155'; ctx.lineWidth = 1; ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
                     for(let i=0; i<=targetPeak*1.5; i+=100) { const y = gy(i); ctx.beginPath(); ctx.moveTo(p.l, y); ctx.lineTo(p.l+w, y); ctx.stroke(); ctx.fillText(i+'mg', p.l-10, y); }
                     ctx.textAlign = 'center'; const xStep = Math.max(1, Math.round((labels[labels.length-1] - labels[0])/6)); for(let i=Math.ceil(labels[0]); i<=labels[labels.length-1]; i+=xStep) { const x = gx(i); ctx.beginPath(); ctx.moveTo(x, p.t); ctx.lineTo(x, p.t+h); ctx.stroke(); ctx.fillText(formatTime(raceDate, i), x, p.t+h+20); }
-                    const yTop = gy(targetPeak), yBot = gy(targetFloor);
                     ctx.fillStyle = `rgba(${color}, 0.1)`; ctx.fillRect(p.l, gy(targetPeak), w, gy(targetFloor)-gy(targetPeak));
                     ctx.fillStyle = `rgb(${color})`; ctx.textAlign = 'left'; ctx.fillText(t.target_zone, p.l+10, gy(targetPeak)+15);
                     if(labels.length>0) {
@@ -387,6 +403,7 @@
                     if(boosters.length > 1) { let dur = 0; for(let i=1; i<boosters.length; i++) dur += boosters[i].time - boosters[i-1].time; setSummary(t.summary.replace('{0}', (dur/(boosters.length-1)).toFixed(1))); } 
                     else if(boosters.length === 1) setSummary(t.summary.replace('{0}', params.raceDuration)); else setSummary(t.summary_none);
                 }, [params, lang, activeTheme]);
+
                 return (
                     <div className="animate-fade-in relative max-w-7xl mx-auto">
                         <div className="text-center mb-10 pt-2"><h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Kafein <span className="text-primary">{lang === 'tr' ? 'Stratejisi' : 'Strategy'}</span></h1><p className="text-slate-400 text-sm">{t.sim_title}</p></div>
@@ -415,7 +432,7 @@
                 );
             };
 
-            const HomePage = ({ changePage, posts, onRead, lang }) => {
+            const HomePage = ({ changePage, posts, onRead, lang, currentFact }) => {
                 const latestPost = posts.length > 0 ? posts[0] : null;
                 return (
                     <div className="space-y-8 animate-fade-in">
@@ -428,13 +445,18 @@
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div onClick={() => latestPost && onRead(latestPost)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift">
-                                    <div><div className="flex items-center gap-2 text-primary mb-2"><Icons.Zap size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span></div><h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-primary transition-colors">{latestPost ? latestPost.title[lang] : 'Loading...'}</h3><p className="text-sm text-slate-400 line-clamp-2">{latestPost ? latestPost.summary[lang] : ''}</p></div>
+                                <div onClick={() => latestPost && onRead(latestPost)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift shadow-xl">
+                                    <div><div className="flex items-center gap-2 text-primary mb-2"><Icons.Zap size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span></div><h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-primary transition-colors">{latestPost ? latestPost.title[lang] : '...'}</h3><p className="text-sm text-slate-400 line-clamp-2">{latestPost ? latestPost.summary[lang] : ''}</p></div>
                                     <div className="mt-4 flex items-center text-xs font-bold text-slate-500 group-hover:text-white transition-colors">{lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={14} className="ml-1" /></div>
                                 </div>
-                                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between hover-lift">
-                                    <div><div className="flex items-center gap-2 text-blue-400 mb-2"><Icons.Info size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Biliyor Muydunuz?' : 'Did You Know?'}</span></div><p className="text-slate-300 text-sm leading-relaxed">{lang === 'tr' ? '"Zone 2 antrenmanları, yağ oksidasyonunu maksimize ederek ultra mesafelerde glikojen depolarını korumanın anahtarıdır."' : '"Zone 2 training is key to preserving glycogen stores in ultra distances by maximizing fat oxidation."'}</p></div>
-                                    <div className="mt-4 text-xs text-slate-500">#AntrenmanBilimi</div>
+                                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between hover-lift shadow-xl">
+                                    <div><div className="flex items-center gap-2 text-blue-400 mb-2"><Icons.Info size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Biliyor Muydunuz?' : 'Did You Know?'}</span></div>
+                                        <div className="text-slate-500 text-[10px] font-bold uppercase mb-1">{currentFact ? currentFact.tag : '#Antrenman'}</div>
+                                        <p className="text-slate-200 text-sm leading-relaxed italic">
+                                            {currentFact ? `"${currentFact.text[lang]}"` : '...'}
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 text-[10px] text-slate-600 font-mono tracking-widest uppercase">HybNotes Intelligence</div>
                                 </div>
                             </div>
                             <div className="md:col-span-1 h-full min-h-[250px] hover-lift"><LatestPostsWidget posts={posts} onSelect={onRead} lang={lang} /></div>
@@ -449,7 +471,7 @@
                     <nav className="fixed top-0 w-full z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
                         <div className="max-w-7xl mx-auto px-4 md:px-8">
                             <div className="flex items-center justify-between h-20">
-                                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('home')}><PulseBarLogo size={32} /><span className="text-2xl font-black text-white tracking-tighter hidden md:block">HybNotes</span></div>
+                                <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setActiveTab('home'); setReadingArticle(null); }}><PulseBarLogo size={32} /><span className="text-2xl font-black text-white tracking-tighter hidden md:block">HybNotes</span></div>
                                 <div className="hidden md:flex items-center gap-1">
                                     {MENU_ITEMS.map((item) => (
                                         <div key={item.id} className="relative group">
@@ -478,7 +500,7 @@
 
             const renderContent = () => {
                 switch (activeTab) {
-                    case 'home': return <HomePage changePage={setActiveTab} posts={posts} onRead={(post) => { setReadingArticle(post); setActiveTab('research'); }} lang={lang} />;
+                    case 'home': return <HomePage changePage={setActiveTab} posts={posts} onRead={(post) => { setReadingArticle(post); setActiveTab('research'); }} lang={lang} currentFact={currentFact} />;
                     case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} lang={lang} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} lang={lang} />;
                     case 'utmb_lottery': return <UTMBLotteryPage lang={lang} />;
                     case 'caffeine': return <CaffeinePage lang={lang} />;
