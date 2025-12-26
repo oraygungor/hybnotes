@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HybNotes - Hibrit Sporcu Notları</title>
+    
+    <!-- React ve ReactDOM (Çekirdek Kütüphaneler) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel (JSX'i Tarayıcının Anlaması İçin) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS (Tasarım İçin) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-in': 'slideIn 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons (İkonlar İçin) -->
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+
+    <style>
+        /* Kaydırma çubuğunu gizlemek için */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Prose ayarları */
+        .prose p { margin-bottom: 1rem; }
+        .prose h4 { color: white; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200">
+    
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // React ve Lucide kütüphanelerini globalden alıyoruz
+        const { useState, useEffect, useMemo } = React;
+        const { Menu, X, Activity, TrendingUp, Zap, BookOpen, ChevronRight, Calculator, ChevronDown, User, ArrowLeft, Calendar, Clock, Bookmark, Search, Filter, FileText } = lucideReact;
+
+        // --- ANA UYGULAMA ---
+        const App = () => {
+            // Veri State'leri
+            const [posts, setPosts] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+
+            // Uygulama State'leri
+            const [activeTab, setActiveTab] = useState('home');
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [readingArticle, setReadingArticle] = useState(null);
+
+            // VERİ ÇEKME İŞLEMİ (posts.json dosyasından)
+            useEffect(() => {
+                fetch('posts.json')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Veri dosyası bulunamadı');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        setPosts(data);
+                        setLoading(false);
+                    })
+                    .catch(err => {
+                        console.error("Hata:", err);
+                        setError("Veriler yüklenirken bir hata oluştu.");
+                        setLoading(false);
+                    });
+            }, []);
+
+            // Menü Yapısı
+            const MENU_ITEMS = [
+                { id: 'home', title: 'Ana Sayfa', icon: Activity },
+                { id: 'research', title: 'Kütüphane', icon: BookOpen },
+                { 
+                    id: 'tools', 
+                    title: 'Araçlar', 
+                    icon: Calculator,
+                    type: 'dropdown',
+                    children: [
+                        { id: 'utmb', title: 'UTMB Hesaplama', icon: TrendingUp },
+                        { id: 'caffeine', title: 'Kafein Grafiği', icon: Zap },
+                    ]
+                },
+            ];
+
+            // --- BİLEŞENLER ---
+
+            // İçerik İşleyici (Math Box vb.)
+            const processContent = (htmlContent) => {
+                return htmlContent.replace(/class='math-box'/g, 'class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-lime-500 rounded-r-xl font-mono text-lime-100 text-sm md:text-lg text-center shadow-inner italic"');
+            };
+
+            const ArticleDetail = ({ article, goBack }) => (
+                <div className="animate-fade-in pb-20">
+                    <button onClick={goBack} className="mb-6 flex items-center gap-2 text-slate-400 hover:text-lime-400 transition-colors font-bold group text-sm md:text-base">
+                        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Kütüphaneye Dön
+                    </button>
+                    <article className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden">
+                        <div className="p-6 md:p-12 border-b border-slate-700 bg-slate-800/50">
+                            <div className="flex flex-wrap gap-4 text-xs md:text-sm text-slate-400 mb-4 md:mb-6 font-mono">
+                                <span className="flex items-center gap-1"><Calendar size={12}/> {article.date}</span>
+                                <span className="flex items-center gap-1"><Clock size={12}/> {article.readTime}</span>
+                                <span className="bg-lime-500/10 text-lime-400 px-2 py-0.5 md:px-3 md:py-1 rounded-full border border-lime-500/20 font-bold">{article.category}</span>
+                            </div>
+                            <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight">{article.title}</h1>
+                        </div>
+                        <div className="p-6 md:p-12">
+                            <div 
+                                className="prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed space-y-2 md:space-y-4" 
+                                dangerouslySetInnerHTML={{ __html: processContent(article.content) }} 
+                            />
+                            {article.references && article.references.length > 0 && (
+                                <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-slate-700/50">
+                                    <h3 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center gap-2"><Bookmark size={18} className="text-lime-500"/> Referanslar</h3>
+                                    <ul className="space-y-2 md:space-y-3">
+                                        {article.references.map((ref, i) => (
+                                            <li key={i} className="text-slate-500 text-xs md:text-sm pl-4 border-l-2 border-slate-700">[{i + 1}] {ref}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    </article>
+                </div>
+            );
+
+            const ResearchPage = ({ posts, onSelect }) => {
+                const [searchTerm, setSearchTerm] = useState("");
+                const [selectedCategory, setSelectedCategory] = useState("Tümü");
+
+                const categories = useMemo(() => {
+                    const cats = ["Tümü", ...new Set(posts.map(p => p.category))];
+                    return cats;
+                }, [posts]);
+
+                const filteredPosts = posts.filter(post => {
+                    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                          post.summary.toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchesCategory = selectedCategory === "Tümü" || post.category === selectedCategory;
+                    return matchesSearch && matchesCategory;
+                });
+
+                return (
+                    <div className="space-y-8 animate-fade-in min-h-[600px]">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                            <div>
+                                <h2 className="text-3xl md:text-4xl font-black text-white mb-2">Kütüphane</h2>
+                                <p className="text-slate-400 text-sm md:text-base">Toplam {posts.length} makale ve analiz.</p>
+                            </div>
+                            <div className="relative w-full md:w-80">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                                <input 
+                                    type="text" 
+                                    placeholder="Başlık veya içerik ara..." 
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 transition-all placeholder:text-slate-600 text-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                            {categories.map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setSelectedCategory(cat)}
+                                    className={`whitespace-nowrap px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border ${
+                                        selectedCategory === cat 
+                                        ? 'bg-lime-500 text-slate-900 border-lime-500' 
+                                        : 'bg-slate-800 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-white'
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            {filteredPosts.length > 0 ? (
+                                filteredPosts.map((post) => (
+                                <div 
+                                    key={post.id} 
+                                    onClick={() => onSelect(post)}
+                                    className="bg-slate-800 rounded-2xl p-6 md:p-8 border border-slate-700 hover:border-lime-500 transition-all hover:-translate-y-1 cursor-pointer group shadow-lg flex flex-col md:flex-row gap-4 md:gap-6"
+                                >
+                                    <div className="flex-1">
+                                        <div className="flex gap-3 mb-3">
+                                            <span className="bg-slate-700 text-slate-300 text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider">{post.category}</span>
+                                            <span className="text-slate-500 text-[10px] md:text-xs font-mono flex items-center gap-1"><Calendar size={12}/> {post.date}</span>
+                                        </div>
+                                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3 group-hover:text-lime-400 transition-colors">
+                                            {post.title}
+                                        </h3>
+                                        <p className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3">
+                                            {post.summary}
+                                        </p>
+                                        <div className="flex items-center text-lime-500 text-sm font-bold gap-1">
+                                            Okumaya Başla <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                        </div>
+                                    </div>
+                                </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-20 bg-slate-800/50 rounded-2xl border border-slate-800 border-dashed">
+                                    <div className="inline-flex p-4 bg-slate-800 rounded-full mb-4">
+                                        <Filter size={32} className="text-slate-600" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-white mb-2">Sonuç Bulunamadı</h3>
+                                    <button onClick={() => { setSearchTerm(''); setSelectedCategory('Tümü'); }} className="mt-4 text-lime-500 font-bold hover:underline">Filtreleri Temizle</button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            };
+
+            const LatestPostsWidget = ({ posts, onSelect }) => {
+                const latest = [...posts].sort((a, b) => b.id - a.id).slice(0, 3);
+                return (
+                    <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col h-full">
+                        <div className="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+                            <h3 className="font-bold text-white flex items-center gap-2"><FileText size={18} className="text-lime-500"/> Son Eklenenler</h3>
+                            <span className="text-[10px] text-lime-400 bg-lime-500/10 px-2 py-1 rounded-md">Yeni</span>
+                        </div>
+                        <div className="divide-y divide-slate-700/50">
+                            {latest.map(post => (
+                                <div key={post.id} onClick={() => onSelect(post)} className="p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group">
+                                    <div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div>
+                                    <div className="text-sm font-medium text-slate-200 group-hover:text-lime-400 transition-colors line-clamp-2">{post.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <div onClick={() => onSelect(null, 'research')} className="p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">Tümünü Gör</div>
+                    </div>
+                );
+            };
+
+            const UTMBPage = () => {
+                const [stones, setStones] = useState(1);
+                const [chance, setChance] = useState(0);
+                useEffect(() => { setChance(Math.min(100, (stones * 2.8) + 5)); }, [stones]);
+                return (
+                  <div className="bg-slate-800 rounded-3xl p-6 md:p-12 border border-slate-700 shadow-xl">
+                    <div className="flex items-center gap-4 mb-8"><div className="p-3 bg-lime-500 rounded-xl text-slate-900"><Calculator size={32} /></div><div><h2 className="text-2xl md:text-3xl font-bold text-white">UTMB Hesaplayıcı</h2></div></div>
+                    <div className="grid md:grid-cols-2 gap-12 items-center"><div><div className="flex justify-between text-slate-300 mb-4 font-medium"><span>Running Stones</span><span className="text-lime-400">{stones} Adet</span></div><input type="range" min="0" max="15" value={stones} onChange={(e) => setStones(Number(e.target.value))} className="w-full h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-lime-500" /></div><div className="bg-slate-900 border border-slate-700 rounded-full w-48 h-48 flex flex-col items-center justify-center mx-auto"><span className="text-5xl font-black text-white">%{chance.toFixed(0)}</span></div></div>
+                  </div>
+                );
+            };
+
+            const CaffeinePage = () => (
+                <div className="bg-slate-800 rounded-3xl p-6 md:p-8 border border-slate-700 animate-fade-in">
+                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">Kafein Metabolizması</h2>
+                    <div className="h-64 flex items-end justify-between gap-2">{[100, 85, 70, 60, 50, 42, 35, 90, 75, 62, 50, 40].map((h, i) => (<div key={i} style={{ height: `${h}%` }} className={`w-full rounded-t-lg ${i === 7 ? 'bg-yellow-400' : 'bg-slate-700 hover:bg-lime-500'} transition-colors`}></div>))}</div>
+                </div>
+            );
+
+            // --- NAVİGASYON ---
+            const NavBar = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }) => {
+                const [openDropdown, setOpenDropdown] = useState(null);
+                return (
+                    <nav className="fixed top-0 w-full z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+                        <div className="max-w-7xl mx-auto px-4 md:px-8">
+                            <div className="flex items-center justify-between h-20">
+                                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('home')}>
+                                    <div className="w-10 h-10 bg-lime-500 rounded-xl flex items-center justify-center text-slate-900"><Activity size={22} strokeWidth={3} /></div>
+                                    <span className="text-2xl font-black text-white tracking-tighter hidden md:block">HybNotes</span>
+                                </div>
+                                <div className="hidden md:flex items-center gap-1">
+                                    {MENU_ITEMS.map((item) => (
+                                        <div key={item.id} className="relative group" onMouseEnter={() => item.children && setOpenDropdown(item.id)} onMouseLeave={() => setOpenDropdown(null)}>
+                                            <button onClick={() => !item.children && setActiveTab(item.id)} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id ? 'text-lime-400 bg-lime-500/10' : 'text-slate-400 hover:text-white'}`}>
+                                                <item.icon size={18} /> {item.title} {item.children && <ChevronDown size={14}/>}
+                                            </button>
+                                            {item.children && openDropdown === item.id && (
+                                                <div className="absolute top-full left-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">
+                                                    {item.children.map((subItem) => (<button key={subItem.id} onClick={() => { setActiveTab(subItem.id); setOpenDropdown(null); }} className="w-full text-left px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3"><subItem.icon size={16} /> {subItem.title}</button>))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 text-slate-300 hover:text-lime-400">{isMenuOpen ? <X size={28} /> : <Menu size={28} />}</button>
+                            </div>
+                        </div>
+                        {isMenuOpen && (
+                            <div className="md:hidden bg-slate-900 border-b border-slate-800 absolute w-full h-[calc(100vh-80px)] overflow-y-auto p-4 space-y-2">
+                                {MENU_ITEMS.map((item) => (
+                                    <div key={item.id}>
+                                        {item.children ? (
+                                            <div className="bg-slate-800/50 rounded-xl p-2">
+                                                <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase flex items-center gap-2"><item.icon size={14}/> {item.title}</div>
+                                                {item.children.map(sub => (<button key={sub.id} onClick={() => {setActiveTab(sub.id); setIsMenuOpen(false);}} className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 ${activeTab === sub.id ? 'text-lime-400 bg-lime-500/10' : ''}`}>{sub.title}</button>))}
+                                            </div>
+                                        ) : (
+                                            <button onClick={() => {setActiveTab(item.id); setIsMenuOpen(false);}} className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold ${activeTab === item.id ? 'bg-lime-500 text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}><item.icon size={24} /> {item.title}</button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </nav>
+                );
+            };
+
+            const HomePage = ({ changePage }) => (
+                <div className="space-y-8 animate-fade-in">
+                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 md:p-12 border border-slate-700 relative overflow-hidden shadow-2xl">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-lime-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                        <h1 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10">HybNotes <span className="text-lime-500">Dashboard</span></h1>
+                        <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">Sporcu veri tabanı, hesaplama araçları ve bilimsel analizler tek bir yerde.</p>
+                        <button onClick={() => changePage('research')} className="bg-lime-500 text-slate-900 px-6 py-3 rounded-xl font-bold hover:bg-lime-400 transition-colors shadow-lg shadow-lime-500/20">Kütüphaneye Git</button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between"><div><Activity className="text-lime-400 mb-2" /><div className="text-2xl md:text-3xl font-bold text-white">58.4</div><div className="text-sm text-slate-500">VO2 Max (Tahmini)</div></div><div className="mt-4 w-full bg-slate-700 h-1.5 rounded-full"><div className="bg-lime-500 w-[70%] h-full rounded-full"></div></div></div>
+                            <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between"><div><BookOpen className="text-blue-400 mb-2" /><div className="text-2xl md:text-3xl font-bold text-white">{loading ? '...' : posts.length}</div><div className="text-sm text-slate-500">Yayınlanmış Makale</div></div></div>
+                        </div>
+                        <div className="md:col-span-1 h-full min-h-[250px]">{loading ? <div className="text-slate-500 p-4">Yükleniyor...</div> : <LatestPostsWidget posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} />}</div>
+                    </div>
+                </div>
+            );
+
+            // --- ANA RENDER ---
+            const renderContent = () => {
+                if (loading) return <div className="min-h-screen flex items-center justify-center text-lime-400 font-bold text-xl">HybNotes Verisi Yükleniyor...</div>;
+                if (error) return <div className="min-h-screen flex items-center justify-center text-red-400">{error}</div>;
+
+                switch (activeTab) {
+                    case 'home': return <HomePage changePage={setActiveTab} />;
+                    case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} />;
+                    case 'utmb': return <UTMBPage />;
+                    case 'caffeine': return <CaffeinePage />;
+                    default: return <HomePage changePage={setActiveTab} />;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-900 text-slate-200 font-sans selection:bg-lime-500/30">
+                    <NavBar activeTab={activeTab} setActiveTab={(tab) => { setActiveTab(tab); setReadingArticle(null); }} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+                    <main className="pt-24 pb-20 px-4 md:px-8 max-w-6xl mx-auto min-h-screen">{renderContent()}</main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
