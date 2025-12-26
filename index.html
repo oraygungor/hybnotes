@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HybNotes - Hibrit Sporcu Notları</title>
     
-    <!-- React ve ReactDOM (Çekirdek Kütüphaneler) -->
+    <!-- React ve ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     
-    <!-- Babel (JSX'i Tarayıcının Anlaması İçin) -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Tailwind CSS (Tasarım İçin) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -37,19 +37,12 @@
         }
     </script>
 
-    <!-- Lucide Icons (İkonlar İçin) -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
 
     <style>
-        /* Kaydırma çubuğunu gizlemek için */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        /* Prose ayarları */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .prose p { margin-bottom: 1rem; }
         .prose h4 { color: white; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
     </style>
@@ -59,43 +52,90 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // React ve Lucide kütüphanelerini globalden alıyoruz
         const { useState, useEffect, useMemo } = React;
         const { Menu, X, Activity, TrendingUp, Zap, BookOpen, ChevronRight, Calculator, ChevronDown, User, ArrowLeft, Calendar, Clock, Bookmark, Search, Filter, FileText } = lucideReact;
 
-        // --- ANA UYGULAMA ---
-        const App = () => {
-            // Veri State'leri
-            const [posts, setPosts] = useState([]);
-            const [loading, setLoading] = useState(true);
-            const [error, setError] = useState(null);
+        // --- YEDEK VERİLER (FALLBACK) ---
+        // Eğer posts.json okunamazsa (yerel çalışma durumunda) bu veriler devreye girer.
+        const DEFAULT_POSTS = [
+          {
+            "id": 5,
+            "title": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak",
+            "category": "Antrenman Bilimi",
+            "date": "28 Ekim 2024",
+            "readTime": "6 dk",
+            "summary": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.",
+            "content": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır. Ancak bu formül, dinlenik nabzı (Resting HR) hesaba katmadığı için sporcuları yanlış yönlendirebilir.</p><div class='math-box'>Hedef Nabız = ((Maks Nabız - Dinlenik Nabız) × %Yoğunluk) + Dinlenik Nabız</div><p>Bu formül, özellikle dinlenik nabzı düşük olan dayanıklılık sporcuları için çok daha hassas sonuçlar verir.</p>",
+            "references": ["Karvonen M, Kentala E. (1957). The effects of training on heart rate."]
+          },
+          {
+            "id": 4,
+            "title": "Ultra Maratonlarda Sodyum Alım Stratejileri",
+            "category": "Beslenme",
+            "date": "20 Ekim 2024",
+            "readTime": "8 dk",
+            "summary": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.",
+            "content": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir. Terle kaybedilen tuzu yerine koymak performansın sürdürülebilirliği için şarttır.</p>",
+            "references": ["Hoffman, M. D. (2014). Sodium intake during an ultramarathon."]
+          },
+          {
+            "id": 3,
+            "title": "Mitokondriyal Biyogenez ve Zone 2",
+            "category": "Fizyoloji",
+            "date": "15 Ekim 2024",
+            "readTime": "12 dk",
+            "summary": "Düşük yoğunluklu antrenmanların laktat temizleme kapasitesini nasıl artırdığına dair yeni bulgular.",
+            "content": "<p>Mitokondri, hücrenin enerji santralidir. Zone 2 antrenmanları, Tip 1 kas liflerindeki mitokondri yoğunluğunu artırarak yağ yakım kapasitesini maksimize eder.</p>",
+            "references": ["San-Millán, I. (2018). Assessment of Metabolic Flexibility."]
+          },
+          {
+            "id": 2,
+            "title": "Karbon Fiber Ayakkabılar: Hile mi Teknoloji mi?",
+            "category": "Ekipman",
+            "date": "10 Ekim 2024",
+            "readTime": "5 dk",
+            "summary": "Enerji geri dönüşümü sağlayan plakalı ayakkabıların koşu ekonomisine %4'lük etkisi.",
+            "content": "<p>Vaporfly serisi ile başlayan devrim, mekanik doping tartışmalarını da beraberinde getirdi.</p>",
+            "references": ["Hoogkamer, W. (2018). A Comparison of the Energetic Cost of Running."]
+          },
+          {
+            "id": 1,
+            "title": "Uyku ve Toparlanma: 8 Saat Yeterli mi?",
+            "category": "Recovery",
+            "date": "05 Ekim 2024",
+            "readTime": "4 dk",
+            "summary": "Sporcular için uyku kalitesi süreden daha önemli olabilir mi? REM uykusunun önemi.",
+            "content": "<p>Derin uyku (REM olmayan evre 3), büyüme hormonunun salgılandığı evredir.</p>",
+            "references": []
+          }
+        ];
 
-            // Uygulama State'leri
+        const App = () => {
+            // BAŞLANGIÇTA VARSAYILAN VERİLERLE AÇIYORUZ (HATA VERMEMESİ İÇİN)
+            const [posts, setPosts] = useState(DEFAULT_POSTS);
+            const [loading, setLoading] = useState(false); // Artık beklemiyoruz, veri hazır.
+
             const [activeTab, setActiveTab] = useState('home');
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [readingArticle, setReadingArticle] = useState(null);
 
-            // VERİ ÇEKME İŞLEMİ (posts.json dosyasından)
+            // Yine de posts.json var mı diye bak, varsa güncelle (GitHub'da çalışır)
             useEffect(() => {
                 fetch('posts.json')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Veri dosyası bulunamadı');
-                        }
-                        return response.json();
+                    .then(res => {
+                        if(res.ok) return res.json();
+                        throw new Error('Dosya okunamadı');
                     })
                     .then(data => {
+                        console.log("Dış veri dosyası bulundu ve yüklendi.");
                         setPosts(data);
-                        setLoading(false);
                     })
                     .catch(err => {
-                        console.error("Hata:", err);
-                        setError("Veriler yüklenirken bir hata oluştu.");
-                        setLoading(false);
+                        console.log("Yerel moddasınız veya dosya yok, varsayılan veriler kullanılıyor.");
+                        // Hata fırlatmıyoruz, sessizce varsayılan veriyi kullanmaya devam ediyoruz.
                     });
             }, []);
 
-            // Menü Yapısı
             const MENU_ITEMS = [
                 { id: 'home', title: 'Ana Sayfa', icon: Activity },
                 { id: 'research', title: 'Kütüphane', icon: BookOpen },
@@ -111,9 +151,6 @@
                 },
             ];
 
-            // --- BİLEŞENLER ---
-
-            // İçerik İşleyici (Math Box vb.)
             const processContent = (htmlContent) => {
                 return htmlContent.replace(/class='math-box'/g, 'class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-lime-500 rounded-r-xl font-mono text-lime-100 text-sm md:text-lg text-center shadow-inner italic"');
             };
@@ -282,7 +319,6 @@
                 </div>
             );
 
-            // --- NAVİGASYON ---
             const NavBar = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }) => {
                 const [openDropdown, setOpenDropdown] = useState(null);
                 return (
@@ -343,16 +379,13 @@
                             <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between"><div><Activity className="text-lime-400 mb-2" /><div className="text-2xl md:text-3xl font-bold text-white">58.4</div><div className="text-sm text-slate-500">VO2 Max (Tahmini)</div></div><div className="mt-4 w-full bg-slate-700 h-1.5 rounded-full"><div className="bg-lime-500 w-[70%] h-full rounded-full"></div></div></div>
                             <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between"><div><BookOpen className="text-blue-400 mb-2" /><div className="text-2xl md:text-3xl font-bold text-white">{loading ? '...' : posts.length}</div><div className="text-sm text-slate-500">Yayınlanmış Makale</div></div></div>
                         </div>
-                        <div className="md:col-span-1 h-full min-h-[250px]">{loading ? <div className="text-slate-500 p-4">Yükleniyor...</div> : <LatestPostsWidget posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} />}</div>
+                        <div className="md:col-span-1 h-full min-h-[250px]"><LatestPostsWidget posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} /></div>
                     </div>
                 </div>
             );
 
-            // --- ANA RENDER ---
             const renderContent = () => {
-                if (loading) return <div className="min-h-screen flex items-center justify-center text-lime-400 font-bold text-xl">HybNotes Verisi Yükleniyor...</div>;
-                if (error) return <div className="min-h-screen flex items-center justify-center text-red-400">{error}</div>;
-
+                // Loading hatasını kaldırdım, çünkü artık veri her zaman var.
                 switch (activeTab) {
                     case 'home': return <HomePage changePage={setActiveTab} />;
                     case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} />;
