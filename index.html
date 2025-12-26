@@ -111,12 +111,20 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef } = React;
 
-        // --- FIREBASE SETUP ---
-        const firebaseConfig = JSON.parse(__firebase_config);
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        // --- FIREBASE INITIALIZATION ---
+        let auth, db, firebaseApp;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'hybnotes-app';
+
+        try {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+            }
+        } catch (e) {
+            console.error("Firebase init failed:", e);
+        }
 
         // --- İKON KÜTÜPHANESİ ---
         const Icons = {
@@ -183,6 +191,7 @@
 
             // --- AUTH & DATA SYNC ---
             useEffect(() => {
+                if (!auth) return;
                 const initAuth = async () => {
                     try {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -217,14 +226,15 @@
 
             // --- THEME SYNC ---
             useEffect(() => {
-                if (!user) return;
+                if (!user || !db) return;
                 const loadSettings = async () => {
                     try {
                         const settingsRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('settings');
                         const snapshot = await settingsRef.get();
                         const themeDoc = snapshot.docs.find(d => d.id === 'theme');
                         if (themeDoc) {
-                            const found = THEMES.find(t => t.id === themeDoc.data().id);
+                            const savedThemeId = themeDoc.data().id;
+                            const found = THEMES.find(t => t.id === savedThemeId);
                             if (found) setActiveTheme(found);
                         }
                     } catch (e) {}
@@ -234,8 +244,9 @@
 
             useEffect(() => {
                 document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
-                if (user) {
-                    db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('settings').doc('theme').set({ id: activeTheme.id });
+                if (user && db) {
+                    db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('settings').doc('theme').set({ id: activeTheme.id })
+                      .catch(e => console.error("Save theme failed", e));
                 }
             }, [activeTheme, user]);
 
@@ -363,7 +374,6 @@
                 const t = translations[lang];
                 const formatTime = (baseTime, hoursOffset) => { const newTime = new Date(baseTime.getTime() + hoursOffset * 60 * 60 * 1000); return newTime.toLocaleTimeString(lang === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' }); };
                 const formatRelTime = (val) => { const h = Math.floor(Math.abs(val)), m = Math.round((Math.abs(val) - h) * 60); let txt = (h > 0 ? h + (lang==='tr'?' sa ':' hr ') : '') + (m > 0 ? m + (lang==='tr'?' dk':' min') : ''); return val < 0 ? (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' önce':' before') : (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' sonra':' after'); };
-                
                 useEffect(() => {
                     if (!canvasRef.current) return;
                     const ctx = canvasRef.current.getContext('2d');
@@ -383,12 +393,15 @@
                     }
                     const cvs = canvasRef.current; cvs.width = cvs.parentElement.clientWidth; cvs.height = cvs.parentElement.clientHeight;
                     const p = { t: 30, r: 30, b: 50, l: 50 }, w = cvs.width - p.l - p.r, h = cvs.height - p.t - p.b;
-                    const gx = (v) => p.l + ((v - labels[0]) / (labels[labels.length-1] - labels[0])) * w, gy = (v) => p.t + h - (v / Math.max(targetPeak * 1.3, Math.max(...data), 200)) * h;
+                    const xMin = labels[0], xMax = labels[labels.length-1];
+                    const yMax = Math.max(targetPeak * 1.3, Math.max(...data), 200);
+                    const gx = (v) => p.l + ((v - xMin) / (xMax - xMin)) * w, gy = (v) => p.t + h - (v / yMax) * h;
                     const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
+
                     ctx.clearRect(0,0,cvs.width,cvs.height);
                     ctx.strokeStyle = '#334155'; ctx.lineWidth = 1; ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-                    for(let i=0; i<=targetPeak*1.5; i+=100) { const y = gy(i); ctx.beginPath(); ctx.moveTo(p.l, y); ctx.lineTo(p.l+w, y); ctx.stroke(); ctx.fillText(i+'mg', p.l-10, y); }
-                    ctx.textAlign = 'center'; const xStep = Math.max(1, Math.round((labels[labels.length-1] - labels[0])/6)); for(let i=Math.ceil(labels[0]); i<=labels[labels.length-1]; i+=xStep) { const x = gx(i); ctx.beginPath(); ctx.moveTo(x, p.t); ctx.lineTo(x, p.t+h); ctx.stroke(); ctx.fillText(formatTime(raceDate, i), x, p.t+h+20); }
+                    for(let i=0; i<=yMax; i+=100) { const y = gy(i); ctx.beginPath(); ctx.moveTo(p.l, y); ctx.lineTo(p.l+w, y); ctx.stroke(); ctx.fillText(i+'mg', p.l-10, y); }
+                    ctx.textAlign = 'center'; const xStep = Math.max(1, Math.round((xMax - xMin)/6)); for(let i=Math.ceil(xMin); i<=xMax; i+=xStep) { const x = gx(i); ctx.beginPath(); ctx.moveTo(x, p.t); ctx.lineTo(x, p.t+h); ctx.stroke(); ctx.fillText(formatTime(raceDate, i), x, p.t+h+20); }
                     ctx.fillStyle = `rgba(${color}, 0.1)`; ctx.fillRect(p.l, gy(targetPeak), w, gy(targetFloor)-gy(targetPeak));
                     ctx.fillStyle = `rgb(${color})`; ctx.textAlign = 'left'; ctx.fillText(t.target_zone, p.l+10, gy(targetPeak)+15);
                     if(labels.length>0) {
