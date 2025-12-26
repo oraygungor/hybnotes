@@ -28,9 +28,18 @@
                 extend: {
                     fontFamily: {
                         sans: ['DC Archia', 'Archer', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
                     },
                     colors: {
                         primary: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                        utmb: {
+                            bg: '#0e1224',
+                            card: '#141a33',
+                            border: '#2a335a',
+                            accent: '#4fd1c5',
+                            ink: '#e7ecff',
+                            muted: '#a9b3d9'
+                        }
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.6s ease-out forwards',
@@ -76,6 +85,7 @@
         .prose h4 { color: white; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
         input:focus, select:focus { outline: none; }
         
+        /* Custom Range Slider */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; margin: 8px 0; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #334155; border-radius: 3px; transition: background 0.2s; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; cursor: pointer; margin-top: -7px; box-shadow: 0 0 0 4px #0f172a; transition: transform 0.1s; background-color: rgb(var(--primary-rgb)); }
@@ -103,6 +113,18 @@
             90% { opacity: 1; }
             100% { stroke-dashoffset: 0; opacity: 0; }
         }
+
+        /* Latex Formula Styling */
+        .latex-formula { display: flex; align-items: center; justify-content: center; font-family: "Times New Roman", Times, serif; font-size: 20px; color: #e7ecff; margin: 15px 0; flex-wrap: wrap; }
+        .latex-formula .op { font-size: 20px; margin: 0 0.5em; color: #a9b3d9; }
+        .product-notation { display: inline-grid; grid-template-areas: "upper" "symbol" "lower"; text-align: center; margin-right: 5px; }
+        .prod-symbol { grid-area: symbol; font-size: 38px; line-height: 1; color: #4fd1c5; }
+        .prod-limit-upper { grid-area: upper; font-size: 12px; line-height: 1; }
+        .prod-limit-lower { grid-area: lower; font-size: 12px; line-height: 1; }
+        .fraction { display: inline-grid; grid-template-areas: "num" "den"; text-align: center; margin: 0 5px; }
+        .numerator { grid-area: num; padding: 3px 5px; font-family: ui-monospace, monospace; font-size: 16px; border-bottom: 1px solid #a9b3d9; }
+        .denominator { grid-area: den; padding: 3px 5px; font-family: ui-monospace, monospace; font-size: 16px; }
+        .numerator span, .denominator span { color: #4fd1c5; font-weight: 700; }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -126,13 +148,12 @@
                 db = firebase.firestore();
             }
         } catch (e) {
-            console.warn("Firebase config not available or failed to parse. Cloud storage disabled.");
+            console.warn("Firebase config not available. Cloud storage disabled.");
         }
 
-        // --- İKON KÜTÜPHANESİ ---
+        // --- ICONS ---
         const Icons = {
             Activity: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>,
-            TrendingUp: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>,
             Zap: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>,
             BookOpen: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>,
             ChevronRight: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>,
@@ -144,9 +165,7 @@
             ArrowLeft: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>,
             Calendar: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
             Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
-            Bookmark: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>,
             Search: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
-            Filter: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>,
             FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>,
             Info: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
             Ticket: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path></svg>,
@@ -163,6 +182,7 @@
             </svg>
         );
 
+        // --- DATA ---
         const DEFAULT_POSTS = [
           { "id": 5, "date": "2024-10-28", "readTime": { "tr": "6 dk", "en": "6 min" }, "category": { "tr": "Antrenman Bilimi", "en": "Training Science" }, "title": { "tr": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak", "en": "Karvonen Formula: Calculating Heart Rate Zones Correctly" }, "summary": { "tr": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.", "en": "Why is the classic (220-Age) formula flawed? Truly personalized zone calculation using the Heart Rate Reserve (HRR) method." }, "content": { "tr": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır...</p>", "en": "<p>Most sports watches use the '220 - Age' formula by default...</p>" }, "references": ["Karvonen M, Kentala E. (1957)."] },
           { "id": 4, "date": "2024-10-20", "readTime": { "tr": "8 dk", "en": "8 min" }, "category": { "tr": "Beslenme", "en": "Nutrition" }, "title": { "tr": "Ultra Maratonlarda Sodyum Alım Stratejileri", "en": "Sodium Intake Strategies in Ultra Marathons" }, "summary": { "tr": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.", "en": "Hourly mg calculations to reduce hyponatremia risk and maintain performance in long races." }, "content": { "tr": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir...</p>", "en": "<p>Drinking only water during long races can be fatal...</p>" }, "references": ["Hoffman, M. D. (2014)."] },
@@ -194,7 +214,7 @@
             const [user, setUser] = useState(null);
             const [isSettingsLoaded, setIsSettingsLoaded] = useState(false);
 
-            // --- AUTH INITIALIZATION ---
+            // --- AUTH ---
             useEffect(() => {
                 if (!auth) return;
                 const initAuth = async () => {
@@ -213,31 +233,19 @@
 
             // --- LOAD DATA ---
             useEffect(() => {
-                fetch('posts.json')
-                    .then(res => res.ok ? res.json() : [])
-                    .then(data => setPosts(data.length ? data : DEFAULT_POSTS))
-                    .catch(() => setPosts(DEFAULT_POSTS));
-
-                fetch('biliyormuydunuz.json')
-                    .then(res => res.ok ? res.json() : [])
-                    .then(data => {
-                        setFacts(data);
-                        if (data.length) setCurrentFact(data[Math.floor(Math.random() * data.length)]);
-                    })
-                    .catch(() => {});
+                fetch('posts.json').then(r=>r.ok?r.json():[]).then(d=>setPosts(d.length?d:DEFAULT_POSTS)).catch(()=>{});
+                fetch('biliyormuydunuz.json').then(r=>r.ok?r.json():[]).then(d=>{setFacts(d);if(d.length)setCurrentFact(d[Math.floor(Math.random()*d.length)]);}).catch(()=>{});
             }, []);
 
-            // --- LOAD PERSISTENT SETTINGS ---
+            // --- PREFERENCES ---
             useEffect(() => {
                 if (!user || !db) {
-                  // If no cloud support, try IP detection once
                   if (!isSettingsLoaded) {
                     const detectLang = async () => {
                       try {
                         const geoResponse = await fetch('https://ipapi.co/json/');
                         const geoData = await geoResponse.json();
-                        if (geoData.country_code === 'TR') setLang('tr');
-                        else setLang('en');
+                        if (geoData.country_code === 'TR') setLang('tr'); else setLang('en');
                       } catch (err) {}
                       setIsSettingsLoaded(true);
                     };
@@ -245,46 +253,34 @@
                   }
                   return;
                 }
-
                 const loadSettings = async () => {
                     try {
-                        const settingsRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings');
-                        const doc = await settingsRef.get();
-                        
+                        const doc = await db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings').get();
                         if (doc.exists) {
                             const data = doc.data();
-                            if (data.themeId) {
-                                const found = THEMES.find(t => t.id === data.themeId);
-                                if (found) setActiveTheme(found);
-                            }
+                            if (data.themeId) { const found = THEMES.find(t => t.id === data.themeId); if (found) setActiveTheme(found); }
                             if (data.lang) setLang(data.lang);
                         } else {
                             try {
                                 const geoResponse = await fetch('https://ipapi.co/json/');
                                 const geoData = await geoResponse.json();
-                                if (geoData.country_code === 'TR') setLang('tr');
-                                else setLang('en');
+                                if (geoData.country_code === 'TR') setLang('tr'); else setLang('en');
                             } catch (err) {}
                         }
-                        setIsSettingsLoaded(true);
-                    } catch (e) {
-                        setIsSettingsLoaded(true);
-                    }
+                    } catch (e) {} finally { setIsSettingsLoaded(true); }
                 };
                 loadSettings();
             }, [user]);
 
-            // --- SAVE SETTINGS ON CHANGE ---
             useEffect(() => {
                 document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
+                document.documentElement.lang = lang; // Fix for uppercase I/İ issue
                 if (user && db && isSettingsLoaded) {
-                    db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings').set({
-                        themeId: activeTheme.id,
-                        lang: lang
-                    }).catch(e => console.error("Save settings failed", e));
+                    db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings').set({ themeId: activeTheme.id, lang: lang }).catch(()=>{});
                 }
             }, [activeTheme, lang, user, isSettingsLoaded]);
 
+            // --- NAVIGATION ---
             const MENU_ITEMS = [
                 { id: 'home', title: lang === 'tr' ? 'Ana Sayfa' : 'Home', icon: Icons.Activity },
                 { id: 'research', title: lang === 'tr' ? 'Kütüphane' : 'Library', icon: Icons.BookOpen },
@@ -295,11 +291,12 @@
                     type: 'dropdown',
                     children: [
                         { id: 'utmb_lottery', title: lang === 'tr' ? 'UTMB Kura' : 'UTMB Lottery', icon: Icons.Ticket },
-                        { id: 'caffeine', title: lang === 'tr' ? 'Kafein Grafiği' : 'Caffeine Chart', icon: Icons.Zap },
+                        { id: 'caffeine', title: lang === 'tr' ? 'Kafein Stratejisi' : 'Caffeine Strategy', icon: Icons.Zap },
                     ]
                 },
             ];
 
+            // --- COMPONENTS ---
             const ArticleDetail = ({ article, goBack, lang }) => (
                 <div className="animate-fade-in pb-20">
                     <button onClick={goBack} className="mb-6 flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base">
@@ -322,11 +319,11 @@
                 </div>
             );
 
-            // --- YENİLENEN RESEARCH PAGE ---
             const ResearchPage = ({ posts, onSelect, lang }) => {
                 const [searchTerm, setSearchTerm] = useState("");
-                const [selectedCategory, setSelectedCategory] = useState("All");
-                const [sortOption, setSortOption] = useState("newest"); // newest, oldest, readingTimeAsc, readingTimeDesc
+                const ALL_CATEGORY = "ALL_CATEGORY"; // Constant key ensures filtering works regardless of language
+                const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORY);
+                const [sortOption, setSortOption] = useState("newest");
 
                 const t = {
                     title: lang === 'tr' ? 'Kütüphane' : 'Library',
@@ -339,10 +336,8 @@
                     readMore: lang === 'tr' ? 'Oku' : 'Read',
                 };
 
-                // Kategorileri çıkar
-                const categories = [t.allCategories, ...new Set(posts.map(post => post.category[lang]))];
+                const categories = [ALL_CATEGORY, ...new Set(posts.map(post => post.category[lang]))];
 
-                // Filtreleme ve Sıralama Mantığı
                 const filteredAndSortedPosts = useMemo(() => {
                     let result = posts.filter(post => {
                         const searchLower = searchTerm.toLowerCase();
@@ -350,12 +345,9 @@
                             post.title[lang].toLowerCase().includes(searchLower) || 
                             post.summary[lang].toLowerCase().includes(searchLower) ||
                             post.category[lang].toLowerCase().includes(searchLower);
-                        
-                        const matchesCategory = selectedCategory === t.allCategories || post.category[lang] === selectedCategory;
-                        
+                        const matchesCategory = selectedCategory === ALL_CATEGORY || post.category[lang] === selectedCategory;
                         return matchesSearch && matchesCategory;
                     });
-
                     return result.sort((a, b) => {
                         if (sortOption === "newest") return new Date(b.date) - new Date(a.date);
                         if (sortOption === "oldest") return new Date(a.date) - new Date(b.date);
@@ -369,69 +361,29 @@
                             <h2 className="text-3xl md:text-4xl font-black text-white">{t.title}</h2>
                             <div className="relative w-full md:w-96 group">
                                 <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors" size={20} />
-                                <input 
-                                    type="text" 
-                                    placeholder={t.searchPlaceholder}
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 pl-10 pr-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-lg"
-                                />
+                                <input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-slate-800 border border-slate-700 text-slate-200 pl-10 pr-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-lg" />
                             </div>
                         </div>
-
-                        {/* Filtreler ve Sıralama Barı */}
                         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-slate-800/50 p-2 rounded-2xl border border-slate-700/50 backdrop-blur-sm">
                             <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto scrollbar-hide">
                                 {categories.map(cat => (
-                                    <button 
-                                        key={cat}
-                                        onClick={() => setSelectedCategory(cat)}
-                                        className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition-all ${selectedCategory === cat ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-400 hover:text-white hover:bg-slate-700'}`}
-                                    >
-                                        {cat}
-                                    </button>
+                                    <button key={cat} onClick={() => setSelectedCategory(cat)} className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition-all ${selectedCategory === cat ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-400 hover:text-white hover:bg-slate-700'}`}>{cat === ALL_CATEGORY ? t.allCategories : cat}</button>
                                 ))}
                             </div>
-                            
                             <div className="flex items-center gap-2 border-l border-slate-700 pl-0 md:pl-4 w-full md:w-auto">
                                 <span className="text-xs text-slate-500 font-bold uppercase hidden md:inline-block"><Icons.SortDesc size={14} /></span>
-                                <select 
-                                    value={sortOption} 
-                                    onChange={(e) => setSortOption(e.target.value)}
-                                    className="bg-transparent text-sm font-medium text-slate-300 focus:text-primary cursor-pointer w-full md:w-auto"
-                                >
-                                    <option value="newest">{t.sortNewest}</option>
-                                    <option value="oldest">{t.sortOldest}</option>
-                                </select>
+                                <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className="bg-transparent text-sm font-medium text-slate-300 focus:text-primary cursor-pointer w-full md:w-auto"><option value="newest">{t.sortNewest}</option><option value="oldest">{t.sortOldest}</option></select>
                             </div>
                         </div>
-
-                        {/* Sonuç Listesi */}
                         {filteredAndSortedPosts.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {filteredAndSortedPosts.map(post => (
                                     <div key={post.id} onClick={() => onSelect(post)} className="bg-slate-800 rounded-2xl border border-slate-700 hover:border-primary/50 transition-all cursor-pointer group hover-lift shadow-lg overflow-hidden flex flex-col h-full">
-                                        <div className="p-6 flex-1">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">{post.category[lang]}</span>
-                                                <span className="text-xs text-slate-500 font-mono flex items-center gap-1"><Icons.Calendar size={12}/> {post.date}</span>
-                                            </div>
-                                            <h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors leading-tight">{post.title[lang]}</h3>
-                                            <p className="text-slate-400 text-sm line-clamp-3 leading-relaxed">{post.summary[lang]}</p>
-                                        </div>
-                                        <div className="px-6 py-4 bg-slate-900/30 border-t border-slate-700/50 flex justify-between items-center mt-auto">
-                                            <span className="text-xs text-slate-500 font-medium flex items-center gap-1"><Icons.Clock size={14} /> {post.readTime[lang]}</span>
-                                            <span className="text-xs font-bold text-slate-300 group-hover:text-white flex items-center gap-1 transition-colors">{t.readMore} <Icons.ChevronRight size={14} className="group-hover:translate-x-1 transition-transform"/></span>
-                                        </div>
-                                    </div>
+                                        <div className="p-6 flex-1"><div className="flex justify-between items-start mb-4"><span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">{post.category[lang]}</span><span className="text-xs text-slate-500 font-mono flex items-center gap-1"><Icons.Calendar size={12}/> {post.date}</span></div><h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors leading-tight">{post.title[lang]}</h3><p className="text-slate-400 text-sm line-clamp-3 leading-relaxed">{post.summary[lang]}</p></div><div className="px-6 py-4 bg-slate-900/30 border-t border-slate-700/50 flex justify-between items-center mt-auto"><span className="text-xs text-slate-500 font-medium flex items-center gap-1"><Icons.Clock size={14} /> {post.readTime[lang]}</span><span className="text-xs font-bold text-slate-300 group-hover:text-white flex items-center gap-1 transition-colors">{t.readMore} <Icons.ChevronRight size={14} className="group-hover:translate-x-1 transition-transform"/></span></div></div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-20 bg-slate-800/50 rounded-3xl border border-slate-700/50 border-dashed">
-                                <Icons.Search size={48} className="mx-auto text-slate-600 mb-4" />
-                                <p className="text-slate-400 text-lg">{t.noResults}</p>
-                                <button onClick={() => {setSearchTerm(""); setSelectedCategory(t.allCategories);}} className="mt-4 text-primary hover:underline text-sm font-bold">Filtreleri Temizle</button>
-                            </div>
+                            <div className="text-center py-20 bg-slate-800/50 rounded-3xl border border-slate-700/50 border-dashed"><Icons.Search size={48} className="mx-auto text-slate-600 mb-4" /><p className="text-slate-400 text-lg">{t.noResults}</p><button onClick={() => {setSearchTerm(""); setSelectedCategory(ALL_CATEGORY);}} className="mt-4 text-primary hover:underline text-sm font-bold">Filtreleri Temizle</button></div>
                         )}
                     </div>
                 );
@@ -444,114 +396,587 @@
                 </div>
             );
 
+            // --- UTMB LOTTERY CALCULATOR ---
             const UTMBLotteryPage = ({ lang }) => {
                 const [race, setRace] = useState('UTMB');
                 const [method, setMethod] = useState('cagr');
                 const [stones, setStones] = useState(1);
                 const chartRef = useRef(null);
                 const chartInstance = useRef(null);
-                const data = useMemo(() => ({ UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } }, CCC: { capacity: 1900, demand: { 2023: 5249, 2024: 5400, 2025: 6000 }, meanStones: { 2024: 4.0, 2025: 4.4 } }, OCC: { capacity: 1200, demand: { 2023: 5171, 2024: 6500, 2025: 10000 }, meanStones: { 2024: 2.8, 2025: 3.2 } } }), []);
-                const translations = { en: { title: "UTMB 2026 Lottery", subtitle: "Probability calculator based on 2023-2025 data.", race: "Race", method: "Method", stones: "Running Stones", prob: "Probability", demand: "Demand", mean: "Avg Stones", tableHead: ["Year", "Demand", "Avg"] }, tr: { title: "UTMB 2026 Kura", subtitle: "2023-2025 verilerine dayalı şans hesaplayıcı.", race: "Yarış", method: "Metod", stones: "Taş Sayısı", prob: "Şans", demand: "Talep", mean: "Ort. Taş", tableHead: ["Yıl", "Talep", "Ort"] } };
-                const t = translations[lang];
+
+                const data = useMemo(() => ({ 
+                    UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } }, 
+                    CCC: { capacity: 1900, demand: { 2023: 5249, 2024: 5400, 2025: 6000 }, meanStones: { 2024: 4.0, 2025: 4.4 } }, 
+                    OCC: { capacity: 1200, demand: { 2023: 5171, 2024: 6500, 2025: 10000 }, meanStones: { 2024: 2.8, 2025: 3.2 } } 
+                }), []);
+
+                const tr = {
+                    EN: {
+                        title: "UTMB 2026 Lottery Chance Calculator",
+                        subtitle: "Interactively displays estimated 2026 lottery probabilities based on 2023→2025 data.",
+                        raceLabel: "Race",
+                        utmbOption: "UTMB (2300 Runners)",
+                        cccOption: "CCC (1900 Runners)",
+                        occOption: "OCC (1200 Runners)",
+                        methodLabel: "Projection Method",
+                        cagrOption: "CAGR (Recommended)",
+                        linearOption: "Linear",
+                        conservativeOption: "Conservative (CAGR x0.7)",
+                        optimisticOption: "Optimistic (CAGR x1.3)",
+                        stonesLabelPrefix: "Running Stones: ",
+                        probLabel: "Estimated Probability",
+                        demandLabel: "2026 Demand",
+                        avgStonesLabel: "Avg. Stones",
+                        dataTitle: "Historical Data & Projection",
+                        tableYear: "Year",
+                        tableDemand: "Demand",
+                        tableAvgStones: "Avg. Stones",
+                        tableProjection: "2026 (Projection)",
+                        modelTitle: "Calculation Model & Methodology",
+                        formulaTitle: "Exact Calculation Formula:",
+                        defP: "Probability of winning",
+                        defW: "Your number of stones",
+                        defB: "Race capacity (Bib number)",
+                        defT: "Estimated total stones (Demand × Avg. Stones + Your Stones)",
+                        defValW: "Value: ",
+                        defValB: "Value: ",
+                        defValT: "Approx. Value: ",
+                        defI: "An iterator for the calculation (from 0 to B-1)",
+                        methodTitle: "Method Descriptions",
+                        defCAGR: "Applies the 2023→2025 compound annual growth rate (CAGR) to 2026.",
+                        defLinear: "Extrapolates the linear trend from 2023→2025.",
+                        defConservative: "Applies 70% of the CAGR growth (lower demand).",
+                        defOptimistic: "Applies 130% of the CAGR growth (higher demand).",
+                        noteTitle: "A Clarification on the Model:",
+                        noteText: "If the lottery is weighted and without replacement, we use the hypergeometric distribution.",
+                        tooltipTitleSuffix: " Stones",
+                        tooltipLabelPrefix: "Probability: ",
+                        xAxisLabel: "Number of Running Stones",
+                        yAxisLabel: "Probability (%)",
+                        locale: "en-US"
+                    },
+                    TR: {
+                        title: "UTMB 2026 Kura Şansı Hesaplayıcı",
+                        subtitle: "2023→2025 verilerine dayanarak 2026 için tahmini kura olasılıklarını interaktif olarak gösterir.",
+                        raceLabel: "Yarış",
+                        utmbOption: "UTMB (2300 Kişi)",
+                        cccOption: "CCC (1900 Kişi)",
+                        occOption: "OCC (1200 Kişi)",
+                        methodLabel: "Tahmin Metodu",
+                        cagrOption: "CAGR (Önerilen)",
+                        linearOption: "Doğrusal",
+                        conservativeOption: "Temkinli (CAGR x0.7)",
+                        optimisticOption: "İyimser (CAGR x1.3)",
+                        stonesLabelPrefix: "Taş Sayısı: ",
+                        probLabel: "Tahmini Olasılık",
+                        demandLabel: "2026 Talep",
+                        avgStonesLabel: "Ort. Taş",
+                        dataTitle: "Geçmiş Veriler ve Projeksiyon",
+                        tableYear: "Yıl",
+                        tableDemand: "Talep",
+                        tableAvgStones: "Ort. Taş",
+                        tableProjection: "2026 (Tahmin)",
+                        modelTitle: "Hesaplama Modeli ve Metodolojisi",
+                        formulaTitle: "Kesin Hesaplama Formülü:",
+                        defP: "Kazanma olasılığı",
+                        defW: "Sizin taş sayınız",
+                        defB: "Yarış kapasitesi (Bib sayısı)",
+                        defT: "Tahmini toplam taş sayısı (Talep × Ort. Taş + Sizin Taşınız)",
+                        defValW: "Değer: ",
+                        defValB: "Değer: ",
+                        defValT: "Yaklaşık Değer: ",
+                        defI: "Hesaplama için bir sayaç (0'dan B-1'e kadar)",
+                        methodTitle: "Metod Açıklamaları",
+                        defCAGR: "2023→2025 arası bileşik büyüme oranını (CAGR) 2026’ya uygular.",
+                        defLinear: "2023→2025 arasındaki doğrusal eğilimi sürdürür.",
+                        defConservative: "CAGR büyümesinin %70’ini uygular (düşük talep).",
+                        defOptimistic: "CAGR büyümesinin %130’unu uygular (yüksek talep).",
+                        noteTitle: "Model Üzerine Bir Netleştirme:",
+                        noteText: "Kura ağırlıklı ve yenilemesiz ise, hipergeometrik dağılım kullanılır.",
+                        tooltipTitleSuffix: " Taş",
+                        tooltipLabelPrefix: "Olasılık: ",
+                        xAxisLabel: "Taş Sayısı",
+                        yAxisLabel: "Olasılık (%)",
+                        locale: "tr-TR"
+                    }
+                };
+
+                const t = lang === 'tr' ? tr.TR : tr.EN;
+
+                // Maths
                 const cagr = (v1, v2, f = 1) => Math.round(v2 * (1 + (Math.pow(v2 / v1, 1 / 2) - 1) * f));
-                const getProb = (B, N, mean, w) => { if (w <= 0) return 0; const T = N * mean + w; let logNoHit = 0; const loops = Math.min(B, T - w); for (let i = 0; i < loops; i++) logNoHit += Math.log(T - w - i) - Math.log(T - i); return 1 - Math.exp(logNoHit); };
-                const vals = useMemo(() => { 
+                const getProb = (B, N, mean, w) => { 
+                    if (w <= 0) return 0; 
+                    const T = N * mean + w; 
+                    let logNoHit = 0; 
+                    const loops = Math.min(B, T - w); 
+                    for (let i = 0; i < loops; i++) {
+                        logNoHit += Math.log(T - w - i) - Math.log(T - i);
+                        if (T - i <= 0 || T - w - i <= 0) break;
+                    }
+                    return 1 - Math.exp(logNoHit); 
+                };
+
+                const vals = useMemo(() => {
                     const d = data[race].demand;
                     const N = method === 'linear' ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) : method === 'conservative' ? cagr(d[2023], d[2025], 0.7) : method === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
                     const mS = data[race].meanStones;
                     const mean = method === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) : mS[2025] * (1 + (mS[2025] / mS[2024] - 1) * (method === 'conservative' ? 0.7 : method === 'optimistic' ? 1.3 : 1));
-                    return { N, mean, B: data[race].capacity, p: getProb(data[race].capacity, N, mean, stones) };
-                }, [race, method, stones]);
-                
+                    const B = data[race].capacity;
+                    const p = getProb(B, N, mean, stones);
+                    const T = N * mean + stones;
+                    return { N, mean, B, p, T };
+                }, [race, method, stones, data]);
+
                 useEffect(() => {
                     if (chartInstance.current) chartInstance.current.destroy();
                     if (!chartRef.current) return;
                     const ctx = chartRef.current.getContext('2d');
+                    
+                    const labels = Array.from({length: 50}, (_, i) => i + 1);
+                    const dataPoints = labels.map(w => getProb(vals.B, vals.N, vals.mean, w) * 100);
+                    
                     const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
-                    const labels = Array.from({length: 20}, (_, i) => i + 1);
-                    chartInstance.current = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: '%', data: labels.map(w => getProb(vals.B, vals.N, vals.mean, w) * 100), borderColor: `rgb(${color})`, backgroundColor: `rgba(${color}, 0.1)`, pointBackgroundColor: labels.map(w => w === stones ? `rgb(${color})` : `rgba(${color}, 0.3)`), pointRadius: labels.map(w => w === stones ? 6 : 2), fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true, max: 100 }, x: { display: false } } } });
+                    const pointColors = labels.map(w => w === stones ? `rgb(${color})` : `rgba(${color}, 0.5)`);
+                    const pointRadii = labels.map(w => w === stones ? 6 : 2);
+
+                    chartInstance.current = new Chart(ctx, { 
+                        type: 'line', 
+                        data: { 
+                            labels, 
+                            datasets: [{ 
+                                label: 'Probability (%)', 
+                                data: dataPoints, 
+                                borderColor: `rgb(${color})`, 
+                                backgroundColor: `rgba(${color}, 0.1)`, 
+                                pointBackgroundColor: pointColors, 
+                                pointRadius: pointRadii, 
+                                fill: true,
+                                tension: 0.3
+                            }] 
+                        }, 
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false, 
+                            plugins: { 
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        title: (items) => `${items[0].label} ${t.tooltipTitleSuffix}`,
+                                        label: (item) => `${t.tooltipLabelPrefix}${item.formattedValue}%`
+                                    }
+                                }
+                            }, 
+                            scales: { 
+                                y: { 
+                                    beginAtZero: true, 
+                                    max: 100, 
+                                    grid: { color: 'rgba(169, 179, 217, 0.2)' }, 
+                                    ticks: { color: '#a9b3d9' },
+                                    title: { display: true, text: t.yAxisLabel, color: '#8ec5ff' }
+                                }, 
+                                x: { 
+                                    grid: { display: false },
+                                    ticks: { color: '#a9b3d9' },
+                                    title: { display: true, text: t.xAxisLabel, color: '#8ec5ff' }
+                                } 
+                            } 
+                        } 
+                    });
                     return () => chartInstance.current?.destroy();
-                }, [vals, stones, activeTheme]);
-                
+                }, [vals, stones, t, activeTheme]);
+
                 return (
-                    <div className="animate-fade-in relative max-w-7xl mx-auto">
-                        <div className="text-center mb-10 pt-2"><h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">UTMB 2026 <span className="text-primary">{lang === 'tr' ? 'Kura' : 'Lottery'}</span></h1><p className="text-slate-400 text-sm">{t.subtitle}</p></div>
-                        <div className="grid lg:grid-cols-12 gap-6">
-                            <div className="lg:col-span-4 space-y-6">
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl">
-                                    <div className="mb-4"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.race}</label><select value={race} onChange={e=>setRace(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 focus:border-primary"><option value="UTMB">UTMB</option><option value="CCC">CCC</option><option value="OCC">OCC</option></select></div>
-                                    <div className="mb-4"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.method}</label><select value={method} onChange={e=>setMethod(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 focus:border-primary"><option value="cagr">CAGR</option><option value="linear">Linear</option><option value="conservative">Conservative</option><option value="optimistic">Optimistic</option></select></div>
-                                    <Slider label={t.stones} val={stones} min={1} max={50} step={1} unit="" onChange={setStones} />
-                                    <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center mt-6"><h3 className="text-primary text-xs font-bold uppercase mb-1">{t.prob}</h3><div className="text-4xl font-black text-white">% {(vals.p * 100).toFixed(2)}</div></div>
+                    <div className="bg-[#0e1224] text-[#e7ecff] rounded-[14px] p-6 max-w-[1100px] mx-auto border border-[#2a335a] shadow-2xl animate-fade-in font-sans">
+                        <div className="text-center mb-6">
+                            <h1 className="text-2xl md:text-3xl font-bold mb-2">{t.title}</h1>
+                            <div className="text-[#a9b3d9] text-sm md:text-base">{t.subtitle}</div>
+                        </div>
+
+                        <div className="grid lg:grid-cols-[300px_1fr] gap-5 mb-5">
+                            {/* Controls */}
+                            <div className="bg-[#141a33] border border-[#2a335a] rounded-[14px] p-5 flex flex-col gap-4 shadow-lg">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-sm font-medium text-[#a9b3d9]">{t.raceLabel}</label>
+                                    <select value={race} onChange={e=>setRace(e.target.value)} className="w-full bg-[#0d1230] border border-[#2a335a] text-[#e7ecff] p-2.5 rounded-[10px] focus:outline-none focus:border-primary">
+                                        <option value="UTMB">{t.utmbOption}</option>
+                                        <option value="CCC">{t.cccOption}</option>
+                                        <option value="OCC">{t.occOption}</option>
+                                    </select>
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-sm font-medium text-[#a9b3d9]">{t.methodLabel}</label>
+                                    <select value={method} onChange={e=>setMethod(e.target.value)} className="w-full bg-[#0d1230] border border-[#2a335a] text-[#e7ecff] p-2.5 rounded-[10px] focus:outline-none focus:border-primary">
+                                        <option value="cagr">{t.cagrOption}</option>
+                                        <option value="linear">{t.linearOption}</option>
+                                        <option value="conservative">{t.conservativeOption}</option>
+                                        <option value="optimistic">{t.optimisticOption}</option>
+                                    </select>
+                                </div>
+                                <Slider label={t.stonesLabelPrefix} val={stones} min={1} max={50} step={1} unit="" onChange={setStones} />
+
+                                <div className="grid grid-cols-2 gap-3 mt-2">
+                                    <div className="col-span-2 bg-[linear-gradient(135deg,rgba(var(--primary-rgb),0.1),rgba(var(--primary-rgb),0.05))] border border-primary rounded-[10px] p-3 text-center">
+                                        <h3 className="m-0 mb-2 text-[13px] text-[#a9b3d9] font-medium uppercase">{t.probLabel}</h3>
+                                        <div className="text-[32px] md:text-[38px] font-bold leading-none text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]">% {(vals.p * 100).toFixed(2)}</div>
+                                    </div>
+                                    <div className="bg-[#0c1129] border border-[#2a335a] rounded-[10px] p-3 text-center">
+                                        <h3 className="m-0 mb-2 text-[13px] text-[#a9b3d9] font-medium uppercase">{t.demandLabel}</h3>
+                                        <div className="text-xl md:text-2xl font-bold leading-none text-[#e7ecff]">{vals.N.toLocaleString(t.locale)}</div>
+                                    </div>
+                                    <div className="bg-[#0c1129] border border-[#2a335a] rounded-[10px] p-3 text-center">
+                                        <h3 className="m-0 mb-2 text-[13px] text-[#a9b3d9] font-medium uppercase">{t.avgStonesLabel}</h3>
+                                        <div className="text-xl md:text-2xl font-bold leading-none text-[#e7ecff]">{vals.mean.toFixed(2)}</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="lg:col-span-8 flex flex-col gap-6">
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-4 h-[400px]"><canvas ref={chartRef} className="w-full h-full"></canvas></div>
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6"><div className="grid grid-cols-3 gap-4 text-center text-sm text-slate-300"><div className="font-bold text-slate-500">{t.tableHead[0]}</div><div className="font-bold text-slate-500">{t.tableHead[1]}</div><div className="font-bold text-slate-500">{t.tableHead[2]}</div>{[2023, 2024, 2025].map(y=>(<React.Fragment key={y}><div>{y}</div><div>{data[race].demand[y]}</div><div>{data[race].meanStones[y]||'-'}</div></React.Fragment>))}<div className="col-span-3 h-px bg-slate-700 my-2"></div><div className="text-primary font-bold">2026</div><div className="text-white font-bold">{vals.N.toLocaleString()}</div><div className="text-white font-bold">{vals.mean.toFixed(2)}</div></div></div>
+
+                            {/* Chart */}
+                            <div className="bg-[#141a33] border border-[#2a335a] rounded-[14px] p-2.5 h-[400px] md:h-auto flex flex-col relative shadow-lg">
+                                <div className="bg-[#0c1129] rounded-[10px] p-2.5 flex-grow relative min-h-[300px]">
+                                    <canvas ref={chartRef}></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-5">
+                            {/* Data Table */}
+                            <div className="bg-[#141a33] border border-[#2a335a] rounded-[14px] p-5 shadow-lg">
+                                <h3 className="text-[#e7ecff] font-bold mb-4">{t.dataTitle}</h3>
+                                <table className="w-full border-separate border-spacing-y-1">
+                                    <thead>
+                                        <tr>
+                                            <th className="bg-[#2a335a] text-[#8ec5ff] text-[13px] uppercase p-2.5 text-left rounded-l-[10px]">{t.tableYear}</th>
+                                            <th className="bg-[#2a335a] text-[#8ec5ff] text-[13px] uppercase p-2.5 text-right">{t.tableDemand}</th>
+                                            <th className="bg-[#2a335a] text-[#8ec5ff] text-[13px] uppercase p-2.5 text-right rounded-r-[10px]">{t.tableAvgStones}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[2023, 2024, 2025].map(y => (
+                                            <tr key={y}>
+                                                <td className="bg-[#0c1129] p-2.5 rounded-l-[10px]">{y}</td>
+                                                <td className="bg-[#0c1129] p-2.5 text-right">{data[race].demand[y].toLocaleString(t.locale)}</td>
+                                                <td className="bg-[#0c1129] p-2.5 text-right rounded-r-[10px]">{data[race].meanStones[y] ? data[race].meanStones[y].toFixed(2) : '-'}</td>
+                                            </tr>
+                                        ))}
+                                        <tr>
+                                            <td className="bg-[#0c1129] p-2.5 rounded-l-[10px] font-bold text-[#8ec5ff]">{t.tableProjection}</td>
+                                            <td className="bg-[#0c1129] p-2.5 text-right font-bold text-[#8ec5ff]">{vals.N.toLocaleString(t.locale)}</td>
+                                            <td className="bg-[#0c1129] p-2.5 text-right rounded-r-[10px] font-bold text-[#8ec5ff]">{vals.mean.toFixed(2)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Formula */}
+                            <div className="bg-[#141a33] border border-[#2a335a] rounded-[14px] p-5 shadow-lg">
+                                <h3 className="text-[#e7ecff] font-bold mb-4">{t.modelTitle}</h3>
+                                <div className="bg-[#0c1129] rounded-[10px] p-4 font-mono text-[#cde2ff] text-sm leading-relaxed mb-4">
+                                    <div className="mb-2 text-[#8ec5ff] font-sans font-bold">{t.formulaTitle}</div>
+                                    <div className="latex-formula">
+                                        <span>p</span> <span className="op">=</span> <span>1</span> <span className="op">−</span>
+                                        <div className="product-notation">
+                                            <span className="prod-limit-upper">B-1</span>
+                                            <span className="prod-symbol">Π</span>
+                                            <span className="prod-limit-lower">i=0</span>
+                                        </div>
+                                        <div className="fraction">
+                                            <span className="numerator">(T − w − i)</span>
+                                            <span className="denominator">(T − i)</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-[1.2em] font-bold text-primary mt-2 text-center">p = % {(vals.p * 100).toFixed(2)}</div>
+                                </div>
+
+                                <dl className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-1.5 text-sm">
+                                    <dt className="font-mono text-[#8ec5ff] font-bold">p</dt><dd className="text-[#a9b3d9] m-0">{t.defP}</dd>
+                                    <dt className="font-mono text-[#8ec5ff] font-bold">w</dt><dd className="text-[#a9b3d9] m-0">{t.defW} <span className="text-primary font-bold ml-1">({t.defValW} {stones})</span></dd>
+                                    <dt className="font-mono text-[#8ec5ff] font-bold">B</dt><dd className="text-[#a9b3d9] m-0">{t.defB} <span className="text-primary font-bold ml-1">({t.defValB} {vals.B})</span></dd>
+                                    <dt className="font-mono text-[#8ec5ff] font-bold">T</dt><dd className="text-[#a9b3d9] m-0">{t.defT} <span className="text-primary font-bold ml-1">({t.defValT} {Math.round(vals.T).toLocaleString(t.locale)})</span></dd>
+                                </dl>
+
+                                <div className="mt-4 text-xs text-[#a9b3d9]">
+                                    <b className="text-[#e7ecff] block mb-1">{t.noteTitle}</b>
+                                    <span dangerouslySetInnerHTML={{__html: t.noteText}}></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 );
             };
 
-            const CaffeinePage = ({ lang }) => {
+            // --- CAFFEINE STRATEGY ---
+            const CaffeinePage = ({ lang, activeTheme }) => {
                 const [params, setParams] = useState({ bodyWeight: 70, halfLife: 5, raceStart: '08:00', raceDuration: 8, initialDose: 200, initialDoseTime: -0.5, doseAmount: 75, strategy: 'stay_low' });
                 const canvasRef = useRef(null);
                 const [schedule, setSchedule] = useState([]);
                 const [summary, setSummary] = useState('');
-                const translations = { tr: { strategy_params_title: 'Strateji Parametreleri', body_weight: 'Vücut Ağırlığı', race_start: 'Yarış Başlangıç', race_duration: 'Yarış Süresi', half_life: 'Yarılanma (Genetik)', initial_dose: 'Başlangıç Dozu', initial_dose_time: 'İlk Alım Zamanı', booster_dose: 'Takviye Dozu', strategy: 'Strateji Modu', strategy_low: 'Optimum (Dengeli)', strategy_high: 'Agresif (Yüksek Performans)', sim_title: 'Kişiselleştirilmiş Kafein Simülasyonu', schedule_title: 'Önerilen Alım Takvimi', time: 'Saat', amount: 'Miktar', type: 'Tip', summary: 'Bu plana göre, yarış sırasında yaklaşık her {0} saatte bir takviye kafein önerilir.', summary_none: 'Mevcut ayarlara göre ek takviyeye ihtiyaç yok.', target_zone: 'Hedef Bölge (3-6 mg/kg)' }, en: { strategy_params_title: 'Strategy Parameters', body_weight: 'Body Weight', race_start: 'Race Start', race_duration: 'Race Duration', half_life: 'Half-Life (Genetic)', initial_dose: 'Initial Dose', initial_dose_time: 'Initial Dose Time', booster_dose: 'Booster Dose', strategy: 'Strategy Mode', strategy_low: 'Optimal (Balanced)', strategy_high: 'Aggressive (Performance)', sim_title: 'Personalized Caffeine Simulation', schedule_title: 'Recommended Intake Schedule', time: 'Time', amount: 'Amount', type: 'Type', summary: 'Recommended booster intake approx every {0} hours.', summary_none: 'No booster needed based on current settings.', target_zone: 'Target Zone (3-6 mg/kg)' } };
-                const t = translations[lang];
-                const formatTime = (baseTime, hoursOffset) => { const newTime = new Date(baseTime.getTime() + hoursOffset * 60 * 60 * 1000); return newTime.toLocaleTimeString(lang === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' }); };
+
+                const tr = {
+                    tr: {
+                        strategy_params_title: 'Strateji Parametreleri',
+                        body_weight_label: 'Vücut Ağırlığı (kg)',
+                        race_start_label: 'Yarış Başlangıç Saati',
+                        race_duration_label: 'Yarış Tahmini Süresi (saat)',
+                        half_life_label: 'Yarılanma Süresi (saat)',
+                        initial_dose_label: 'Başlangıç Dozu (mg)',
+                        initial_dose_time_label: 'İlk Doz Zamanı (yarışa göre saat)',
+                        booster_dose_label: 'Takviye Dozu (mg)',
+                        strategy_label: 'Strateji Tercihi',
+                        strategy_low: 'Daha Seyrek Alım',
+                        strategy_high: 'Daha Sık Alım',
+                        calculate_btn: 'Stratejiyi Oluştur',
+                        simulation_title: 'Kişiselleştirilmiş Kafein Simülasyonu',
+                        schedule_title: 'Önerilen Alım Takvimi',
+                        table_header_time: 'Saat',
+                        table_header_amount: 'Miktar',
+                        summary_base: '* Bu plana göre, yarış sırasında yaklaşık olarak her {0} saatte bir takviye kafein almanız önerilmektedir.',
+                        summary_no_booster: '* Yarış sırasında ek takviye doza ihtiyaç duyulmuyor.',
+                        disclaimer: 'Kafein yarılanma süresi çok değişken olabilir. Eğer yarılanma sürenizi bilmiyorsanız, varsayılan değeri baz alabilirsiniz fakat bu bir medikal öneri değildir. Bu araç, aşağıda yer alan makalelere göre hazırlanmıştır.',
+                        axis_label_time: 'Günün Saati',
+                        target_zone_label: 'Hedef Bölge',
+                        references: 'Referanslar'
+                    },
+                    en: {
+                        strategy_params_title: 'Strategy Parameters',
+                        body_weight_label: 'Body Weight (kg)',
+                        race_start_label: 'Race Start Time',
+                        race_duration_label: 'Est. Race Duration (hours)',
+                        half_life_label: 'Half-Life (hours)',
+                        initial_dose_label: 'Initial Dose (mg)',
+                        initial_dose_time_label: 'Initial Dose Time (vs race start)',
+                        booster_dose_label: 'Booster Dose (mg)',
+                        strategy_label: 'Strategy Preference',
+                        strategy_low: 'Less Frequent Intake',
+                        strategy_high: 'More Frequent Intake',
+                        calculate_btn: 'Create Strategy',
+                        simulation_title: 'Personalized Caffeine Simulation',
+                        schedule_title: 'Recommended Intake Schedule',
+                        table_header_time: 'Time',
+                        table_header_amount: 'Amount',
+                        summary_base: '* According to this plan, it is recommended to take a booster dose of caffeine approximately every {0} hours during the race.',
+                        summary_no_booster: '* No booster dose is needed during the race.',
+                        disclaimer: 'Caffeine half-life can be highly variable. If you do not know your half-life, you can use the default value, but this is not medical advice. This tool has been prepared according to the articles listed below.',
+                        axis_label_time: 'Time of Day',
+                        target_zone_label: 'Target Zone',
+                        references: 'References'
+                    }
+                };
+                const t = lang === 'tr' ? tr.tr : tr.en;
+
+                const formatTime = (baseTime, hoursOffset) => {
+                    const newTime = new Date(baseTime.getTime() + hoursOffset * 60 * 60 * 1000);
+                    return newTime.toLocaleTimeString(lang === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+                };
+                
                 const formatRelTime = (val) => { const h = Math.floor(Math.abs(val)), m = Math.round((Math.abs(val) - h) * 60); let txt = (h > 0 ? h + (lang==='tr'?' sa ':' hr ') : '') + (m > 0 ? m + (lang==='tr'?' dk':' min') : ''); return val < 0 ? (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' önce':' before') : (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' sonra':' after'); };
-                useEffect(() => {
+
+                const runSimulation = () => {
                     if (!canvasRef.current) return;
                     const ctx = canvasRef.current.getContext('2d');
-                    const [sh, sm] = params.raceStart.split(':');
-                    const raceDate = new Date(); raceDate.setHours(sh, sm, 0, 0);
-                    const targetFloor = params.bodyWeight * 3, targetPeak = params.bodyWeight * 6, absorption = 0.5, step = 0.05, k = Math.log(2) / params.halfLife, decay = Math.exp(-k * step);
-                    const trigger = params.strategy === 'stay_high' ? targetFloor + (targetPeak - targetFloor) * 0.4 : targetFloor;
-                    let current = 0, pending = false, nextTime = -1;
-                    const labels = [], data = [], events = [];
-                    if (params.initialDose > 0) events.push({ time: params.initialDoseTime, amount: params.initialDose, type: 'Initial' });
-                    const start = Math.min(-2, params.initialDoseTime - 1), end = params.raceDuration + 1, absTime = params.initialDoseTime + absorption;
-                    for (let t = start; t <= end; t += step) {
-                        let abs = 0; if (params.initialDose > 0 && t >= params.initialDoseTime && t < absTime) abs = (params.initialDose / absorption) * step;
-                        let boost = 0; if (pending && t >= nextTime) { boost = params.doseAmount; events.push({ time: nextTime, amount: params.doseAmount, type: 'Booster' }); pending = false; }
-                        current = current * decay + abs + boost; labels.push(t); data.push(current);
-                        if (t >= absTime && t < params.raceDuration && !pending && current < trigger) { pending = true; nextTime = Math.max(t, Math.ceil(t * 2) / 2); }
-                    }
-                    const cvs = canvasRef.current; cvs.width = cvs.parentElement.clientWidth; cvs.height = cvs.parentElement.clientHeight;
-                    const p = { t: 30, r: 30, b: 50, l: 50 }, w = cvs.width - p.l - p.r, h = cvs.height - p.t - p.b;
-                    const gx = (v) => p.l + ((v - labels[0]) / (labels[labels.length-1] - labels[0])) * w, gy = (v) => p.t + h - (v / Math.max(targetPeak * 1.3, Math.max(...data), 200)) * h;
                     const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
-                    ctx.clearRect(0,0,cvs.width,cvs.height);
-                    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1; ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-                    for(let i=0; i<=targetPeak*1.5; i+=100) { const y = gy(i); ctx.beginPath(); ctx.moveTo(p.l, y); ctx.lineTo(p.l+w, y); ctx.stroke(); ctx.fillText(i+'mg', p.l-10, y); }
-                    ctx.textAlign = 'center'; const xStep = Math.max(1, Math.round((labels[labels.length-1] - labels[0])/6)); for(let i=Math.ceil(labels[0]); i<=labels[labels.length-1]; i+=xStep) { const x = gx(i); ctx.beginPath(); ctx.moveTo(x, p.t); ctx.lineTo(x, p.t+h); ctx.stroke(); ctx.fillText(formatTime(raceDate, i), x, p.t+h+20); }
-                    ctx.fillStyle = `rgba(${color}, 0.1)`; ctx.fillRect(p.l, gy(targetPeak), w, gy(targetFloor)-gy(targetPeak));
-                    ctx.fillStyle = `rgb(${color})`; ctx.textAlign = 'left'; ctx.fillText(t.target_zone, p.l+10, gy(targetPeak)+15);
-                    if(labels.length>0) {
-                        ctx.beginPath(); ctx.moveTo(gx(labels[0]), gy(data[0])); for(let i=1; i<labels.length; i++) ctx.lineTo(gx(labels[i]), gy(data[i]));
-                        const grad = ctx.createLinearGradient(0, p.t, 0, p.t+h); grad.addColorStop(0, `rgba(${color},0.4)`); grad.addColorStop(1, `rgba(${color},0)`);
-                        ctx.fillStyle = grad; ctx.lineTo(gx(labels[labels.length-1]), gy(0)); ctx.lineTo(gx(labels[0]), gy(0)); ctx.fill();
-                        ctx.beginPath(); ctx.moveTo(gx(labels[0]), gy(data[0])); for(let i=1; i<labels.length; i++) ctx.lineTo(gx(labels[i]), gy(data[i]));
-                        ctx.strokeStyle = `rgb(${color})`; ctx.lineWidth = 3; ctx.stroke();
+                    
+                    const [sh, sm] = params.raceStart.split(':');
+                    const raceDate = new Date();
+                    raceDate.setHours(sh, sm, 0, 0);
+
+                    const targetFloor = params.bodyWeight * 3;
+                    const targetPeak = params.bodyWeight * 6;
+                    const absorptionTime = 20 / 60; // 20 mins
+                    const timeStep = 0.05;
+                    const k = Math.log(2) / params.halfLife;
+                    const decayFactor = Math.exp(-k * timeStep);
+                    const triggerLevel = (params.strategy === 'stay_high') ? Math.max(targetFloor, targetPeak - params.doseAmount) : targetFloor;
+
+                    let currentCaffeine = 0;
+                    const labels = [], dataPoints = [], doseEvents = [];
+                    let isBoosterPending = false;
+                    let nextBoosterDoseTime = -1;
+
+                    if (params.initialDose > 0) {
+                        doseEvents.push({ time: params.initialDoseTime, amount: params.initialDose.toFixed(0) });
                     }
-                    setSchedule(events.sort((a,b)=>a.time-b.time).map(e => ({...e, timeStr: formatTime(raceDate, e.time)})));
-                    const boosters = events.filter(e=>e.type==='Booster');
-                    if(boosters.length > 1) { let dur = 0; for(let i=1; i<boosters.length; i++) dur += boosters[i].time - boosters[i-1].time; setSummary(t.summary.replace('{0}', (dur/(boosters.length-1)).toFixed(1))); } 
-                    else if(boosters.length === 1) setSummary(t.summary.replace('{0}', params.raceDuration)); else setSummary(t.summary_none);
+
+                    const simStart = Math.min(-2, params.initialDoseTime);
+                    const simEnd = params.raceDuration;
+                    const initialDoseFullyAbsorbedTime = params.initialDoseTime + absorptionTime;
+
+                    for (let t = simStart; t <= simEnd; t += timeStep) {
+                        let absorbed = 0;
+                        if (params.initialDose > 0 && t >= params.initialDoseTime && t < params.initialDoseTime + absorptionTime) {
+                            absorbed = (params.initialDose / absorptionTime) * timeStep;
+                        }
+
+                        let booster = 0;
+                        if (isBoosterPending && t >= nextBoosterDoseTime) {
+                            booster = params.doseAmount;
+                            doseEvents.push({ time: nextBoosterDoseTime, amount: params.doseAmount.toFixed(0) });
+                            isBoosterPending = false;
+                        }
+
+                        currentCaffeine *= decayFactor;
+                        currentCaffeine += absorbed + booster;
+
+                        labels.push(parseFloat(t.toFixed(2)));
+                        dataPoints.push(currentCaffeine);
+
+                        if (t >= initialDoseFullyAbsorbedTime && !isBoosterPending && currentCaffeine < triggerLevel) {
+                            isBoosterPending = true;
+                            nextBoosterDoseTime = Math.max(t, Math.ceil(t * 2) / 2);
+                        }
+                    }
+
+                    // Drawing
+                    const cvs = canvasRef.current;
+                    cvs.width = cvs.clientWidth;
+                    cvs.height = cvs.clientHeight;
+                    const padding = { top: 20, right: 20, bottom: 40, left: 50 };
+                    const chartW = cvs.width - padding.left - padding.right;
+                    const chartH = cvs.height - padding.top - padding.bottom;
+
+                    const xMin = labels[0], xMax = labels[labels.length-1];
+                    const yMax = Math.max(targetPeak * 1.2, Math.max(...dataPoints), 100);
+
+                    const getX = (val) => padding.left + ((val - xMin) / (xMax - xMin)) * chartW;
+                    const getY = (val) => padding.top + chartH - (val / yMax) * chartH;
+
+                    ctx.clearRect(0, 0, cvs.width, cvs.height);
+                    ctx.font = '11px sans-serif';
+                    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+
+                    // Y Axis
+                    for (let i = 0; i <= yMax; i += 50) {
+                        if (i % 100 === 0) {
+                            const y = getY(i);
+                            ctx.fillStyle = '#a9b3d9';
+                            ctx.fillText(i + 'mg', padding.left - 10, y);
+                            ctx.strokeStyle = '#334155';
+                            ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left + chartW, y); ctx.stroke();
+                        }
+                    }
+
+                    // X Axis
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+                    const xStep = Math.max(1, Math.round((xMax - xMin) / 6));
+                    for (let i = Math.ceil(xMin); i <= xMax; i += xStep) {
+                        const x = getX(i);
+                        ctx.fillStyle = '#a9b3d9';
+                        ctx.fillText(formatTime(raceDate, i), x, padding.top + chartH + 10);
+                        ctx.strokeStyle = '#334155';
+                        ctx.beginPath(); ctx.moveTo(x, padding.top); ctx.lineTo(x, padding.top + chartH); ctx.stroke();
+                    }
+
+                    // Target Zone
+                    const yTargetMin = getY(targetPeak), yTargetMax = getY(targetFloor);
+                    ctx.fillStyle = `rgba(${color}, 0.1)`;
+                    ctx.fillRect(padding.left, yTargetMin, chartW, yTargetMax - yTargetMin);
+                    ctx.fillStyle = `rgb(${color})`; ctx.textAlign = 'left';
+                    ctx.fillText(t.target_zone_label, padding.left + 10, yTargetMin + 5);
+
+                    // Line
+                    if (labels.length > 0) {
+                        ctx.beginPath();
+                        ctx.moveTo(getX(labels[0]), getY(dataPoints[0]));
+                        for (let i=1; i<labels.length; i++) ctx.lineTo(getX(labels[i]), getY(dataPoints[i]));
+                        ctx.strokeStyle = `rgb(${color})`; ctx.lineWidth = 3; ctx.stroke();
+                        
+                        ctx.lineTo(getX(labels[labels.length-1]), getY(0));
+                        ctx.lineTo(getX(labels[0]), getY(0));
+                        const grad = ctx.createLinearGradient(0, padding.top, 0, padding.top+chartH); grad.addColorStop(0, `rgba(${color},0.4)`); grad.addColorStop(1, `rgba(${color},0)`);
+                        ctx.fillStyle = grad; ctx.fill();
+                    }
+
+                    setSchedule(doseEvents.sort((a,b)=>a.time-b.time).map(e => ({...e, timeStr: formatTime(raceDate, e.time)})));
+                    
+                    const boosters = doseEvents.filter(e => parseFloat(e.amount) === params.doseAmount && e.time >= 0);
+                    if (boosters.length > 1) {
+                        let totalInt = 0;
+                        for(let i=1; i<boosters.length; i++) totalInt += boosters[i].time - boosters[i-1].time;
+                        const avg = totalInt / (boosters.length - 1);
+                        setSummary(t.summary_base.replace('{0}', (Math.round(avg*2)/2).toFixed(1)));
+                    } else if (boosters.length === 1) {
+                        setSummary(t.summary_base.replace('{0}', params.raceDuration));
+                    } else {
+                        setSummary(t.summary_no_booster);
+                    }
+                };
+
+                // Trigger calculation on load or param change
+                useEffect(() => {
+                    const timer = setTimeout(runSimulation, 100);
+                    return () => clearTimeout(timer);
                 }, [params, lang, activeTheme]);
+
                 return (
-                    <div className="animate-fade-in relative max-w-7xl mx-auto">
-                        <div className="text-center mb-10 pt-2"><h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Kafein <span className="text-primary">{lang === 'tr' ? 'Stratejisi' : 'Strategy'}</span></h1><p className="text-slate-400 text-sm">{t.sim_title}</p></div>
-                        <div className="grid lg:grid-cols-12 gap-6">
-                            <div className="lg:col-span-4 space-y-6">
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl relative overflow-hidden"><div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div><h2 className="text-white font-bold mb-6 border-b border-slate-700 pb-4">{t.strategy_params_title}</h2><Slider label={t.body_weight} val={params.bodyWeight} min={40} max={120} step={1} unit="kg" onChange={v=>setParams(p=>({...p, bodyWeight:v}))} /><Slider label={t.race_duration} val={params.raceDuration} min={1} max={30} step={0.5} unit="sa" onChange={v=>setParams(p=>({...p, raceDuration:v}))} /><div className="grid grid-cols-2 gap-4 mb-4"><div><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.race_start}</label><input type="time" value={params.raceStart} onChange={e=>setParams(p=>({...p, raceStart:e.target.value}))} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white text-sm focus:border-primary"/></div><div><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase">{t.half_life}</span></div><input type="range" min={2} max={8} step={0.5} value={params.halfLife} onChange={e=>setParams(p=>({...p, halfLife:parseFloat(e.target.value)}))} /></div></div><div className="border-t border-slate-700 pt-4"><Slider label={t.initial_dose} val={params.initialDose} min={0} max={400} step={10} unit="mg" onChange={v=>setParams(p=>({...p, initialDose:v}))} /><div className="mb-4"><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase">{t.initial_dose_time}</span><span className="text-primary font-bold text-sm">{formatRelTime(params.initialDoseTime)}</span></div><input type="range" min={-2} max={2} step={0.25} value={params.initialDoseTime} onChange={(e)=>setParams(p=>({...p, initialDoseTime:parseFloat(e.target.value)}))} /></div><Slider label={t.booster_dose} val={params.doseAmount} min={20} max={200} step={5} unit="mg" onChange={v=>setParams(p=>({...p, doseAmount:v}))} /></div><div><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.strategy}</label><select value={params.strategy} onChange={e=>setParams(p=>({...p, strategy:e.target.value}))} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 focus:border-primary"><option value="stay_low">{t.strategy_low}</option><option value="stay_high">{t.strategy_high}</option></select></div></div>
+                    <div className="bg-[#2a2a2a] text-[#e0e0e0] p-6 rounded-2xl max-w-[1400px] mx-auto shadow-2xl border border-[#444] animate-fade-in">
+                        <div className="grid lg:grid-cols-[350px_1fr] gap-8">
+                            {/* LEFT PANEL */}
+                            <div className="flex flex-col gap-6">
+                                <div className="border-b border-[#444] pb-4">
+                                    <h2 className="text-xl font-bold text-white mb-2">{t.strategy_params_title}</h2>
+                                </div>
+                                <div className="grid gap-4">
+                                    <Slider label={t.body_weight_label} val={params.bodyWeight} min={40} max={120} step={1} unit="kg" onChange={v => setParams(p=>({...p, bodyWeight: parseFloat(v)}))} />
+                                    <div className="flex flex-col"><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.race_start_label}</label><input type="time" value={params.raceStart} onChange={e=>setParams(p=>({...p, raceStart: e.target.value}))} className="bg-[#333] border border-[#555] text-[#e0e0e0] rounded-lg p-2.5 focus:outline-none focus:border-primary w-full"/></div>
+                                    <Slider label={t.race_duration_label} val={params.raceDuration} min={1} max={30} step={0.5} unit="sa" onChange={v => setParams(p=>({...p, raceDuration: parseFloat(v)}))} />
+                                    <Slider label={t.half_life_label} val={params.halfLife} min={2} max={10} step={0.5} unit="sa" onChange={v => setParams(p=>({...p, halfLife: parseFloat(v)}))} />
+                                    <div className="h-px bg-[#444] my-2"></div>
+                                    <Slider label={t.initial_dose_label} val={params.initialDose} min={0} max={500} step={10} unit="mg" onChange={v => setParams(p=>({...p, initialDose: parseFloat(v)}))} />
+                                    <div className="mb-4"><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase">{t.initial_dose_time_label}</span><span className="text-primary font-bold text-sm">{formatRelTime(params.initialDoseTime)}</span></div><input type="range" min={-2} max={2} step={0.25} value={params.initialDoseTime} onChange={(e)=>setParams(p=>({...p, initialDoseTime:parseFloat(e.target.value)}))} /></div>
+                                    <Slider label={t.booster_dose_label} val={params.doseAmount} min={20} max={200} step={5} unit="mg" onChange={v => setParams(p=>({...p, doseAmount: parseFloat(v)}))} />
+                                    <div className="flex flex-col">
+                                        <label className="text-sm font-semibold text-[#b0b0b0] mb-1">{t.strategy_label}</label>
+                                        <select value={params.strategy} onChange={e=>setParams(p=>({...p, strategy: e.target.value}))} className="bg-[#333] border border-[#555] text-[#e0e0e0] rounded-lg p-2.5 focus:outline-none focus:border-primary">
+                                            <option value="stay_low">{t.strategy_low}</option>
+                                            <option value="stay_high">{t.strategy_high}</option>
+                                        </select>
+                                    </div>
+                                    <button onClick={runSimulation} className="bg-primary hover:opacity-90 text-white font-bold py-3 rounded-lg transition-opacity mt-2">{t.calculate_btn}</button>
+                                </div>
                             </div>
-                            <div className="lg:col-span-8 flex flex-col gap-6">
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-4 h-[400px]"><canvas ref={canvasRef} className="w-full h-full"></canvas></div>
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6"><h3 className="text-white font-bold mb-4">{t.schedule_title}</h3><div className="overflow-x-auto"><table className="w-full text-sm text-left text-slate-300"><thead className="text-xs text-slate-500 uppercase bg-slate-900/50 border-b border-slate-700"><tr><th className="px-6 py-3">{t.time}</th><th className="px-6 py-3">{t.amount}</th><th className="px-6 py-3">{t.type}</th></tr></thead><tbody className="divide-y divide-slate-800">{schedule.map((ev,i)=>(<tr key={i} className="hover:bg-slate-800/50"><td className="px-6 py-4 font-mono">{ev.timeStr}</td><td className="px-6 py-4 font-bold text-white">{ev.amount} mg</td><td className={`px-6 py-4 font-bold ${ev.type==='Initial'?'text-blue-400':'text-primary'}`}>{ev.type==='Initial'?(lang==='tr'?'Başlangıç':'Initial'):(lang==='tr'?'Takviye':'Booster')}</td></tr>))}</tbody></table></div><div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-xl text-sm text-white/90">{summary}</div></div>
+
+                            {/* RIGHT PANEL */}
+                            <div className="flex flex-col gap-6">
+                                <div className="bg-[#1a1a1a] rounded-xl border border-[#444] p-4 flex flex-col h-[400px]">
+                                    <h3 className="text-center font-bold text-white mb-2">{t.simulation_title}</h3>
+                                    <div className="flex-grow relative w-full h-full">
+                                        <canvas ref={canvasRef} className="w-full h-full"></canvas>
+                                    </div>
+                                </div>
+
+                                <div className="bg-[#1a1a1a] rounded-xl border border-[#444] p-6">
+                                    <h3 className="text-white font-bold mb-4">{t.schedule_title}</h3>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="border-b border-[#444] text-[#888]">
+                                                    <th className="p-3">{t.table_header_time}</th>
+                                                    <th className="p-3">{t.table_header_amount}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {schedule.map((row, i) => (
+                                                    <tr key={i} className="border-b border-[#444] last:border-0 hover:bg-[#2a2a2a]">
+                                                        <td className="p-3 font-mono text-primary">{row.timeStr}</td>
+                                                        <td className="p-3 font-bold">{row.amount} mg</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p className="mt-4 text-[#b0b0b0] italic text-sm" dangerouslySetInnerHTML={{__html: summary}}></p>
+                                </div>
+
+                                <footer className="pt-6 border-t border-[#444] text-xs text-[#888]">
+                                    <p className="italic text-[#b0b0b0] mb-4">{t.disclaimer}</p>
+                                    <p className="font-bold mb-2">{t.references}:</p>
+                                    <ul className="list-none space-y-2">
+                                        <li>1. Grgic, J., Mikulic, P., & Schoenfeld, B. J. (2024). Effects of Acute Ingestion of Caffeine Capsules on Muscle Strength and Muscle Endurance. <em>Nutrients</em>.</li>
+                                        <li>2. Lin YS, Weibel J, Landolt HP, et al. (2022). Time to Recover From Daily Caffeine Intake. <em>Frontiers in Nutrition</em>.</li>
+                                        <li>3. Institute of Medicine (US) Committee on Military Nutrition Research. (2001). Pharmacology of Caffeine.</li>
+                                        <li>4. Tiller, N. B., et al. (2019). ISSN Position Stand: Nutritional considerations for single-stage ultra-marathon training.</li>
+                                    </ul>
+                                </footer>
                             </div>
                         </div>
                     </div>
@@ -641,7 +1066,7 @@
                     case 'home': return <HomePage changePage={setActiveTab} posts={posts} onRead={(post) => { setReadingArticle(post); setActiveTab('research'); }} lang={lang} currentFact={currentFact} />;
                     case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} lang={lang} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} lang={lang} />;
                     case 'utmb_lottery': return <UTMBLotteryPage lang={lang} />;
-                    case 'caffeine': return <CaffeinePage lang={lang} />;
+                    case 'caffeine': return <CaffeinePage lang={lang} activeTheme={activeTheme} />;
                     default: return <HomePage changePage={setActiveTab} />;
                 }
             };
