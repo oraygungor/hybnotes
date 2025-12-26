@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kişiselleştirilebilir Kafein Strateji Planlayıcısı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['DC Archia', 'Archer', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: { 800: '#1e293b', 900: '#0f172a' },
+                        lime: { 400: '#a3e635', 500: '#84cc16' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 1rem; }
+        
+        /* --- SLIDER TEMEL --- */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            margin: 8px 0;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -7px; /* (thumbHeight - trackHeight) / 2 negatiif */
+            box-shadow: 0 0 0 4px #0f172a;
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+        input[type=range]:hover::-webkit-slider-thumb {
+            transform: scale(1.1);
+        }
+
+        /* --- RENK VARYASYONLARI --- */
+        
+        /* Yeşil (Standart / Fiziksel) */
+        .range-lime::-webkit-slider-thumb { background: #84cc16; }
+        .range-lime:focus::-webkit-slider-thumb { box-shadow: 0 0 0 4px #0f172a, 0 0 0 6px rgba(132, 204, 22, 0.4); }
+        .range-lime:hover::-webkit-slider-runnable-track { background: #3f6212; }
+
+        /* Mavi (Metabolizma / Süreç) */
+        .range-blue::-webkit-slider-thumb { background: #3b82f6; }
+        .range-blue:focus::-webkit-slider-thumb { box-shadow: 0 0 0 4px #0f172a, 0 0 0 6px rgba(59, 130, 246, 0.4); }
+        .range-blue:hover::-webkit-slider-runnable-track { background: #1e3a8a; }
+
+        /* Turuncu/Amber (Dozaj Miktarı) */
+        .range-amber::-webkit-slider-thumb { background: #f59e0b; border-radius: 4px; /* Karemsi thumb */ } 
+        .range-amber:focus::-webkit-slider-thumb { box-shadow: 0 0 0 4px #0f172a, 0 0 0 6px rgba(245, 158, 11, 0.4); }
+        .range-amber:hover::-webkit-slider-runnable-track { background: #78350f; }
+
+        /* Mor (Zamanlama) */
+        .range-purple::-webkit-slider-thumb { background: #a855f7; border-radius: 2px; height: 18px; width: 10px; /* Çubuk thumb */ }
+        .range-purple:focus::-webkit-slider-thumb { box-shadow: 0 0 0 4px #0f172a, 0 0 0 6px rgba(168, 85, 247, 0.4); }
+        .range-purple:hover::-webkit-slider-runnable-track { background: #581c87; }
+
+        /* Select Input */
+        select, input[type=time] {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        select:focus, input[type=time]:focus {
+            border-color: #84cc16;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto relative">
+        
+        <!-- Dil Değiştirici -->
+        <div class="absolute top-0 right-0 z-10">
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-1 flex gap-1">
+               <button id="lang-tr" onclick="setLanguage('tr')" class="px-3 py-1 text-xs font-bold rounded transition-colors bg-lime-500 text-slate-900 shadow-lg shadow-lime-500/20">TR</button>
+               <button id="lang-en" onclick="setLanguage('en')" class="px-3 py-1 text-xs font-bold text-slate-400 hover:text-white rounded transition-colors">EN</button>
+            </div>
+       </div>
+
+        <!-- Başlık -->
+        <div class="text-center mb-10 pt-2">
+            <h1 class="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Kafein <span class="text-lime-500">Stratejisi</span></h1>
+            <p class="text-slate-400 text-sm max-w-xl mx-auto" data-key="simulation_title">Kişiselleştirilmiş Kafein Simülasyonu</p>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-6">
+            
+            <!-- Sol Panel: Parametreler -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="card p-6 shadow-xl relative overflow-hidden">
+                    <h2 class="text-white font-bold mb-6 flex items-center gap-2 border-b border-slate-700 pb-4" data-key="strategy_params_title">
+                        Strateji Parametreleri
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- GRUP 1: FİZİKSEL & SÜRE (YEŞİL - STANDART) -->
+                        <div>
+                            <div class="flex justify-between mb-2 items-end">
+                                <label class="text-xs font-bold text-slate-400 uppercase flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-lime-500"></span> <span data-key="body_weight_label">Vücut Ağırlığı</span>
+                                </label>
+                                <span class="text-lime-500 font-bold text-sm"><span id="disp_bodyWeight">70</span> kg</span>
+                            </div>
+                            <input type="range" id="bodyWeight" min="40" max="120" value="70" step="1" class="range-lime">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2 items-end">
+                                <label class="text-xs font-bold text-slate-400 uppercase flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-lime-500"></span> <span data-key="race_duration_label">Yarış Süresi</span>
+                                </label>
+                                <span class="text-lime-500 font-bold text-sm"><span id="disp_raceDuration">8</span> sa</span>
+                            </div>
+                            <input type="range" id="raceDuration" min="1" max="30" value="8" step="0.5" class="range-lime">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase mb-2 block" data-key="race_start_label">Başlangıç</label>
+                                <input type="time" id="raceStart" value="08:00">
+                            </div>
+                            <!-- GRUP 2: METABOLİZMA (MAVİ - BİLİMSEL) -->
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase mb-2 block flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> <span data-key="half_life_label">Yarılanma</span>
+                                </label>
+                                <div class="text-right text-blue-400 font-bold text-xs mb-1"><span id="disp_halfLife">5</span> sa</div>
+                                <input type="range" id="halfLife" min="2" max="8" value="5" step="0.5" class="range-blue">
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-700 pt-4 space-y-5">
+                            
+                            <!-- GRUP 3: DOZAJ MİKTARLARI (AMBER/TURUNCU - KARE THUMB) -->
+                            <div>
+                                <div class="flex justify-between mb-2 items-end">
+                                    <label class="text-xs font-bold text-slate-400 uppercase flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-sm bg-amber-500"></span> <span data-key="initial_dose_label">Başlangıç Dozu</span>
+                                    </label>
+                                    <span class="text-amber-500 font-bold text-sm"><span id="disp_initialDose">200</span> mg</span>
+                                </div>
+                                <input type="range" id="initialDose" min="0" max="400" value="200" step="10" class="range-amber">
+                            </div>
+
+                            <!-- GRUP 4: ZAMANLAMA (MOR - ÇUBUK THUMB) -->
+                            <div>
+                                <div class="flex justify-between mb-2 items-end">
+                                    <label class="text-xs font-bold text-slate-400 uppercase flex items-center gap-1">
+                                        <span class="w-1 h-3 rounded-sm bg-purple-500"></span> <span data-key="initial_dose_time_label">İlk Alım Zamanı</span>
+                                    </label>
+                                    <span class="text-purple-400 font-bold text-sm" id="disp_initialDoseTime">30 dk önce</span>
+                                </div>
+                                <input type="range" id="initialDoseTime" min="-2" max="2" value="-0.5" step="0.25" class="range-purple">
+                            </div>
+
+                            <!-- DOZAJ TEKRAR -->
+                            <div>
+                                <div class="flex justify-between mb-2 items-end">
+                                    <label class="text-xs font-bold text-slate-400 uppercase flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-sm bg-amber-500"></span> <span data-key="booster_dose_label">Takviye Dozu</span>
+                                    </label>
+                                    <span class="text-amber-500 font-bold text-sm"><span id="disp_doseAmount">75</span> mg</span>
+                                </div>
+                                <input type="range" id="doseAmount" min="20" max="200" value="75" step="5" class="range-amber">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase mb-2 block" data-key="strategy_label">Strateji Modu</label>
+                            <select id="strategy">
+                                <option value="stay_low" data-key="strategy_low">Optimum (Dengeli)</option>
+                                <option value="stay_high" data-key="strategy_high">Agresif (Yüksek Performans)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Panel: Grafik ve Sonuçlar -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                <!-- Grafik -->
+                <div class="card p-4 h-[400px] relative">
+                    <canvas id="caffeineCanvas" class="w-full h-full"></canvas>
+                </div>
+
+                <!-- Sonuç Tablosu -->
+                <div class="card p-6">
+                    <h3 class="text-white font-bold mb-4 flex items-center gap-2" data-key="schedule_title">Önerilen Alım Takvimi</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-300">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-900/50 border-b border-slate-700">
+                                <tr>
+                                    <th class="px-6 py-3" data-key="table_header_time">Saat</th>
+                                    <th class="px-6 py-3" data-key="table_header_amount">Miktar</th>
+                                    <th class="px-6 py-3">Tip</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dosing-table-body" class="divide-y divide-slate-800"></tbody>
+                        </table>
+                    </div>
+                    <div id="summary-text" class="mt-4 p-4 bg-lime-500/10 border border-lime-500/20 rounded-xl text-sm text-lime-200"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Çeviri ve Dil Yönetimi ---
+        const translations = {
+            'tr': {
+                strategy_params_title: 'Strateji Parametreleri',
+                body_weight_label: 'Vücut Ağırlığı',
+                race_start_label: 'Yarış Başlangıç',
+                race_duration_label: 'Yarış Süresi',
+                half_life_label: 'Yarılanma (Genetik)',
+                initial_dose_label: 'Başlangıç Dozu',
+                initial_dose_time_label: 'İlk Alım Zamanı',
+                booster_dose_label: 'Takviye Dozu',
+                strategy_label: 'Strateji Modu',
+                strategy_low: 'Optimum (Dengeli)',
+                strategy_high: 'Agresif (Yüksek Performans)',
+                simulation_title: 'Kişiselleştirilmiş Kafein Simülasyonu',
+                schedule_title: 'Önerilen Alım Takvimi',
+                table_header_time: 'Saat',
+                table_header_amount: 'Miktar',
+                summary_base: 'Bu plana göre, yarış sırasında yaklaşık olarak her <strong>{0} saatte bir</strong> takviye kafein almanız önerilmektedir.',
+                summary_no_booster: 'Mevcut ayarlara göre yarış sırasında ek takviye dozuna ihtiyaç duyulmamaktadır.',
+                target_zone_label: 'Hedef Bölge (3-6 mg/kg)'
+            },
+            'en': {
+                strategy_params_title: 'Strategy Parameters',
+                body_weight_label: 'Body Weight',
+                race_start_label: 'Race Start',
+                race_duration_label: 'Race Duration',
+                half_life_label: 'Half-Life (Genetic)',
+                initial_dose_label: 'Initial Dose',
+                initial_dose_time_label: 'Initial Dose Time',
+                booster_dose_label: 'Booster Dose',
+                strategy_label: 'Strategy Mode',
+                strategy_low: 'Optimal (Balanced)',
+                strategy_high: 'Aggressive (Performance)',
+                simulation_title: 'Personalized Caffeine Simulation',
+                schedule_title: 'Recommended Intake Schedule',
+                table_header_time: 'Time',
+                table_header_amount: 'Amount',
+                summary_base: 'Recommended booster intake frequency: approx every <strong>{0} hours</strong>.',
+                summary_no_booster: 'No booster dose is needed based on current settings.',
+                target_zone_label: 'Target Zone (3-6 mg/kg)'
+            }
+        };
+
+        let currentLang = 'tr';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-key]').forEach(elem => {
+                const key = elem.getAttribute('data-key');
+                if (translations[lang][key]) {
+                    if (elem.tagName === 'OPTION') elem.text = translations[lang][key];
+                    else elem.innerHTML = translations[lang][key];
+                }
+            });
+            document.getElementById('lang-tr').className = lang === 'tr' ? "px-3 py-1 text-xs font-bold rounded transition-colors bg-lime-500 text-slate-900 shadow-lg shadow-lime-500/20" : "px-3 py-1 text-xs font-bold text-slate-400 hover:text-white rounded transition-colors";
+            document.getElementById('lang-en').className = lang === 'en' ? "px-3 py-1 text-xs font-bold rounded transition-colors bg-lime-500 text-slate-900 shadow-lg shadow-lime-500/20" : "px-3 py-1 text-xs font-bold text-slate-400 hover:text-white rounded transition-colors";
+            updateDisplays();
+            runSimulationAndDraw();
+        }
+
+        // --- Yardımcı Fonksiyonlar ---
+        function formatTime(baseTime, hoursOffset) {
+            const newTime = new Date(baseTime.getTime() + hoursOffset * 60 * 60 * 1000);
+            return newTime.toLocaleTimeString(currentLang === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatRelativeTime(hours) {
+            if (hours === 0) return currentLang === 'tr' ? 'Start Anı' : 'At Start';
+            const h = Math.floor(Math.abs(hours));
+            const m = Math.round((Math.abs(hours) - h) * 60);
+            let text = "";
+            if (h > 0) text += `${h} ${currentLang === 'tr' ? 'sa' : 'hr'} `;
+            if (m > 0) text += `${m} ${currentLang === 'tr' ? 'dk' : 'min'} `;
+            
+            if (hours < 0) return text + (currentLang === 'tr' ? 'önce' : 'before');
+            return text + (currentLang === 'tr' ? 'sonra' : 'after');
+        }
+
+        function updateDisplays() {
+            document.getElementById('disp_bodyWeight').innerText = document.getElementById('bodyWeight').value;
+            document.getElementById('disp_raceDuration').innerText = document.getElementById('raceDuration').value;
+            document.getElementById('disp_initialDose').innerText = document.getElementById('initialDose').value;
+            document.getElementById('disp_doseAmount').innerText = document.getElementById('doseAmount').value;
+            document.getElementById('disp_halfLife').innerText = document.getElementById('halfLife').value; // Yeni: Yarılanma göstergesi
+            document.getElementById('disp_initialDoseTime').innerText = formatRelativeTime(parseFloat(document.getElementById('initialDoseTime').value));
+        }
+
+        // --- Simülasyon ve Çizim ---
+        const canvas = document.getElementById('caffeineCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function runSimulationAndDraw() {
+            // Değerleri Al
+            const bodyWeight = parseFloat(document.getElementById('bodyWeight').value);
+            const raceStartTimeInput = document.getElementById('raceStart').value;
+            const raceDuration = parseFloat(document.getElementById('raceDuration').value);
+            const halfLife = parseFloat(document.getElementById('halfLife').value);
+            const initialDose = parseFloat(document.getElementById('initialDose').value);
+            const initialDoseTime = parseFloat(document.getElementById('initialDoseTime').value);
+            const doseAmount = parseFloat(document.getElementById('doseAmount').value);
+            const strategy = document.getElementById('strategy').value;
+
+            if (!raceStartTimeInput) return;
+            const [startHour, startMinute] = raceStartTimeInput.split(':');
+            const raceStartDate = new Date();
+            raceStartDate.setHours(startHour, startMinute, 0, 0);
+
+            // Simülasyon Sabitleri
+            const targetFloor = bodyWeight * 3; // 3 mg/kg
+            const targetPeak = bodyWeight * 6;  // 6 mg/kg
+            const absorptionTime = 0.5; // 30 dk
+            const timeStep = 0.05; 
+            const k = Math.log(2) / halfLife;
+            const decayFactor = Math.exp(-k * timeStep);
+            
+            // Strateji Mantığı
+            const triggerLevel = (strategy === 'stay_high') ? Math.max(targetFloor, targetPeak - doseAmount - 50) : targetFloor;
+
+            let currentCaffeine = 0;
+            const labels = [], dataPoints = [], doseEvents = [];
+            let isBoosterPending = false;
+            let nextBoosterDoseTime = -1;
+
+            if (initialDose > 0) {
+                 doseEvents.push({ time: initialDoseTime, amount: initialDose, type: 'Initial' });
+            }
+
+            // Döngü Başlangıcı
+            const simStart = Math.min(-2, initialDoseTime - 1);
+            const simEnd = raceDuration + 1;
+            const initialDoseFullyAbsorbedTime = initialDoseTime + absorptionTime;
+
+            for (let t = simStart; t <= simEnd; t += timeStep) {
+                // 1. Initial Doz Emilimi (Basit Lineer)
+                let absorbed = 0;
+                if (initialDose > 0 && t >= initialDoseTime && t < initialDoseTime + absorptionTime) {
+                    absorbed = (initialDose / absorptionTime) * timeStep;
+                }
+
+                // 2. Booster Doz Emilimi (Hızlı Emilim varsayımı)
+                let booster = 0;
+                if (isBoosterPending && t >= nextBoosterDoseTime) {
+                    booster = doseAmount;
+                    doseEvents.push({ time: nextBoosterDoseTime, amount: doseAmount, type: 'Booster' });
+                    isBoosterPending = false;
+                }
+                
+                // 3. Metabolizma (Yıkım + Emilim)
+                currentCaffeine *= decayFactor;
+                currentCaffeine += absorbed;
+                currentCaffeine += booster;
+                
+                labels.push(t);
+                dataPoints.push(currentCaffeine);
+
+                // 4. Karar Mekanizması
+                // Yarış süresi içinde miyiz? İlk doz emildi mi? Seviye düştü mü?
+                if (t >= initialDoseFullyAbsorbedTime && t < raceDuration && !isBoosterPending && currentCaffeine < triggerLevel) {
+                    isBoosterPending = true;
+                    // Pratik olması için en yakın 15 veya 30 dakikaya yuvarlayabiliriz, burada 0.5 (30dk) kullanıyoruz
+                    nextBoosterDoseTime = Math.max(t, Math.ceil(t * 2) / 2);
+                }
+            }
+            
+            drawChart(labels, dataPoints, targetFloor, targetPeak, raceStartDate);
+            updateResults(doseEvents, raceStartDate);
+        }
+
+        function drawChart(labels, data, yMinTarget, yMaxTarget, baseTime) {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            
+            const padding = { top: 30, right: 30, bottom: 50, left: 50 };
+            const chartWidth = canvas.width - padding.left - padding.right;
+            const chartHeight = canvas.height - padding.top - padding.bottom;
+            
+            const xMin = labels[0], xMax = labels[labels.length - 1];
+            const yMax = Math.max(yMaxTarget * 1.3, ...data, 200);
+
+            const getX = (val) => padding.left + ((val - xMin) / (xMax - xMin)) * chartWidth;
+            const getY = (val) => padding.top + chartHeight - (val / yMax) * chartHeight;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Gridler
+            ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+            ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+
+            // Y Ekseni
+            for (let i = 0; i <= yMax; i += 100) {
+                const y = getY(i);
+                ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left + chartWidth, y); ctx.stroke();
+                ctx.fillText(`${i}mg`, padding.left - 10, y);
+            }
+            
+            // X Ekseni
+            ctx.textAlign = 'center';
+            const xStep = Math.max(1, Math.round((xMax - xMin) / 6)); 
+            for (let i = Math.ceil(xMin); i <= xMax; i += xStep) {
+                const x = getX(i);
+                ctx.beginPath(); ctx.moveTo(x, padding.top); ctx.lineTo(x, padding.top + chartHeight); ctx.stroke();
+                ctx.fillText(formatTime(baseTime, i), x, padding.top + chartHeight + 20);
+            }
+
+            // Hedef Bölge
+            const yTargetTop = getY(yMaxTarget);
+            const yTargetBottom = getY(yMinTarget);
+            ctx.fillStyle = 'rgba(132, 204, 22, 0.1)';
+            ctx.fillRect(padding.left, yTargetTop, chartWidth, yTargetBottom - yTargetTop);
+            ctx.fillStyle = '#84cc16'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'left';
+            ctx.fillText(translations[currentLang].target_zone_label, padding.left + 10, yTargetTop + 15);
+            
+            // Veri Çizgisi
+            if (labels.length > 0) {
+                ctx.beginPath();
+                ctx.moveTo(getX(labels[0]), getY(data[0]));
+                for (let i = 1; i < labels.length; i++) ctx.lineTo(getX(labels[i]), getY(data[i]));
+                
+                const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
+                gradient.addColorStop(0, 'rgba(132, 204, 22, 0.4)');
+                gradient.addColorStop(1, 'rgba(132, 204, 22, 0.0)');
+                ctx.fillStyle = gradient;
+                ctx.lineTo(getX(labels[labels.length-1]), getY(0));
+                ctx.lineTo(getX(labels[0]), getY(0));
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(getX(labels[0]), getY(data[0]));
+                for (let i = 1; i < labels.length; i++) ctx.lineTo(getX(labels[i]), getY(data[i]));
+                ctx.strokeStyle = '#84cc16'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
+            }
+        }
+
+        function updateResults(doseEvents, baseTime) {
+            const tableBody = document.getElementById('dosing-table-body');
+            tableBody.innerHTML = '';
+            
+            doseEvents.sort((a, b) => a.time - b.time).forEach(event => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-800 hover:bg-slate-800/50 transition-colors';
+                const isInitial = event.type === 'Initial';
+                const typeClass = isInitial ? 'text-blue-400' : 'text-lime-400';
+                const typeLabel = isInitial ? (currentLang==='tr'?'Başlangıç':'Initial') : (currentLang==='tr'?'Takviye':'Booster');
+                row.innerHTML = `<td class="px-6 py-4 font-mono text-slate-300">${formatTime(baseTime, event.time)}</td><td class="px-6 py-4 font-bold text-white">${event.amount} mg</td><td class="px-6 py-4 font-bold ${typeClass}">${typeLabel}</td>`;
+                tableBody.appendChild(row);
+            });
+
+            const summaryElement = document.getElementById('summary-text');
+            const boosterDoses = doseEvents.filter(e => e.type === 'Booster');
+            if (boosterDoses.length > 1) {
+                let totalInterval = 0;
+                for (let i = 1; i < boosterDoses.length; i++) totalInterval += boosterDoses[i].time - boosterDoses[i - 1].time;
+                const avg = Math.round((totalInterval / (boosterDoses.length - 1)) * 10) / 10;
+                summaryElement.innerHTML = translations[currentLang].summary_base.replace('{0}', avg);
+            } else if (boosterDoses.length === 1) {
+                summaryElement.innerHTML = translations[currentLang].summary_base.replace('{0}', document.getElementById('raceDuration').value);
+            } else {
+                summaryElement.innerHTML = translations[currentLang].summary_no_booster;
+            }
+        }
+
+        // Event Listeners
+        document.querySelectorAll('input[type=range], input[type=number], input[type=time], select').forEach(el => {
+            el.addEventListener('input', () => {
+                updateDisplays();
+                runSimulationAndDraw();
+            });
+        });
+
+        window.addEventListener('load', () => setLanguage('tr'));
+        window.addEventListener('resize', runSimulationAndDraw);
+
+    </script>
+</body>
+</html>
