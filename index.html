@@ -14,11 +14,6 @@
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -38,7 +33,6 @@
                         'text-shimmer': 'textShimmer 3s linear infinite',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'draw-path': 'drawPath 2s ease-in-out infinite',
-                        'blob': 'blob 7s infinite',
                     },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -46,12 +40,6 @@
                         textShimmer: {
                             '0%': { backgroundPosition: '-200% center' },
                             '100%': { backgroundPosition: '200% center' },
-                        },
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         }
                     }
                 }
@@ -63,12 +51,10 @@
         :root {
             --primary-rgb: 239 68 68;
         }
-
         body {
             background-color: #0f172a;
             color: #e2e8f0;
         }
-
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .prose p { margin-bottom: 1rem; }
@@ -111,22 +97,43 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef } = React;
 
-        // --- FIREBASE INITIALIZATION ---
-        let auth = null, db = null;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'hybnotes-app';
+        // --- VERİLER VE TEMALAR (Hata almamak için en üstte tanımlı) ---
+        const DEFAULT_POSTS = [
+          { 
+            "id": 5, 
+            "date": "2024-10-28", 
+            "readTime": { "tr": "6 dk", "en": "6 min" }, 
+            "category": { "tr": "Antrenman Bilimi", "en": "Training Science" }, 
+            "title": { "tr": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak", "en": "Karvonen Formula: Calculating Heart Rate Zones Correctly" },
+            "summary": { "tr": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.", "en": "Why is the classic (220-Age) formula flawed? Truly personalized zone calculation using the Heart Rate Reserve (HRR) method." },
+            "content": { 
+                "tr": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır...</p>",
+                "en": "<p>Most sports watches use the '220 - Age' formula by default...</p>"
+            },
+            "references": ["Karvonen M, Kentala E. (1957)."] 
+          },
+          { 
+            "id": 4, 
+            "date": "2024-10-20", 
+            "readTime": { "tr": "8 dk", "en": "8 min" }, 
+            "category": { "tr": "Beslenme", "en": "Nutrition" }, 
+            "title": { "tr": "Ultra Maratonlarda Sodyum Alım Stratejileri", "en": "Sodium Intake Strategies in Ultra Marathons" },
+            "summary": { "tr": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.", "en": "Hourly mg calculations to reduce hyponatremia risk and maintain performance in long races." },
+            "content": { "tr": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir...</p>", "en": "<p>Drinking only water during long races can be fatal...</p>" },
+            "references": ["Hoffman, M. D. (2014)."] 
+          }
+        ];
 
-        try {
-            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                if (firebase.apps.length === 0) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                auth = firebase.auth();
-                db = firebase.firestore();
-            }
-        } catch (e) {
-            console.warn("Firebase config not available or failed to parse. Cloud storage disabled.");
-        }
+        const THEMES = [
+            { id: 'red', name: 'Kırmızı', rgb: '239 68 68', hex: '#ef4444' },
+            { id: 'lime', name: 'Yeşil', rgb: '132 204 22', hex: '#84cc16' },
+            { id: 'blue', name: 'Mavi', rgb: '59 130 246', hex: '#3b82f6' },
+            { id: 'purple', name: 'Mor', rgb: '168 85 247', hex: '#a855f7' },
+            { id: 'orange', name: 'Turuncu', rgb: '249 115 22', hex: '#f97316' },
+            { id: 'yellow', name: 'Altın Sarısı', rgb: '234 179 8', hex: '#eab308' },
+            { id: 'pink', name: 'Pembe', rgb: '236 72 153', hex: '#ec4899' },
+            { id: 'cyan', name: 'Turkuaz', rgb: '6 182 212', hex: '#06b6d4' },
+        ];
 
         // --- İKON KÜTÜPHANESİ ---
         const Icons = {
@@ -141,13 +148,13 @@
             Menu: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
             Palette: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path></svg>,
             ArrowLeft: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>,
+            Info: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
             Calendar: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
             Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
             Bookmark: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>,
             Search: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
             Filter: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>,
             FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>,
-            Info: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
             Ticket: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path></svg>
         };
 
@@ -161,24 +168,19 @@
             </svg>
         );
 
-        const DEFAULT_POSTS = [
-          { "id": 5, "date": "2024-10-28", "readTime": { "tr": "6 dk", "en": "6 min" }, "category": { "tr": "Antrenman Bilimi", "en": "Training Science" }, "title": { "tr": "Karvonen Formülü: Nabız Aralıklarını Doğru Hesaplamak", "en": "Karvonen Formula: Calculating Heart Rate Zones Correctly" }, "summary": { "tr": "Klasik (220-Yaş) formülü neden hatalı? Nabız yedeği (HR Reserve) yöntemi ile gerçek kişiselleştirilmiş zone hesaplaması.", "en": "Why is the classic (220-Age) formula flawed? Truly personalized zone calculation using the Heart Rate Reserve (HRR) method." }, "content": { "tr": "<p>Çoğu spor saati varsayılan olarak '220 - Yaş' formülünü kullanır...</p>", "en": "<p>Most sports watches use the '220 - Age' formula by default...</p>" }, "references": ["Karvonen M, Kentala E. (1957)."] },
-          { "id": 4, "date": "2024-10-20", "readTime": { "tr": "8 dk", "en": "8 min" }, "category": { "tr": "Beslenme", "en": "Nutrition" }, "title": { "tr": "Ultra Maratonlarda Sodyum Alım Stratejileri", "en": "Sodium Intake Strategies in Ultra Marathons" }, "summary": { "tr": "Uzun yarışlarda hiponatremi riskini azaltmak ve performansı korumak için saatlik mg hesaplamaları.", "en": "Hourly mg calculations to reduce hyponatremia risk and maintain performance in long races." }, "content": { "tr": "<p>Uzun yarışlarda sadece su içmek ölümcül olabilir...</p>", "en": "<p>Drinking only water during long races can be fatal...</p>" }, "references": ["Hoffman, M. D. (2014)."] },
-          { "id": 3, "date": "2024-10-15", "readTime": { "tr": "12 dk", "en": "12 min" }, "category": { "tr": "Fizyoloji", "en": "Physiology" }, "title": { "tr": "Mitokondriyal Biyogenez ve Zone 2", "en": "Mitochondrial Biogenesis and Zone 2" }, "summary": { "tr": "Düşük yoğunluklu antrenmanların laktat temizleme kapasitesini nasıl artırdığına dair yeni bulgular.", "en": "New findings on how low-intensity training increases lactate clearance capacity." }, "content": { "tr": "<p>Mitokondri, hücrenin enerji santralidir...</p>", "en": "<p>Mitochondria are the powerhouse of the cell...</p>" }, "references": ["San-Millán, I. (2018)."] }
-        ];
+        // --- COMPONENTS ---
 
-        const THEMES = [
-            { id: 'red', name: 'Kırmızı', rgb: '239 68 68', hex: '#ef4444' },
-            { id: 'lime', name: 'Yeşil', rgb: '132 204 22', hex: '#84cc16' },
-            { id: 'blue', name: 'Mavi', rgb: '59 130 246', hex: '#3b82f6' },
-            { id: 'purple', name: 'Mor', rgb: '168 85 247', hex: '#a855f7' },
-            { id: 'orange', name: 'Turuncu', rgb: '249 115 22', hex: '#f97316' },
-            { id: 'yellow', name: 'Altın Sarısı', rgb: '234 179 8', hex: '#eab308' },
-            { id: 'pink', name: 'Pembe', rgb: '236 72 153', hex: '#ec4899' },
-            { id: 'cyan', name: 'Turkuaz', rgb: '6 182 212', hex: '#06b6d4' },
-            { id: 'indigo', name: 'İndigo', rgb: '99 102 241', hex: '#6366f1' },
-            { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
-        ];
+        const LatestPostsWidget = ({ posts, onSelect, lang }) => {
+            const latest = [...posts].sort((a, b) => b.id - a.id).slice(0, 3);
+            const t = { title: lang === 'tr' ? 'Son Eklenenler' : 'Latest Posts', new: lang === 'tr' ? 'Yeni' : 'New', viewAll: lang === 'tr' ? 'Tümünü Gör' : 'View All' };
+            return (
+                <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col h-full hover-lift shadow-lg">
+                    <div className="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50"><h3 className="font-bold text-white flex items-center gap-2"><Icons.FileText size={18} className="text-primary"/> {t.title}</h3><span className="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-md">{t.new}</span></div>
+                    <div className="divide-y divide-slate-700/50">{latest.map(post => (<div key={post.id} onClick={() => onSelect(post)} className="p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group"><div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div><div className="text-sm font-medium text-slate-200 group-hover:text-primary transition-colors line-clamp-2">{post.title[lang]}</div></div>))}</div>
+                    <div onClick={() => onSelect(null, 'research')} className="p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</div>
+                </div>
+            );
+        };
 
         const App = () => {
             const [posts, setPosts] = useState(DEFAULT_POSTS);
@@ -187,113 +189,37 @@
             const [activeTab, setActiveTab] = useState('home');
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [readingArticle, setReadingArticle] = useState(null);
-            const [lang, setLang] = useState('tr');
-            const [activeTheme, setActiveTheme] = useState(THEMES[0]);
-            const [user, setUser] = useState(null);
-            const [isSettingsLoaded, setIsSettingsLoaded] = useState(false);
+            const [lang, setLang] = useState(() => localStorage.getItem('hybnotes_lang') || 'tr');
+            const [activeTheme, setActiveTheme] = useState(() => {
+                const saved = localStorage.getItem('hybnotes_theme');
+                return THEMES.find(t => t.id === saved) || THEMES[0];
+            });
 
-            // --- AUTH INITIALIZATION ---
-            useEffect(() => {
-                if (!auth) return;
-                const initAuth = async () => {
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await auth.signInWithCustomToken(__initial_auth_token);
-                        } else {
-                            await auth.signInAnonymously();
-                        }
-                    } catch (e) { console.warn("Auth initial failure", e); }
-                };
-                initAuth();
-                const unsubscribe = auth.onAuthStateChanged(setUser);
-                return () => unsubscribe();
-            }, []);
-
-            // --- LOAD DATA ---
-            useEffect(() => {
-                fetch('posts.json')
-                    .then(res => res.ok ? res.json() : [])
-                    .then(data => setPosts(data.length ? data : DEFAULT_POSTS))
-                    .catch(() => setPosts(DEFAULT_POSTS));
-
-                fetch('biliyormuydunuz.json')
-                    .then(res => res.ok ? res.json() : [])
-                    .then(data => {
-                        setFacts(data);
-                        if (data.length) setCurrentFact(data[Math.floor(Math.random() * data.length)]);
-                    })
-                    .catch(() => {});
-            }, []);
-
-            // --- LOAD PERSISTENT SETTINGS ---
-            useEffect(() => {
-                if (!user || !db) {
-                  // If no cloud support, try IP detection once
-                  if (!isSettingsLoaded) {
-                    const detectLang = async () => {
-                      try {
-                        const geoResponse = await fetch('https://ipapi.co/json/');
-                        const geoData = await geoResponse.json();
-                        if (geoData.country_code === 'TR') setLang('tr');
-                        else setLang('en');
-                      } catch (err) {}
-                      setIsSettingsLoaded(true);
-                    };
-                    detectLang();
-                  }
-                  return;
-                }
-
-                const loadSettings = async () => {
-                    try {
-                        const settingsRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings');
-                        const doc = await settingsRef.get();
-                        
-                        if (doc.exists) {
-                            const data = doc.data();
-                            if (data.themeId) {
-                                const found = THEMES.find(t => t.id === data.themeId);
-                                if (found) setActiveTheme(found);
-                            }
-                            if (data.lang) setLang(data.lang);
-                        } else {
-                            try {
-                                const geoResponse = await fetch('https://ipapi.co/json/');
-                                const geoData = await geoResponse.json();
-                                if (geoData.country_code === 'TR') setLang('tr');
-                                else setLang('en');
-                            } catch (err) {}
-                        }
-                        setIsSettingsLoaded(true);
-                    } catch (e) {
-                        setIsSettingsLoaded(true);
-                    }
-                };
-                loadSettings();
-            }, [user]);
-
-            // --- SAVE SETTINGS ON CHANGE ---
             useEffect(() => {
                 document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
-                if (user && db && isSettingsLoaded) {
-                    db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('user_prefs').doc('settings').set({
-                        themeId: activeTheme.id,
-                        lang: lang
-                    }).catch(e => console.error("Save settings failed", e));
-                }
-            }, [activeTheme, lang, user, isSettingsLoaded]);
+                localStorage.setItem('hybnotes_theme', activeTheme.id);
+            }, [activeTheme]);
+
+            useEffect(() => {
+                localStorage.setItem('hybnotes_lang', lang);
+            }, [lang]);
+
+            useEffect(() => {
+                fetch('posts.json').then(r => r.ok ? r.json() : []).then(d => setPosts(d.length ? d : DEFAULT_POSTS));
+                fetch('biliyormuydunuz.json').then(r => r.ok ? r.json() : []).then(d => {
+                    setFacts(d);
+                    if (d.length) setCurrentFact(d[Math.floor(Math.random() * d.length)]);
+                });
+            }, []);
 
             const MENU_ITEMS = [
                 { id: 'home', title: lang === 'tr' ? 'Ana Sayfa' : 'Home', icon: Icons.Activity },
                 { id: 'research', title: lang === 'tr' ? 'Kütüphane' : 'Library', icon: Icons.BookOpen },
                 { 
-                    id: 'tools', 
-                    title: lang === 'tr' ? 'Araçlar' : 'Tools', 
-                    icon: Icons.Calculator,
-                    type: 'dropdown',
+                    id: 'tools', title: lang === 'tr' ? 'Araçlar' : 'Tools', icon: Icons.Calculator, type: 'dropdown',
                     children: [
                         { id: 'utmb_lottery', title: lang === 'tr' ? 'UTMB Kura' : 'UTMB Lottery', icon: Icons.Ticket },
-                        { id: 'caffeine', title: lang === 'tr' ? 'Kafein Grafiği' : 'Caffeine Chart', icon: Icons.Zap },
+                        { id: 'caffeine', title: lang === 'tr' ? 'Caffeine Strategy' : 'Caffeine Strategy', icon: Icons.Zap },
                     ]
                 },
             ];
@@ -303,7 +229,7 @@
                     <button onClick={goBack} className="mb-6 flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base">
                         <Icons.ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> {lang === 'tr' ? 'Kütüphaneye Dön' : 'Back to Library'}
                     </button>
-                    <article className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden">
+                    <article className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden animate-slide-in">
                         <div className="p-6 md:p-12 border-b border-slate-700 bg-slate-800/50">
                             <div className="flex flex-wrap gap-4 text-xs md:text-sm text-slate-400 mb-4 md:mb-6 font-mono">
                                 <span className="flex items-center gap-1"><Icons.Calendar size={12}/> {article.date}</span>
@@ -312,10 +238,8 @@
                             </div>
                             <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight">{article.title[lang]}</h1>
                         </div>
-                        <div className="p-6 md:p-12">
-                            <div className="prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed" 
-                                dangerouslySetInnerHTML={{ __html: article.content[lang].replace(/class='math-box'/g, `class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-primary rounded-r-xl font-mono text-primary text-opacity-90 text-sm md:text-lg text-center shadow-inner italic"`) }} />
-                        </div>
+                        <div className="p-6 md:p-12 prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed" 
+                            dangerouslySetInnerHTML={{ __html: article.content[lang].replace(/class='math-box'/g, `class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-primary rounded-r-xl font-mono text-primary text-opacity-90 text-sm md:text-lg text-center shadow-inner italic"`) }} />
                     </article>
                 </div>
             );
@@ -325,17 +249,10 @@
                 const filteredPosts = posts.filter(post => post.title[lang].toLowerCase().includes(searchTerm.toLowerCase()));
                 return (
                     <div className="space-y-8 animate-fade-in min-h-[600px]">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                            <h2 className="text-3xl md:text-4xl font-black text-white mb-2">{lang === 'tr' ? 'Kütüphane' : 'Library'}</h2>
-                            <div className="relative w-full md:w-80">
-                                <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                                <input type="text" placeholder={lang === 'tr' ? 'Ara...' : 'Search...'} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-slate-600 text-sm" />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 gap-4">
+                        <h2 className="text-3xl md:text-4xl font-black text-white mb-2">{lang === 'tr' ? 'Kütüphane' : 'Library'}</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {filteredPosts.map(post => (
                                 <div key={post.id} onClick={() => onSelect(post)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-primary transition-all cursor-pointer group hover-lift shadow-lg">
-                                    <span className="bg-slate-700 text-slate-300 text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider mb-2 inline-block">{post.category[lang]}</span>
                                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">{post.title[lang]}</h3>
                                     <p className="text-slate-400 text-sm line-clamp-2">{post.summary[lang]}</p>
                                 </div>
@@ -345,138 +262,22 @@
                 );
             };
 
-            const Slider = ({ label, val, min, max, step, unit, onChange }) => (
-                <div className="mb-4">
-                    <div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase">{label}</span><span className="text-primary font-bold text-sm">{val} {unit}</span></div>
-                    <input type="range" min={min} max={max} step={step} value={val} onChange={(e)=>onChange(parseFloat(e.target.value))} />
+            // --- TOOLS ---
+            const UTMBLotteryPage = ({ lang }) => (
+                <div className="text-center py-20 bg-slate-800 rounded-3xl border border-slate-700 shadow-xl">
+                    <Icons.Ticket size={48} className="mx-auto text-primary mb-4" />
+                    <h2 className="text-3xl font-black text-white mb-2">{lang === 'tr' ? 'UTMB Kura' : 'UTMB Lottery'}</h2>
+                    <p className="text-slate-400">Yakında...</p>
                 </div>
             );
 
-            const UTMBLotteryPage = ({ lang }) => {
-                const [race, setRace] = useState('UTMB');
-                const [method, setMethod] = useState('cagr');
-                const [stones, setStones] = useState(1);
-                const chartRef = useRef(null);
-                const chartInstance = useRef(null);
-                const data = useMemo(() => ({ UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } }, CCC: { capacity: 1900, demand: { 2023: 5249, 2024: 5400, 2025: 6000 }, meanStones: { 2024: 4.0, 2025: 4.4 } }, OCC: { capacity: 1200, demand: { 2023: 5171, 2024: 6500, 2025: 10000 }, meanStones: { 2024: 2.8, 2025: 3.2 } } }), []);
-                const translations = { en: { title: "UTMB 2026 Lottery", subtitle: "Probability calculator based on 2023-2025 data.", race: "Race", method: "Method", stones: "Running Stones", prob: "Probability", demand: "Demand", mean: "Avg Stones", tableHead: ["Year", "Demand", "Avg"] }, tr: { title: "UTMB 2026 Kura", subtitle: "2023-2025 verilerine dayalı şans hesaplayıcı.", race: "Yarış", method: "Metod", stones: "Taş Sayısı", prob: "Şans", demand: "Talep", mean: "Ort. Taş", tableHead: ["Yıl", "Talep", "Ort"] } };
-                const t = translations[lang];
-                const cagr = (v1, v2, f = 1) => Math.round(v2 * (1 + (Math.pow(v2 / v1, 1 / 2) - 1) * f));
-                const getProb = (B, N, mean, w) => { if (w <= 0) return 0; const T = N * mean + w; let logNoHit = 0; const loops = Math.min(B, T - w); for (let i = 0; i < loops; i++) logNoHit += Math.log(T - w - i) - Math.log(T - i); return 1 - Math.exp(logNoHit); };
-                const vals = useMemo(() => { 
-                    const d = data[race].demand;
-                    const N = method === 'linear' ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) : method === 'conservative' ? cagr(d[2023], d[2025], 0.7) : method === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
-                    const mS = data[race].meanStones;
-                    const mean = method === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) : mS[2025] * (1 + (mS[2025] / mS[2024] - 1) * (method === 'conservative' ? 0.7 : method === 'optimistic' ? 1.3 : 1));
-                    return { N, mean, B: data[race].capacity, p: getProb(data[race].capacity, N, mean, stones) };
-                }, [race, method, stones]);
-                
-                useEffect(() => {
-                    if (chartInstance.current) chartInstance.current.destroy();
-                    if (!chartRef.current) return;
-                    const ctx = chartRef.current.getContext('2d');
-                    const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
-                    const labels = Array.from({length: 20}, (_, i) => i + 1);
-                    chartInstance.current = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: '%', data: labels.map(w => getProb(vals.B, vals.N, vals.mean, w) * 100), borderColor: `rgb(${color})`, backgroundColor: `rgba(${color}, 0.1)`, pointBackgroundColor: labels.map(w => w === stones ? `rgb(${color})` : `rgba(${color}, 0.3)`), pointRadius: labels.map(w => w === stones ? 6 : 2), fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true, max: 100 }, x: { display: false } } } });
-                    return () => chartInstance.current?.destroy();
-                }, [vals, stones, activeTheme]);
-                
-                return (
-                    <div className="animate-fade-in relative max-w-7xl mx-auto">
-                        <div className="text-center mb-10 pt-2"><h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">UTMB 2026 <span className="text-primary">{lang === 'tr' ? 'Kura' : 'Lottery'}</span></h1><p className="text-slate-400 text-sm">{t.subtitle}</p></div>
-                        <div className="grid lg:grid-cols-12 gap-6">
-                            <div className="lg:col-span-4 space-y-6">
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl">
-                                    <div className="mb-4"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.race}</label><select value={race} onChange={e=>setRace(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 focus:border-primary"><option value="UTMB">UTMB</option><option value="CCC">CCC</option><option value="OCC">OCC</option></select></div>
-                                    <div className="mb-4"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.method}</label><select value={method} onChange={e=>setMethod(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 focus:border-primary"><option value="cagr">CAGR</option><option value="linear">Linear</option><option value="conservative">Conservative</option><option value="optimistic">Optimistic</option></select></div>
-                                    <Slider label={t.stones} val={stones} min={1} max={50} step={1} unit="" onChange={setStones} />
-                                    <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center mt-6"><h3 className="text-primary text-xs font-bold uppercase mb-1">{t.prob}</h3><div className="text-4xl font-black text-white">% {(vals.p * 100).toFixed(2)}</div></div>
-                                </div>
-                            </div>
-                            <div className="lg:col-span-8 flex flex-col gap-6">
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-4 h-[400px]"><canvas ref={chartRef} className="w-full h-full"></canvas></div>
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6"><div className="grid grid-cols-3 gap-4 text-center text-sm text-slate-300"><div className="font-bold text-slate-500">{t.tableHead[0]}</div><div className="font-bold text-slate-500">{t.tableHead[1]}</div><div className="font-bold text-slate-500">{t.tableHead[2]}</div>{[2023, 2024, 2025].map(y=>(<React.Fragment key={y}><div>{y}</div><div>{data[race].demand[y]}</div><div>{data[race].meanStones[y]||'-'}</div></React.Fragment>))}<div className="col-span-3 h-px bg-slate-700 my-2"></div><div className="text-primary font-bold">2026</div><div className="text-white font-bold">{vals.N.toLocaleString()}</div><div className="text-white font-bold">{vals.mean.toFixed(2)}</div></div></div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            };
-
-            const CaffeinePage = ({ lang }) => {
-                const [params, setParams] = useState({ bodyWeight: 70, halfLife: 5, raceStart: '08:00', raceDuration: 8, initialDose: 200, initialDoseTime: -0.5, doseAmount: 75, strategy: 'stay_low' });
-                const canvasRef = useRef(null);
-                const [schedule, setSchedule] = useState([]);
-                const [summary, setSummary] = useState('');
-                const translations = { tr: { strategy_params_title: 'Strateji Parametreleri', body_weight: 'Vücut Ağırlığı', race_start: 'Yarış Başlangıç', race_duration: 'Yarış Süresi', half_life: 'Yarılanma (Genetik)', initial_dose: 'Başlangıç Dozu', initial_dose_time: 'İlk Alım Zamanı', booster_dose: 'Takviye Dozu', strategy: 'Strateji Modu', strategy_low: 'Optimum (Dengeli)', strategy_high: 'Agresif (Yüksek Performans)', sim_title: 'Kişiselleştirilmiş Kafein Simülasyonu', schedule_title: 'Önerilen Alım Takvimi', time: 'Saat', amount: 'Miktar', type: 'Tip', summary: 'Bu plana göre, yarış sırasında yaklaşık her {0} saatte bir takviye kafein önerilir.', summary_none: 'Mevcut ayarlara göre ek takviyeye ihtiyaç yok.', target_zone: 'Hedef Bölge (3-6 mg/kg)' }, en: { strategy_params_title: 'Strategy Parameters', body_weight: 'Body Weight', race_start: 'Race Start', race_duration: 'Race Duration', half_life: 'Half-Life (Genetic)', initial_dose: 'Initial Dose', initial_dose_time: 'Initial Dose Time', booster_dose: 'Booster Dose', strategy: 'Strategy Mode', strategy_low: 'Optimal (Balanced)', strategy_high: 'Aggressive (Performance)', sim_title: 'Personalized Caffeine Simulation', schedule_title: 'Recommended Intake Schedule', time: 'Time', amount: 'Amount', type: 'Type', summary: 'Recommended booster intake approx every {0} hours.', summary_none: 'No booster needed based on current settings.', target_zone: 'Target Zone (3-6 mg/kg)' } };
-                const t = translations[lang];
-                const formatTime = (baseTime, hoursOffset) => { const newTime = new Date(baseTime.getTime() + hoursOffset * 60 * 60 * 1000); return newTime.toLocaleTimeString(lang === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' }); };
-                const formatRelTime = (val) => { const h = Math.floor(Math.abs(val)), m = Math.round((Math.abs(val) - h) * 60); let txt = (h > 0 ? h + (lang==='tr'?' sa ':' hr ') : '') + (m > 0 ? m + (lang==='tr'?' dk':' min') : ''); return val < 0 ? (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' önce':' before') : (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' sonra':' after'); };
-                useEffect(() => {
-                    if (!canvasRef.current) return;
-                    const ctx = canvasRef.current.getContext('2d');
-                    const [sh, sm] = params.raceStart.split(':');
-                    const raceDate = new Date(); raceDate.setHours(sh, sm, 0, 0);
-                    const targetFloor = params.bodyWeight * 3, targetPeak = params.bodyWeight * 6, absorption = 0.5, step = 0.05, k = Math.log(2) / params.halfLife, decay = Math.exp(-k * step);
-                    const trigger = params.strategy === 'stay_high' ? targetFloor + (targetPeak - targetFloor) * 0.4 : targetFloor;
-                    let current = 0, pending = false, nextTime = -1;
-                    const labels = [], data = [], events = [];
-                    if (params.initialDose > 0) events.push({ time: params.initialDoseTime, amount: params.initialDose, type: 'Initial' });
-                    const start = Math.min(-2, params.initialDoseTime - 1), end = params.raceDuration + 1, absTime = params.initialDoseTime + absorption;
-                    for (let t = start; t <= end; t += step) {
-                        let abs = 0; if (params.initialDose > 0 && t >= params.initialDoseTime && t < absTime) abs = (params.initialDose / absorption) * step;
-                        let boost = 0; if (pending && t >= nextTime) { boost = params.doseAmount; events.push({ time: nextTime, amount: params.doseAmount, type: 'Booster' }); pending = false; }
-                        current = current * decay + abs + boost; labels.push(t); data.push(current);
-                        if (t >= absTime && t < params.raceDuration && !pending && current < trigger) { pending = true; nextTime = Math.max(t, Math.ceil(t * 2) / 2); }
-                    }
-                    const cvs = canvasRef.current; cvs.width = cvs.parentElement.clientWidth; cvs.height = cvs.parentElement.clientHeight;
-                    const p = { t: 30, r: 30, b: 50, l: 50 }, w = cvs.width - p.l - p.r, h = cvs.height - p.t - p.b;
-                    const gx = (v) => p.l + ((v - labels[0]) / (labels[labels.length-1] - labels[0])) * w, gy = (v) => p.t + h - (v / Math.max(targetPeak * 1.3, Math.max(...data), 200)) * h;
-                    const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
-                    ctx.clearRect(0,0,cvs.width,cvs.height);
-                    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1; ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-                    for(let i=0; i<=targetPeak*1.5; i+=100) { const y = gy(i); ctx.beginPath(); ctx.moveTo(p.l, y); ctx.lineTo(p.l+w, y); ctx.stroke(); ctx.fillText(i+'mg', p.l-10, y); }
-                    ctx.textAlign = 'center'; const xStep = Math.max(1, Math.round((labels[labels.length-1] - labels[0])/6)); for(let i=Math.ceil(labels[0]); i<=labels[labels.length-1]; i+=xStep) { const x = gx(i); ctx.beginPath(); ctx.moveTo(x, p.t); ctx.lineTo(x, p.t+h); ctx.stroke(); ctx.fillText(formatTime(raceDate, i), x, p.t+h+20); }
-                    ctx.fillStyle = `rgba(${color}, 0.1)`; ctx.fillRect(p.l, gy(targetPeak), w, gy(targetFloor)-gy(targetPeak));
-                    ctx.fillStyle = `rgb(${color})`; ctx.textAlign = 'left'; ctx.fillText(t.target_zone, p.l+10, gy(targetPeak)+15);
-                    if(labels.length>0) {
-                        ctx.beginPath(); ctx.moveTo(gx(labels[0]), gy(data[0])); for(let i=1; i<labels.length; i++) ctx.lineTo(gx(labels[i]), gy(data[i]));
-                        const grad = ctx.createLinearGradient(0, p.t, 0, p.t+h); grad.addColorStop(0, `rgba(${color},0.4)`); grad.addColorStop(1, `rgba(${color},0)`);
-                        ctx.fillStyle = grad; ctx.lineTo(gx(labels[labels.length-1]), gy(0)); ctx.lineTo(gx(labels[0]), gy(0)); ctx.fill();
-                        ctx.beginPath(); ctx.moveTo(gx(labels[0]), gy(data[0])); for(let i=1; i<labels.length; i++) ctx.lineTo(gx(labels[i]), gy(data[i]));
-                        ctx.strokeStyle = `rgb(${color})`; ctx.lineWidth = 3; ctx.stroke();
-                    }
-                    setSchedule(events.sort((a,b)=>a.time-b.time).map(e => ({...e, timeStr: formatTime(raceDate, e.time)})));
-                    const boosters = events.filter(e=>e.type==='Booster');
-                    if(boosters.length > 1) { let dur = 0; for(let i=1; i<boosters.length; i++) dur += boosters[i].time - boosters[i-1].time; setSummary(t.summary.replace('{0}', (dur/(boosters.length-1)).toFixed(1))); } 
-                    else if(boosters.length === 1) setSummary(t.summary.replace('{0}', params.raceDuration)); else setSummary(t.summary_none);
-                }, [params, lang, activeTheme]);
-                return (
-                    <div className="animate-fade-in relative max-w-7xl mx-auto">
-                        <div className="text-center mb-10 pt-2"><h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Kafein <span className="text-primary">{lang === 'tr' ? 'Stratejisi' : 'Strategy'}</span></h1><p className="text-slate-400 text-sm">{t.sim_title}</p></div>
-                        <div className="grid lg:grid-cols-12 gap-6">
-                            <div className="lg:col-span-4 space-y-6">
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl relative overflow-hidden"><div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div><h2 className="text-white font-bold mb-6 border-b border-slate-700 pb-4">{t.strategy_params_title}</h2><Slider label={t.body_weight} val={params.bodyWeight} min={40} max={120} step={1} unit="kg" onChange={v=>setParams(p=>({...p, bodyWeight:v}))} /><Slider label={t.race_duration} val={params.raceDuration} min={1} max={30} step={0.5} unit="sa" onChange={v=>setParams(p=>({...p, raceDuration:v}))} /><div className="grid grid-cols-2 gap-4 mb-4"><div><label className="text-xs font-bold text-slate-400 uppercase block mb-2">{t.race_start}</label><input type="time" value={params.raceStart} onChange={e=>setParams(p=>({...p, raceStart:e.target.value}))} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white text-sm focus:border-primary"/></div><div><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase">{t.half_life}</span></div><input type="range" min={2} max={8} step={0.5} value={params.halfLife} onChange={e=>setParams(p=>({...p, halfLife:parseFloat(e.target.value)}))} /></div></div><div className="border-t border-slate-700 pt-4"><Slider label={t.initial_dose} val={params.initialDose} min={0} max={400} step={10} unit="mg" onChange={v=>setParams(p=>({...p, initialDose:v}))} /><div className="mb-4"><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase">{t.initial_dose_time}</span><span className="text-primary font-bold text-sm">{formatRelTime(params.initialDoseTime)}</span></div><input type="range" min={-2} max={2} step={0.25} value={params.initialDoseTime} onChange={(e)=>setParams(p=>({...p, initialDoseTime:parseFloat(e.target.value)}))} /></div><Slider label={t.booster_dose} val={params.doseAmount} min={20} max={200} step={5} unit="mg" onChange={v=>setParams(p=>({...p, doseAmount:v}))} /></div><div><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.strategy}</label><select value={params.strategy} onChange={e=>setParams(p=>({...p, strategy:e.target.value}))} className="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 focus:border-primary"><option value="stay_low">{t.strategy_low}</option><option value="stay_high">{t.strategy_high}</option></select></div></div>
-                            </div>
-                            <div className="lg:col-span-8 flex flex-col gap-6">
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-4 h-[400px]"><canvas ref={canvasRef} className="w-full h-full"></canvas></div>
-                                <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6"><h3 className="text-white font-bold mb-4">{t.schedule_title}</h3><div className="overflow-x-auto"><table className="w-full text-sm text-left text-slate-300"><thead className="text-xs text-slate-500 uppercase bg-slate-900/50 border-b border-slate-700"><tr><th className="px-6 py-3">{t.time}</th><th className="px-6 py-3">{t.amount}</th><th className="px-6 py-3">{t.type}</th></tr></thead><tbody className="divide-y divide-slate-800">{schedule.map((ev,i)=>(<tr key={i} className="hover:bg-slate-800/50"><td className="px-6 py-4 font-mono">{ev.timeStr}</td><td className="px-6 py-4 font-bold text-white">{ev.amount} mg</td><td className={`px-6 py-4 font-bold ${ev.type==='Initial'?'text-blue-400':'text-primary'}`}>{ev.type==='Initial'?(lang==='tr'?'Başlangıç':'Initial'):(lang==='tr'?'Takviye':'Booster')}</td></tr>))}</tbody></table></div><div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-xl text-sm text-white/90">{summary}</div></div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            };
-
-            const LatestPostsWidget = ({ posts, onSelect, lang }) => {
-                const latest = [...posts].sort((a, b) => b.id - a.id).slice(0, 3);
-                const t = { title: lang === 'tr' ? 'Son Eklenenler' : 'Latest Posts', new: lang === 'tr' ? 'Yeni' : 'New', viewAll: lang === 'tr' ? 'Tümünü Gör' : 'View All' };
-                return (
-                    <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col h-full hover-lift">
-                        <div className="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50"><h3 className="font-bold text-white flex items-center gap-2"><Icons.FileText size={18} className="text-primary"/> {t.title}</h3><span className="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-md">{t.new}</span></div>
-                        <div className="divide-y divide-slate-700/50">{latest.map(post => (<div key={post.id} onClick={() => onSelect(post)} className="p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group"><div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div><div className="text-sm font-medium text-slate-200 group-hover:text-primary transition-colors line-clamp-2">{post.title[lang]}</div></div>))}</div>
-                        <div onClick={() => onSelect(null, 'research')} className="p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</div>
-                    </div>
-                );
-            };
+            const CaffeinePage = ({ lang }) => (
+                <div className="text-center py-20 bg-slate-800 rounded-3xl border border-slate-700 shadow-xl">
+                    <Icons.Zap size={48} className="mx-auto text-primary mb-4" />
+                    <h2 className="text-3xl font-black text-white mb-2">Caffeine Strategy</h2>
+                    <p className="text-slate-400">Yakında...</p>
+                </div>
+            );
 
             const HomePage = ({ changePage, posts, onRead, lang, currentFact }) => {
                 const latestPost = posts.length > 0 ? posts[0] : null;
@@ -491,21 +292,19 @@
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div onClick={() => latestPost && onRead(latestPost)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift shadow-xl">
+                                <div onClick={() => latestPost && onRead(latestPost)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-all group hover-lift shadow-xl">
                                     <div><div className="flex items-center gap-2 text-primary mb-2"><Icons.Zap size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span></div><h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-primary transition-colors">{latestPost ? latestPost.title[lang] : '...'}</h3><p className="text-sm text-slate-400 line-clamp-2">{latestPost ? latestPost.summary[lang] : ''}</p></div>
                                     <div className="mt-4 flex items-center text-xs font-bold text-slate-500 group-hover:text-white transition-colors">{lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={14} className="ml-1" /></div>
                                 </div>
                                 <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between hover-lift shadow-xl">
                                     <div><div className="flex items-center gap-2 text-blue-400 mb-2"><Icons.Info size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Biliyor Muydunuz?' : 'Did You Know?'}</span></div>
                                         <div className="text-slate-500 text-[10px] font-bold uppercase mb-1">{currentFact ? currentFact.tag : '#Antrenman'}</div>
-                                        <p className="text-slate-200 text-sm leading-relaxed italic">
-                                            {currentFact ? `"${currentFact.text[lang]}"` : '...'}
-                                        </p>
+                                        <p className="text-slate-200 text-sm leading-relaxed italic">{currentFact ? `"${currentFact.text[lang]}"` : '...'}</p>
                                     </div>
                                     <div className="mt-4 text-[10px] text-slate-600 font-mono tracking-widest uppercase">HybNotes Intelligence</div>
                                 </div>
                             </div>
-                            <div className="md:col-span-1 h-full min-h-[250px] hover-lift"><LatestPostsWidget posts={posts} onSelect={onRead} lang={lang} /></div>
+                            <div className="md:col-span-1 h-full min-h-[250px]"><LatestPostsWidget posts={posts} onSelect={onRead} lang={lang} /></div>
                         </div>
                     </div>
                 );
@@ -539,7 +338,6 @@
                                 </div>
                             </div>
                         </div>
-                        {isMenuOpen && (<div className="md:hidden bg-slate-900 border-b border-slate-800 absolute w-full h-[calc(100vh-80px)] overflow-y-auto p-4 space-y-2 z-50">{MENU_ITEMS.map((item) => (<div key={item.id}>{item.children ? (<div className="bg-slate-800/50 rounded-xl p-2"><div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase flex items-center gap-2"><item.icon size={14}/> {item.title}</div>{item.children.map(sub => (<button key={sub.id} onClick={() => {setActiveTab(sub.id); setIsMenuOpen(false);}} className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}>{sub.title}</button>))}</div>) : (<button onClick={() => {setActiveTab(item.id); setIsMenuOpen(false);}} className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold ${activeTab === item.id ? 'bg-primary text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}><item.icon size={24} /> {item.title}</button>)}</div>))}</div>)}
                     </nav>
                 );
             };
