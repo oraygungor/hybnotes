@@ -13,6 +13,20 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
+// --- ÖZEL HYROX LOGOSU (GÜNCELLENDİ: Daha kalın ve gerçekçi X) ---
+const HyroxLogo = ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 398 262" fill="currentColor" className={className}>
+        <polygon points="72,37 249,37 243,53 66,53" />
+        <polygon points="55,67 232,67 226,82 49,82" />
+        <polygon points="38,96 215,96 209,112 32,112" />
+        <polygon points="21,126 375,126 370,141 15,141" />
+        <polygon points="182,155 359,155 353,171 175,171" />
+        <polygon points="164,185 342,185 336,200 159,200" />
+        <polygon points="147,215 325,215 319,230 142,230" />
+    </svg>
+);
+
+
 const App = () => {
     // --- VERİLERİ HARİCİ DOSYADAN (Data.js) AL ---
     const [posts, setPosts] = useState(window.HybNotesData?.posts || []);
@@ -214,6 +228,15 @@ const App = () => {
             { id: 'home', title: lang === 'tr' ? 'Ana Sayfa' : 'Home', icon: Icons.Activity },
             { id: 'research', title: lang === 'tr' ? 'Kütüphane' : 'Library', icon: Icons.BookOpen },
             { 
+                id: 'hyrox',
+                title: 'HYROX',
+                icon: HyroxLogo,
+                type: 'dropdown',
+                children: [
+                    { id: 'hyrox_calc', title: lang === 'tr' ? 'Süre Hesaplama' : 'Time Calculator', icon: Icons.Clock },
+                ]
+            },
+            { 
                 id: 'running', 
                 title: lang === 'tr' ? 'Koşu' : 'Running', 
                 icon: Icons.Activity,
@@ -280,6 +303,7 @@ const App = () => {
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
+            case 'hyrox_calc': return window.HyroxCalculatorPage ? <window.HyroxCalculatorPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             default: return <HomePage changePage={setActiveTab} />;
         }
     };
