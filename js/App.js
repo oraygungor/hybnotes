@@ -26,13 +26,13 @@ const HyroxLogo = ({ size = 20, className = "" }) => (
     </svg>
 );
 
-
 const App = () => {
     // --- VERİLERİ HARİCİ DOSYADAN (Data.js) AL ---
     const [posts, setPosts] = useState(window.HybNotesData?.posts || []);
     const [facts, setFacts] = useState(window.HybNotesData?.facts || []);
     const [currentFact, setCurrentFact] = useState(null);
     
+    // --- STATE ---
     const [activeTab, setActiveTab] = useState('home');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [readingArticle, setReadingArticle] = useState(null);
@@ -45,6 +45,68 @@ const App = () => {
         const saved = localStorage.getItem('hybnotes_theme');
         return THEMES.find(t => t.id === saved) || THEMES[0];
     });
+
+    // --- ROUTING / URL YÖNETİMİ (YENİ EKLENEN KISIM) ---
+    // 1. URL değiştiğinde State'i güncelle (Back butonu, refresh ve ilk yükleme için)
+    useEffect(() => {
+        const handleHashChange = () => {
+            const hash = window.location.hash.replace('#', '');
+            
+            // Hash yoksa ana sayfaya dön
+            if (!hash) {
+                setActiveTab('home');
+                setReadingArticle(null);
+                window.scrollTo(0, 0);
+                return;
+            }
+
+            // Makale tespiti: #article/101
+            if (hash.startsWith('article/')) {
+                const articleId = parseInt(hash.split('/')[1]);
+                const foundArticle = posts.find(p => p.id === articleId);
+                
+                if (foundArticle) {
+                    setReadingArticle(foundArticle);
+                    setActiveTab('research');
+                    window.scrollTo(0, 0);
+                } else {
+                    // Makale bulunamazsa kütüphaneye dön
+                    setActiveTab('research');
+                    setReadingArticle(null);
+                }
+            } 
+            // Diğer sayfalar: #hyrox_calc, #running_perf vb.
+            else {
+                setActiveTab(hash);
+                setReadingArticle(null);
+                window.scrollTo(0, 0);
+            }
+        };
+
+        // Event listener ekle
+        window.addEventListener('hashchange', handleHashChange);
+        
+        // İlk yüklemede çalıştır (posts yüklendikten sonra)
+        if (posts.length > 0) {
+            handleHashChange();
+        } else {
+            // Posts henüz yüklenmediyse bile hash varsa bir dene (örneğin statik sayfalar için)
+            handleHashChange();
+        }
+
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, [posts]); // posts değişince tekrar kontrol et
+
+    // 2. Navigasyon Yardımcısı (Tüm tıklamalarda bunu kullanacağız)
+    const navigateTo = (destination, param = null) => {
+        setIsMenuOpen(false); // Mobilde menüyü kapat
+        if (destination === 'article' && param) {
+            window.location.hash = `article/${param.id}`;
+        } else {
+            window.location.hash = destination;
+        }
+    };
+    // ----------------------------------------------------
 
     // Rastgele bir bilgi seç
     useEffect(() => {
@@ -85,29 +147,52 @@ const App = () => {
     }, [activeTheme, lang, user]);
 
     // --- COMPONENTS ---
-    const ArticleDetail = ({ article, goBack, lang }) => (
-        <div className="animate-fade-in pb-20">
-            <button onClick={goBack} className="mb-6 flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base">
-                <Icons.ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> {lang === 'tr' ? 'Kütüphaneye Dön' : 'Back to Library'}
-            </button>
-            <article className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden">
-                <div className="p-6 md:p-12 border-b border-slate-700 bg-slate-800/50">
-                    <div className="flex flex-wrap gap-4 text-xs md:text-sm text-slate-400 mb-4 md:mb-6 font-mono">
-                        <span className="flex items-center gap-1"><Icons.Calendar size={12}/> {article.date}</span>
-                        <span className="flex items-center gap-1"><Icons.Clock size={12}/> {article.readTime[lang]}</span>
-                        <span className="bg-primary/10 text-primary px-2 py-0.5 md:px-3 md:py-1 rounded-full border border-primary/20 font-bold">{article.category[lang]}</span>
-                    </div>
-                    <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight">{article.title[lang]}</h1>
-                </div>
-                <div className="p-6 md:p-12">
-                    <div className="prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed" 
-                        dangerouslySetInnerHTML={{ __html: article.content[lang].replace(/class='math-box'/g, `class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-primary rounded-r-xl font-mono text-primary text-opacity-90 text-sm md:text-lg text-center shadow-inner italic"`) }} />
-                </div>
-            </article>
-        </div>
-    );
+    
+    // ArticleDetail: "Paylaş" butonu eklendi ve Geri butonu güncellendi
+    const ArticleDetail = ({ article, lang }) => {
+        const [copied, setCopied] = useState(false);
 
-    const ResearchPage = ({ posts, onSelect, lang }) => {
+        const handleShare = () => {
+            navigator.clipboard.writeText(window.location.href);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        };
+
+        return (
+            <div className="animate-fade-in pb-20">
+                <div className="flex justify-between items-center mb-6">
+                    <button onClick={() => navigateTo('research')} className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base">
+                        <Icons.ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> {lang === 'tr' ? 'Kütüphaneye Dön' : 'Back to Library'}
+                    </button>
+                    
+                    <button onClick={handleShare} className="flex items-center gap-2 text-primary bg-primary/10 px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-primary/20 transition-all font-bold text-xs md:text-sm border border-primary/20">
+                        {copied ? (
+                            <><span className="text-emerald-400">✓</span> {lang === 'tr' ? 'Kopyalandı' : 'Copied'}</>
+                        ) : (
+                            <><Icons.Zap size={14} /> {lang === 'tr' ? 'Paylaş' : 'Share'}</>
+                        )}
+                    </button>
+                </div>
+
+                <article className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden">
+                    <div className="p-6 md:p-12 border-b border-slate-700 bg-slate-800/50">
+                        <div className="flex flex-wrap gap-4 text-xs md:text-sm text-slate-400 mb-4 md:mb-6 font-mono">
+                            <span className="flex items-center gap-1"><Icons.Calendar size={12}/> {article.date}</span>
+                            <span className="flex items-center gap-1"><Icons.Clock size={12}/> {article.readTime[lang]}</span>
+                            <span className="bg-primary/10 text-primary px-2 py-0.5 md:px-3 md:py-1 rounded-full border border-primary/20 font-bold">{article.category[lang]}</span>
+                        </div>
+                        <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight">{article.title[lang]}</h1>
+                    </div>
+                    <div className="p-6 md:p-12">
+                        <div className="prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed" 
+                            dangerouslySetInnerHTML={{ __html: article.content[lang].replace(/class='math-box'/g, `class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-primary rounded-r-xl font-mono text-primary text-opacity-90 text-sm md:text-lg text-center shadow-inner italic"`) }} />
+                    </div>
+                </article>
+            </div>
+        );
+    };
+
+    const ResearchPage = ({ posts, lang }) => {
         const [searchTerm, setSearchTerm] = useState("");
         const ALL_CATEGORY = "ALL_CATEGORY"; 
         const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORY);
@@ -166,7 +251,7 @@ const App = () => {
                 {filteredAndSortedPosts.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {filteredAndSortedPosts.map(post => (
-                            <div key={post.id} onClick={() => onSelect(post)} className="bg-slate-800 rounded-2xl border border-slate-700 hover:border-primary/50 transition-all cursor-pointer group hover-lift shadow-lg overflow-hidden flex flex-col h-full">
+                            <div key={post.id} onClick={() => navigateTo('article', post)} className="bg-slate-800 rounded-2xl border border-slate-700 hover:border-primary/50 transition-all cursor-pointer group hover-lift shadow-lg overflow-hidden flex flex-col h-full">
                                 <div className="p-6 flex-1"><div className="flex justify-between items-start mb-4"><span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">{post.category[lang]}</span><span className="text-xs text-slate-500 font-mono flex items-center gap-1"><Icons.Calendar size={12}/> {post.date}</span></div><h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors leading-tight">{post.title[lang]}</h3><p className="text-slate-400 text-sm line-clamp-3 leading-relaxed">{post.summary[lang]}</p></div><div className="px-6 py-4 bg-slate-900/30 border-t border-slate-700/50 flex justify-between items-center mt-auto"><span className="text-xs text-slate-500 font-medium flex items-center gap-1"><Icons.Clock size={14} /> {post.readTime[lang]}</span><span className="text-xs font-bold text-slate-300 group-hover:text-white flex items-center gap-1 transition-colors">{t.readMore} <Icons.ChevronRight size={14} className="group-hover:translate-x-1 transition-transform"/></span></div></div>
                         ))}
                     </div>
@@ -177,19 +262,19 @@ const App = () => {
         );
     };
 
-    const LatestPostsWidget = ({ posts, onSelect, lang }) => {
+    const LatestPostsWidget = ({ posts, lang }) => {
         const latest = [...posts].sort((a, b) => b.id - a.id).slice(0, 3);
         const t = { title: lang === 'tr' ? 'Son Eklenenler' : 'Latest Posts', new: lang === 'tr' ? 'Yeni' : 'New', viewAll: lang === 'tr' ? 'Tümünü Gör' : 'View All' };
         return (
             <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col h-full hover-lift">
                 <div className="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50"><h3 className="font-bold text-white flex items-center gap-2"><Icons.FileText size={18} className="text-primary"/> {t.title}</h3><span className="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-md">{t.new}</span></div>
-                <div className="divide-y divide-slate-700/50">{latest.map(post => (<div key={post.id} onClick={() => onSelect(post)} className="p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group"><div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div><div className="text-sm font-medium text-slate-200 group-hover:text-primary transition-colors line-clamp-2">{post.title[lang]}</div></div>))}</div>
-                <div onClick={() => onSelect(null, 'research')} className="p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</div>
+                <div className="divide-y divide-slate-700/50">{latest.map(post => (<div key={post.id} onClick={() => navigateTo('article', post)} className="p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group"><div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div><div className="text-sm font-medium text-slate-200 group-hover:text-primary transition-colors line-clamp-2">{post.title[lang]}</div></div>))}</div>
+                <div onClick={() => navigateTo('research')} className="p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</div>
             </div>
         );
     };
 
-    const HomePage = ({ changePage, posts, onRead, lang, currentFact }) => {
+    const HomePage = ({ posts, lang, currentFact }) => {
         const latestPost = posts.length > 0 ? posts[0] : null;
         return (
             <div className="space-y-8 animate-fade-in">
@@ -198,11 +283,11 @@ const App = () => {
                     <h1 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10 animate-shimmer-text">HybNotes</h1>
                     <div className="absolute top-10 left-10 w-40 h-40 bg-primary rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse-slow"></div>
                     <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">{lang === 'tr' ? 'Sporcular için bilimsel analizlerin, tecrübelerin ve makalelerin yer aldığı kişisel bir not defteri.' : 'A personal notebook containing scientific analysis, experiences, and articles for athletes.'}</p>
-                    <button onClick={() => changePage('research')} className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10">{lang === 'tr' ? 'Kütüphaneye Git' : 'Go to Library'}</button>
+                    <button onClick={() => navigateTo('research')} className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10">{lang === 'tr' ? 'Kütüphaneye Git' : 'Go to Library'}</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div onClick={() => latestPost && onRead(latestPost)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift shadow-xl">
+                        <div onClick={() => latestPost && navigateTo('article', latestPost)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift shadow-xl">
                             <div><div className="flex items-center gap-2 text-primary mb-2"><Icons.Zap size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span></div><h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-primary transition-colors">{latestPost ? latestPost.title[lang] : '...'}</h3><p className="text-sm text-slate-400 line-clamp-2">{latestPost ? latestPost.summary[lang] : ''}</p></div>
                             <div className="mt-4 flex items-center text-xs font-bold text-slate-500 group-hover:text-white transition-colors">{lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={14} className="ml-1" /></div>
                         </div>
@@ -216,13 +301,13 @@ const App = () => {
                             <div className="mt-4 text-[10px] text-slate-600 font-mono tracking-widest uppercase">HybNotes Intelligence</div>
                         </div>
                     </div>
-                    <div className="md:col-span-1 h-full min-h-[250px] hover-lift"><LatestPostsWidget posts={posts} onSelect={onRead} lang={lang} /></div>
+                    <div className="md:col-span-1 h-full min-h-[250px] hover-lift"><LatestPostsWidget posts={posts} lang={lang} /></div>
                 </div>
             </div>
         );
     };
 
-    const NavBar = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen, activeTheme, setActiveTheme, lang, setLang }) => {
+    const NavBar = ({ activeTab, isMenuOpen, setIsMenuOpen, activeTheme, setActiveTheme, lang, setLang }) => {
         const [showPalette, setShowPalette] = useState(false);
         const MENU_ITEMS = [
             { id: 'home', title: lang === 'tr' ? 'Ana Sayfa' : 'Home', icon: Icons.Activity },
@@ -269,12 +354,12 @@ const App = () => {
             <nav className="fixed top-0 w-full z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 md:px-8">
                     <div className="flex items-center justify-between h-20">
-                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setActiveTab('home'); setReadingArticle(null); }}><PulseBarLogo size={32} /><span className="text-2xl font-black text-white tracking-tighter hidden md:block">HybNotes</span></div>
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigateTo('home')}><PulseBarLogo size={32} /><span className="text-2xl font-black text-white tracking-tighter hidden md:block">HybNotes</span></div>
                         <div className="hidden md:flex items-center gap-1">
                             {MENU_ITEMS.map((item) => (
                                 <div key={item.id} className="relative group">
-                                    <button onClick={() => !item.children && setActiveTab(item.id)} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}><item.icon size={18} /> {item.title} {item.children && <Icons.ChevronDown size={14}/>}</button>
-                                    {item.children && (<div className="absolute top-full left-0 w-56 pt-2 hidden group-hover:block"><div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">{item.children.map((subItem) => (<button key={subItem.id} onClick={() => { setActiveTab(subItem.id); setReadingArticle(null); }} className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3"><subItem.icon size={16} /> {subItem.title}</button>))}</div></div>)}
+                                    <button onClick={() => !item.children && navigateTo(item.id)} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}><item.icon size={18} /> {item.title} {item.children && <Icons.ChevronDown size={14}/>}</button>
+                                    {item.children && (<div className="absolute top-full left-0 w-56 pt-2 hidden group-hover:block"><div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">{item.children.map((subItem) => (<button key={subItem.id} onClick={() => navigateTo(subItem.id)} className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3"><subItem.icon size={16} /> {subItem.title}</button>))}</div></div>)}
                                 </div>
                             ))}
                         </div>
@@ -291,26 +376,26 @@ const App = () => {
                         </div>
                     </div>
                 </div>
-                {isMenuOpen && (<div className="md:hidden bg-slate-900 border-b border-slate-800 absolute w-full h-[calc(100vh-80px)] overflow-y-auto p-4 space-y-2 z-50">{MENU_ITEMS.map((item) => (<div key={item.id}>{item.children ? (<div className="bg-slate-800/50 rounded-xl p-2"><div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase flex items-center gap-2"><item.icon size={14}/> {item.title}</div>{item.children.map(sub => (<button key={sub.id} onClick={() => {setActiveTab(sub.id); setIsMenuOpen(false);}} className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}>{sub.title}</button>))}</div>) : (<button onClick={() => {setActiveTab(item.id); setIsMenuOpen(false);}} className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold ${activeTab === item.id ? 'bg-primary text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}><item.icon size={24} /> {item.title}</button>)}</div>))}</div>)}
+                {isMenuOpen && (<div className="md:hidden bg-slate-900 border-b border-slate-800 absolute w-full h-[calc(100vh-80px)] overflow-y-auto p-4 space-y-2 z-50">{MENU_ITEMS.map((item) => (<div key={item.id}>{item.children ? (<div className="bg-slate-800/50 rounded-xl p-2"><div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase flex items-center gap-2"><item.icon size={14}/> {item.title}</div>{item.children.map(sub => (<button key={sub.id} onClick={() => navigateTo(sub.id)} className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}>{sub.title}</button>))}</div>) : (<button onClick={() => navigateTo(item.id)} className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold ${activeTab === item.id ? 'bg-primary text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}><item.icon size={24} /> {item.title}</button>)}</div>))}</div>)}
             </nav>
         );
     };
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'home': return <HomePage changePage={setActiveTab} posts={posts} onRead={(post) => { setReadingArticle(post); setActiveTab('research'); }} lang={lang} currentFact={currentFact} />;
-            case 'research': return readingArticle ? <ArticleDetail article={readingArticle} goBack={() => setReadingArticle(null)} lang={lang} /> : <ResearchPage posts={posts} onSelect={(article) => { setReadingArticle(article); setActiveTab('research'); }} lang={lang} />;
+            case 'home': return <HomePage posts={posts} lang={lang} currentFact={currentFact} />;
+            case 'research': return readingArticle ? <ArticleDetail article={readingArticle} lang={lang} /> : <ResearchPage posts={posts} lang={lang} />;
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'hyrox_calc': return window.HyroxCalculatorPage ? <window.HyroxCalculatorPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
-            default: return <HomePage changePage={setActiveTab} />;
+            default: return <HomePage posts={posts} lang={lang} currentFact={currentFact} />;
         }
     };
 
     return (
         <div className="min-h-screen bg-slate-900 text-slate-200 font-sans selection:bg-primary/30">
-            <NavBar activeTab={activeTab} setActiveTab={(tab) => { setActiveTab(tab); setReadingArticle(null); }} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} activeTheme={activeTheme} setActiveTheme={setActiveTheme} lang={lang} setLang={setLang} />
+            <NavBar activeTab={activeTab} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} activeTheme={activeTheme} setActiveTheme={setActiveTheme} lang={lang} setLang={setLang} />
             <main className="pt-24 pb-20 px-4 md:px-8 max-w-6xl mx-auto min-h-screen">{renderContent()}</main>
         </div>
     );
