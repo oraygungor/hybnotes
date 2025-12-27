@@ -75,36 +75,35 @@ window.HybNotesData = {
             ] 
         },
 
-
-  {
-    "id": 105,
-    "date": "2025-12-27",
-    "readTime": {
-      "tr": "1 dk",
-      "en": "1 min"
-    },
-    "category": {
-      "tr": "Antrenman Bilimi",
-      "en": "Training Science"
-    },
-    "title": {
-      "tr": "Koşunun Yeni Denkleminde 4. Değişken: Fizyolojik Direnç (Resilience)",
-      "en": ""
-    },
-    "summary": {
-      "tr": "Prof. Andrew M. Jones, dayanıklılık performansını belirleyen klasik üçlü modele ($\\dot{V}_{O_{2}max}$, Ekonomi, Eşik) karşı çıkarak, bu değerlerin yorgunlukla bozulabileceğini vurguluyor ve denkleme \"Fizyolojik Direnç\" (Resilience) adında dördüncü bir boyut ekliyor111111111. Bu yeni değişken, sporcunun başlangıçtaki kapasitesinden bağımsız olarak, yarışın sonlarında performans düşüşüne (Kritik Güç/Hız kaybına) ne kadar direnebildiğini temsil ediyor ve şampiyonları belirleyen asıl faktörün bu \"bozulmama yeteneği\" olduğunu savunuyor222222222.",
-      "en": ""
-    },
-    "content": {
-      "tr": "<p><span style='background-color: rgba(0, 0, 0, 0);'>Bir maratoncunun potansiyelini tahmin etmek için elimizde yıllardır güvenilen, 3 temel değişkene dayalı 'Klasik Model' vardı</span><sup style='background-color: transparent; color: rgb(68, 71, 70);'>1</sup><span style='background-color: rgba(0, 0, 0, 0);'>. Ancak bilim insanları, bu modelin kağıt üzerindeki tahminlerinin, yorgunluk faktörü devreye girdiğinde gerçek yarış sonuçlarıyla her zaman örtüşmediğini fark etti.</span></p><p><br></p><p><span style='background-color: rgba(0, 0, 0, 0);'>Prof. Andrew M. Jones’un ses getiren makalesi, 30 yıllık bu kavramsal çerçeveyi güncelliyor ve modele </span><strong style='background-color: rgba(0, 0, 0, 0);'>'Fizyolojik Direnç' (Resilience)</strong><span style='background-color: rgba(0, 0, 0, 0);'> adında, bağımsız bir aday değişken eklenmesini öneriyor.</span></p><p><br></p><p>İşte Jones'un önerdiği güncel modelin detayları ve bilimsel arka planı:</p><p><br></p><h3>1. Klasik Model (1991): Performansın 3 Ayağı</h3><p><br></p><p><span style='background-color: rgba(0, 0, 0, 0);'>Hikaye, Dr. Michael Joyner'ın 1991 yılında yayınladığı ve bugün hala referans alınan modelle başlar</span><sup style='background-color: transparent; color: rgb(68, 71, 70);'>4</sup><span style='background-color: rgba(0, 0, 0, 0);'>. Joyner, dayanıklılık performansını şu 3 fizyolojik sütun üzerine kurmuştu:</span></p><ol><li><strong style='background-color: rgba(0, 0, 0, 0);'>Motorun Hacmi  ($\\dot{V}_{O_{2}max}$):</strong> Sporcunun oksijen kapasitesi.</li><li><strong style='background-color: rgba(0, 0, 0, 0);'>Yakıt Verimliliği (Koşu Ekonomisi):</strong> Belirli bir hızda harcanan enerji miktarı.</li><li><strong style='background-color: rgba(0, 0, 0, 0);'>Sürdürülebilir Eşik (Laktat Eşiği/Kritik Hız):</strong> Motoru boğmadan çıkılabilen maksimum devir.</li></ol><p><span style='background-color: rgba(0, 0, 0, 0);'>Ancak bu model, değişkenleri büyük ölçüde </span><strong style='background-color: rgba(0, 0, 0, 0);'>statik</strong><span style='background-color: rgba(0, 0, 0, 0);'> kabul ediyordu; yani start çizgisindeki fizyolojik değerlerin yarış boyunca sabit kaldığı varsayılıyordu.</span></p>",
-      "en": ""
-    },
-    "references": [
-      "Jones, A. M. (2024). The fourth dimension: physiological resilience as an independent determinant of endurance exercise performance. The Journal of Physiology, 602(17), 4113–4128. https://doi.org/10.1113/JP284205",
-      "Joyner, M. J. (1991). Modeling: optimal marathon performance on the basis of physiological factors. Journal of Applied Physiology, 70(2), 683–687. https://doi.org/10.1152/jappl.1991.70.2.683"
-    ]
+{
+  "id": 105,
+  "date": "2025-12-27",
+  "readTime": {
+    "tr": "6 dk",
+    "en": "6 min"
   },
-
+  "category": {
+    "tr": "Spor Fizyolojisi",
+    "en": "Exercise Physiology"
+  },
+  "title": {
+    "tr": "Koşunun Yeni Denkleminde 4. Değişken: Fizyolojik Direnç (Resilience)",
+    "en": "The 4th Variable in the New Equation of Running: Physiological Resilience"
+  },
+  "summary": {
+    "tr": "Prof. Andrew M. Jones'un çığır açan çalışması, 30 yıllık klasik dayanıklılık modelini güncelliyor. Yorgunluk altında performansın nasıl korunduğunu açıklayan 'Fizyolojik Direnç', denkleme dördüncü boyut olarak ekleniyor.",
+    "en": "Prof. Andrew M. Jones's groundbreaking work updates the 30-year-old classical endurance model. 'Physiological Resilience,' which explains how performance is maintained under fatigue, is added as the fourth dimension to the equation."
+  },
+  "content": {
+    [cite_start]"tr": "<p>Bir maratoncunun potansiyelini tahmin etmek için yıllardır güvenilen ve 3 temel değişkene dayalı 'Klasik Model'[cite: 51, 52], yorgunluk faktörünün devreye girdiği gerçek yarış senaryolarında artık yetersiz kalmaktadır. [cite_start]Prof. Andrew M. Jones'un 2023 tarihli makalesi, bu kavramsal çerçeveyi güncelleyerek modele <strong>'Fizyolojik Direnç' (Resilience)</strong> adında, bağımsız bir değişken eklenmesini önermektedir[cite: 4, 41, 436].</p><h3>Klasik Modelin Sınırları</h3><p>Dr. [cite_start]Michael Joyner tarafından 1991 yılında tanımlanan model, dayanıklılık performansını üç ana sütun üzerine kurmuştu [cite: 51, 52][cite_start]:</p><ol style=\"list-style-type: decimal; padding-left: 20px; color: #e7ecff;\"><li><strong>Maksimal Oksijen Alımı (VO2max):</strong> Sporcunun aerobik motorunun hacmi [cite: 22, 54][cite_start].</li><li><strong>Koşu Ekonomisi:</strong> Belirli bir hızda harcanan enerji miktarı veya yakıt verimliliği [cite: 22, 55][cite_start].</li><li><strong>Fraksiyonel Kullanım (Laktat Eşiği/Kritik Hız):</strong> Oksijen kapasitesinin sürdürülebilir yüzdesi[cite: 22, 54].</li></ol><p>Ancak bu model, fizyolojik değişkenleri büyük ölçüde <em>statik</em> kabul etmekteydi. [cite_start]Yani start çizgisindeki ölçümlerin yarışın sonuna kadar sabit kaldığı varsayılıyordu[cite: 36, 430, 431].</p><h3>Dördüncü Boyut: Fizyolojik Direnç</h3><p>Jones, bu değişkenlerin sabit olmadığını ve yorgunlukla birlikte bozulduğunu vurgulamaktadır. [cite_start]'Fizyolojik Direnç', bu bozulmaya karşı koyabilme kapasitesidir[cite: 36, 143, 144].</p><div style=\"background: #1e293b; padding: 15px; border-left: 4px solid var(--primary-rgb); margin: 15px 0;\"><p><strong>Kritik Veri:</strong> Yapılan çalışmalarda, 2 saatlik ağır egzersiz sonrasında sporcuların Kritik Güç (CP) değerlerinde ortalama <strong>~%10</strong> oranında bir düşüş saptanmıştır. [cite_start]Bireyler arası değişkenlik ise %1 ile %32 arasındadır[cite: 37, 38, 129, 137].</p></div><p>Bu veriler, iki sporcunun başlangıç VO2max veya Eşik değerleri aynı olsa bile, 'direnç' kapasitesi yüksek olanın (yani parametreleri daha az bozulanın) yarışı kazanacağını göstermektedir. [cite_start]Bu nedenle Resilience, diğer faktörlerden bağımsız bir belirleyici olarak kabul edilmelidir [cite: 435, 470][cite_start].</p><h3>Direnci Geliştiren Stratejiler</h3><p>Makale, bu kapasiteyi artırmak için kanıta dayalı stratejiler sunmaktadır[cite: 381, 382, 383]:</p><p><strong>1. [cite_start]Yakıt Stratejisi:</strong> Egzersiz sırasında saatte 60g karbonhidrat alımının, Kritik Güç (CP) düşüşünü plaseboya kıyasla önemli ölçüde engellediği gösterilmiştir[cite: 215, 236, 250].</p><p><strong>2. Antrenman Hacmi:</strong> Profesyonel bisikletçilerin, genç sporculara kıyasla yorgunluk altında güçlerini çok daha iyi korudukları gözlemlenmiştir. [cite_start]Bu durum, direncin uzun yıllara dayanan antrenman birikimiyle geliştiğini düşündürmektedir[cite: 278, 280, 281].</p><p><strong>3. [cite_start]Teknoloji:</strong> Yeni nesil ayakkabılar, kas hasarını azaltarak yorgunluğa bağlı ekonomi kaybını muhtemelen hafifletebilir[cite: 334, 384, 385].</p>",
+    [cite_start]"en": "<p>The 'Classical Model'[cite: 51, 52], relied upon for years to predict a marathoner's potential based on three fundamental variables, falls short in real-world racing scenarios where fatigue comes into play. [cite_start]Prof. Andrew M. Jones's 2023 paper updates this conceptual framework, proposing the addition of an independent variable called <strong>'Physiological Resilience'</strong> to the model [cite: 4, 41, 436][cite_start].</p><h3>Limits of the Classical Model</h3><p>Defined by Dr. Michael Joyner in 1991, the model established endurance performance on three main pillars [cite: 51, 52][cite_start]:</p><ol style=\"list-style-type: decimal; padding-left: 20px; color: #e7ecff;\"><li><strong>Maximal Oxygen Uptake (VO2max):</strong> The volume of the athlete's aerobic engine [cite: 22, 54][cite_start].</li><li><strong>Running Economy:</strong> The amount of energy expended at a given speed, or fuel efficiency [cite: 22, 55][cite_start].</li><li><strong>Fractional Utilization (Lactate Threshold/Critical Speed):</strong> The sustainable percentage of oxygen capacity[cite: 22, 54].</li></ol><p>However, this model largely assumed physiological variables to be <em>static</em>. [cite_start]That is, measurements taken at the starting line were assumed to remain constant until the end of the race[cite: 36, 430, 431].</p><h3>The Fourth Dimension: Physiological Resilience</h3><p>Jones emphasizes that these variables are not constant and deteriorate with fatigue. [cite_start]'Physiological Resilience' is the capacity to resist this deterioration[cite: 36, 143, 144].</p><div style=\"background: #1e293b; padding: 15px; border-left: 4px solid var(--primary-rgb); margin: 15px 0;\"><p><strong>Critical Data:</strong> Studies have found an average drop of <strong>~10%</strong> in athletes' Critical Power (CP) values after 2 hours of heavy exercise. [cite_start]Inter-individual variability ranges from 1% to 32%[cite: 37, 38, 129, 137].</p></div><p>These data indicate that even if two athletes have the same starting VO2max or Threshold values, the one with higher 'resilience' capacity (i.e., whose parameters deteriorate less) will win the race. [cite_start]Therefore, Resilience should be considered an independent determinant [cite: 435, 470][cite_start].</p><h3>Strategies to Improve Resilience</h3><p>The paper offers evidence-based strategies to enhance this capacity[cite: 381, 382, 383]:</p><p><strong>1. [cite_start]Fueling Strategy:</strong> Carbohydrate intake of 60g per hour during exercise has been shown to significantly prevent the decline in Critical Power (CP) compared to placebo[cite: 215, 236, 250].</p><p><strong>2. Training Volume:</strong> It has been observed that professional cyclists maintain their power under fatigue much better than younger athletes. [cite_start]This suggests that resilience develops with accumulated training over many years[cite: 278, 280, 281].</p><p><strong>3. [cite_start]Technology:</strong> New generation footwear may likely mitigate fatigue-induced loss of economy by reducing muscle damage[cite: 334, 384, 385].</p>"
+  },
+  "references": [
+    "Jones, A. M. (2023). The fourth dimension: physiological resilience as an independent determinant of endurance exercise performance. The Journal of Physiology.",
+    "Joyner, M. J. (1991). Modeling: optimal marathon performance on the basis of physiological factors. Journal of Applied Physiology.",
+    "Clark, I. E., Vanhatalo, A., Thompson, C., et al. (2019). Dynamics of the power-duration relationship during prolonged endurance exercise and influence of carbohydrate ingestion. Journal of Applied Physiology."
+  ]
+}
 
 
         
