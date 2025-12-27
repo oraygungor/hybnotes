@@ -103,7 +103,7 @@ window.HybNotesData = {
     "Joyner, M. J. (1991). Modeling: optimal marathon performance on the basis of physiological factors. Journal of Applied Physiology.",
     "Clark, I. E., Vanhatalo, A., Thompson, C., et al. (2019). Dynamics of the power-duration relationship during prolonged endurance exercise and influence of carbohydrate ingestion. Journal of Applied Physiology."
   ]
-}
+},
 
 
         
