@@ -13,22 +13,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['DC Archia', 'Archer', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif'],
-                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+                        sans: ['Inter', 'DC Archia', 'Archer', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
                     },
                     colors: {
                         primary: 'rgb(var(--primary-rgb) / <alpha-value>)',
@@ -55,29 +55,99 @@
 
     <style>
         :root { --primary-rgb: 6 182 212; }
-        body { background-color: #0f172a; color: #e2e8f0; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Prosedeki başlıklar ve paragraflar */
-        .prose p { margin-bottom: 1rem; }
-        .prose h3, .prose h4 { color: white; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-        .prose ul, .prose ol { margin-bottom: 1rem; }
+        /* --- RICH TEXT CONTENT STYLES (Admin Paneli Stilleri) --- */
+        /* Bu sınıf App.js içindeki ArticleDetail bileşeninde kullanılacak */
         
-        /* Form elemanları */
+        .rich-text-content {
+            color: #cbd5e1;
+            line-height: 1.8;
+            font-size: 1.1rem; /* Okunabilirlik için biraz büyüttük */
+        }
+
+        .rich-text-content h2 { 
+            font-size: 1.8em; 
+            font-weight: 800; 
+            color: #e2e8f0; 
+            margin-top: 2em; 
+            margin-bottom: 0.75em; 
+            border-bottom: 1px solid #334155; 
+            padding-bottom: 0.5rem; 
+        }
+        
+        .rich-text-content h3 { 
+            font-size: 1.4em; 
+            font-weight: 700; 
+            color: #94a3b8; 
+            margin-top: 1.5em; 
+            margin-bottom: 0.5em; 
+        }
+        
+        .rich-text-content p { 
+            margin-bottom: 1.5em; 
+        }
+
+        /* ÖZEL: Havalı Alıntı (Blockquote) */
+        .rich-text-content blockquote {
+            border-left: 4px solid #f59e0b; /* Amber rengi çizgi */
+            background: rgba(245, 158, 11, 0.1); /* Hafif şeffaf amber arka plan */
+            padding: 1.25rem 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+            color: #fbbf24; /* Parlak amber yazı */
+            font-style: italic;
+            font-size: 1.1em;
+            position: relative;
+        }
+
+        /* ÖZEL: Math Box (Vurgu Kutusu) */
+        .math-box {
+            display: block;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(6, 182, 212, 0.1); /* Cyan arka plan */
+            border-left: 4px solid #06b6d4; /* Cyan çizgi */
+            border-radius: 0 12px 12px 0;
+            color: #22d3ee;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Listeler */
+        .rich-text-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; color: #cbd5e1; }
+        .rich-text-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1.5rem; color: #cbd5e1; }
+        .rich-text-content li { margin-bottom: 0.5rem; padding-left: 0.5rem; }
+        
+        /* Kod Blokları */
+        .rich-text-content pre {
+            background: #1e293b;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            margin: 1.5rem 0;
+        }
+
+        /* Form Elemanları (Mevcut) */
         input:focus, select:focus { outline: none; }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; margin: 8px 0; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #334155; border-radius: 3px; transition: background 0.2s; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; cursor: pointer; margin-top: -7px; box-shadow: 0 0 0 4px #0f172a; transition: transform 0.1s; background-color: rgb(var(--primary-rgb)); }
         
-        /* Animasyonlar */
+        /* Animasyonlar (Mevcut) */
         .animate-shimmer-text { background: linear-gradient(to right, #ffffff 0%, rgb(var(--primary-rgb)) 20%, #ffffff 40%, rgb(var(--primary-rgb)) 60%, #ffffff 100%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: textShimmer 4s linear infinite; }
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(var(--primary-rgb), 0.3); }
         .pulse-path { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawPath 3s linear infinite; }
         @keyframes drawPath { 0% { stroke-dashoffset: 100; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
-        
-        /* Not: Eski .latex-formula stilleri kaldırıldı çünkü artık gerçek LaTeX kullanacağız */
     </style>
 </head>
 <body class="font-sans antialiased">
