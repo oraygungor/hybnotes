@@ -3,89 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HybNotes Admin - Ultimate Editor</title>
+    <title>HybNotes Live Studio</title>
     
+    <!-- React & Libraries -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- KaTeX (Matematik) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
+    <!-- Quill Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap');
+        /* --- TEMEL AYARLAR --- */
+        body { background-color: #020617; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow: hidden; }
         
-        body { 
-            background-color: #0f172a; 
-            color: #e2e8f0; 
-            font-family: 'Inter', sans-serif;
-        }
+        /* --- RICH TEXT CONTENT --- */
+        .rich-text-content { font-family: 'Inter', sans-serif; line-height: 1.8; font-size: 16px; color: #cbd5e1; }
+        .rich-text-content h1 { font-size: 2em; font-weight: 800; color: #fff; margin: 1em 0 0.5em; }
+        .rich-text-content h2 { font-size: 1.5em; font-weight: 700; color: #e2e8f0; margin: 1.5em 0 0.5em; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+        .rich-text-content h3 { font-size: 1.25em; font-weight: 600; color: #94a3b8; margin: 1.5em 0 0.5em; }
+        .rich-text-content p { margin-bottom: 1em; }
+        .rich-text-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .rich-text-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
         
-        /* Quill Özelleştirmeleri */
-        .ql-toolbar.ql-snow {
-            background-color: #1e293b;
-            border-color: #334155 !important;
-            border-radius: 16px 16px 0 0;
-            padding: 16px;
+        .rich-text-content blockquote {
+            border-left: 4px solid #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            color: #fbbf24;
+            font-style: italic;
         }
-        .ql-container.ql-snow {
-            border-color: #334155 !important;
-            border-radius: 0 0 16px 16px;
-            background-color: #0f172a;
-            font-size: 16px;
-            min-height: 500px;
-            font-family: 'Inter', sans-serif;
+
+        .math-box {
+            display: block;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid #06b6d4;
+            border-radius: 0 8px 8px 0;
+            color: #22d3ee;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
         }
-        .ql-editor { color: #e2e8f0; line-height: 1.7; padding: 2rem; }
-        .ql-editor.ql-blank::before { color: #475569 !important; font-style: normal; }
+
+        /* --- QUILL EDİTÖR ÖZELLEŞTİRMESİ --- */
+        .ql-toolbar.ql-snow { background: #1e293b; border-color: #334155 !important; border-radius: 12px 12px 0 0; }
+        .ql-container.ql-snow { background: #0f172a; border-color: #334155 !important; border-radius: 0 0 12px 12px; color: #cbd5e1; font-family: 'Inter', sans-serif; font-size: 16px; }
+        .ql-editor.ql-blank::before { color: #475569; font-style: italic; }
         
-        /* Toolbar Renkleri */
+        .ql-editor h2 { font-size: 1.5em; font-weight: 700; color: #e2e8f0; margin-top: 1em; border-bottom: 1px solid #334155; }
+        .ql-editor blockquote { border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.1); color: #fbbf24; font-style: italic; }
+        .ql-editor .math-box { border-left: 4px solid #06b6d4; background: rgba(6, 182, 212, 0.1); color: #22d3ee; font-family: 'JetBrains Mono'; text-align: center; padding: 1rem; margin: 1rem 0; }
+
+        /* Toolbar İkonları */
         .ql-snow .ql-stroke { stroke: #94a3b8 !important; }
         .ql-snow .ql-fill { fill: #94a3b8 !important; }
         .ql-snow .ql-picker { color: #94a3b8 !important; }
         .ql-snow .ql-picker-options { background-color: #1e293b !important; border-color: #334155 !important; }
-        .ql-snow .ql-active .ql-stroke { stroke: #22d3ee !important; }
-        .ql-snow .ql-active .ql-fill { fill: #22d3ee !important; }
-
-        /* Formül Butonu */
-        .ql-formula { color: #22d3ee !important; }
-
-        /* Math Box (Vurgu Kutusu) */
-        .math-box {
-            margin: 2rem 0;
-            padding: 1.5rem;
-            background: rgba(30, 41, 59, 0.7);
-            border-left: 4px solid #06b6d4;
-            border-radius: 0 1rem 1rem 0;
-            font-family: 'JetBrains Mono', monospace;
-            color: #22d3ee;
-            text-align: center;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Preview (Önizleme) Alanı */
-        .prose-preview h3, .prose-preview h4 { color: white; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; }
-        .prose-preview h3 { font-size: 1.5rem; }
-        .prose-preview p { margin-bottom: 1.2rem; color: #cbd5e1; line-height: 1.8; }
-        .prose-preview ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; color: #cbd5e1; }
-        .prose-preview li { margin-bottom: 0.5rem; }
-        .prose-preview blockquote {
-            border-left: 4px solid #64748b;
-            padding-left: 1.5rem;
-            font-style: italic;
-            color: #94a3b8;
-            margin: 2rem 0;
-        }
         
-        /* Scrollbar */
+        /* ÖZEL TOOLBAR BUTONU (MATHBOX) */
+        .ql-mathbox {
+            font-weight: bold;
+            color: #22d3ee !important; /* Cyan renk */
+            width: auto !important;
+            padding: 0 5px !important;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ql-mathbox:hover {
+            color: #fff !important;
+        }
+        .ql-mathbox::after {
+            content: "[ MB ]"; /* Buton üzerinde görünecek metin */
+            font-size: 12px;
+        }
+
+        /* Scrollbars */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
@@ -100,105 +108,124 @@
             { tr: "Antrenman Bilimi", en: "Training Science" },
             { tr: "Beslenme", en: "Nutrition" },
             { tr: "Fizyoloji", en: "Physiology" },
-            { tr: "Toparlanma", en: "Recovery" },
-            { tr: "Spor Psikolojisi", en: "Sports Psychology" },
-            { tr: "Koşu Mekaniği", en: "Running Mechanics" },
-            { tr: "Yarış Raporu", en: "Race Report" },
             { tr: "Sistem Kılavuzu", en: "System Guide" }
         ];
 
         const App = () => {
-            // --- State ---
-            const [title, setTitle] = useState("");
-            const [summary, setSummary] = useState("");
+            // --- STATE ---
+            const [title, setTitle] = useState("Örnek Makale Başlığı");
+            const [summary, setSummary] = useState("Makalenin kısa özeti buraya gelecek...");
             const [categoryIndex, setCategoryIndex] = useState(0);
             const [references, setReferences] = useState([]);
             const [refInput, setRefInput] = useState("");
-            const [jsonOutput, setJsonOutput] = useState("");
-            const [readTime, setReadTime] = useState(1);
-            const [view, setView] = useState('json'); // 'json' | 'preview'
+            const [readTime, setReadTime] = useState(5);
             const [editorHtml, setEditorHtml] = useState("");
-            const [showImportModal, setShowImportModal] = useState(false);
-            const [importValue, setImportValue] = useState("");
-            
-            // --- Refs ---
+            const [jsonOutput, setJsonOutput] = useState("");
+
             const quillRef = useRef(null);
-            const editorContainerRef = useRef(null);
             const previewRef = useRef(null);
 
-            // --- Quill Başlatma ---
+            // --- 1. QUILL BAŞLATMA ---
             useEffect(() => {
-                // 1. KaTeX'i Window'a Ata (Quill'in formula modülü için kritik)
-                if (window.katex) {
-                    window.katex = katex;
-                } else {
-                    console.error("KaTeX yüklenemedi!");
-                }
+                if (window.katex) window.katex = katex;
 
-                if (!quillRef.current && editorContainerRef.current) {
-                    quillRef.current = new Quill(editorContainerRef.current, {
+                if (!quillRef.current) {
+                    const container = document.getElementById('editor-container');
+                    
+                    // Custom Blot
+                    const Block = Quill.import('blots/block');
+                    class MathBox extends Block {}
+                    MathBox.blotName = 'math-box';
+                    MathBox.tagName = 'div';
+                    MathBox.className = 'math-box';
+                    Quill.register(MathBox);
+
+                    // Custom Toolbar Handler
+                    const addMathBoxHandler = function() {
+                        const range = this.quill.getSelection(true) || { index: this.quill.getLength() };
+                        const html = `<div class="math-box">$$ x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a} $$</div><p><br></p>`;
+                        this.quill.clipboard.dangerouslyPasteHTML(range.index, html);
+                    };
+
+                    const quill = new Quill(container, {
                         theme: 'snow',
                         modules: {
-                            formula: true, // Native formül desteğini aç
-                            toolbar: [
-                                [{ 'header': [2, 3, false] }],
-                                ['bold', 'italic', 'underline', 'strike'],
-                                [{ 'color': [] }, { 'background': [] }],
-                                [{ 'script': 'sub'}, { 'script': 'super' }],
-                                ['blockquote', 'code-block'],
-                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                                [{ 'align': [] }],
-                                ['link', 'image', 'formula'], // Formül butonu
-                                ['clean']
-                            ]
+                            toolbar: {
+                                container: [
+                                    [{ 'header': [2, 3, false] }],
+                                    ['bold', 'italic', 'underline', 'strike'],
+                                    ['blockquote', 'code-block', 'mathbox'], // 'mathbox' butonu buraya eklendi
+                                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                    [{ 'script': 'sub'}, { 'script': 'super' }],
+                                    [{ 'color': [] }, { 'background': [] }],
+                                    ['link', 'formula', 'clean']
+                                ],
+                                handlers: {
+                                    'mathbox': addMathBoxHandler
+                                }
+                            }
                         },
-                        placeholder: 'Bilimsel makalenizi buraya yazın...'
+                        placeholder: 'İçerik yazmaya başla...'
                     });
 
-                    quillRef.current.on('text-change', () => {
-                        const text = quillRef.current.getText();
-                        const html = quillRef.current.root.innerHTML;
-                        const words = text.trim().split(/\s+/).length;
-                        const mins = Math.max(1, Math.ceil(words / 180));
-                        
-                        setReadTime(mins);
+                    quillRef.current = quill;
+
+                    // Başlangıç İçeriği
+                    const initialContent = `
+                        <p>Toolbar'daki <strong>[ MB ]</strong> butonuna basarak aşağıdakini oluşturabilirsin:</p>
+                        <div class="math-box">$$ E = mc^2 $$</div>
+                        <p>Bu bir formül kutusudur.</p>
+                        <blockquote>"Bu bir alıntıdır."</blockquote>
+                    `;
+                    quill.clipboard.dangerouslyPasteHTML(0, initialContent);
+
+                    // Değişiklikleri Dinle
+                    quill.on('text-change', () => {
+                        const html = quill.root.innerHTML;
+                        const text = quill.getText();
+                        const wordCount = text.trim().split(/\s+/).length;
+                        setReadTime(Math.max(1, Math.ceil(wordCount / 180)));
                         setEditorHtml(html);
                     });
                 }
             }, []);
 
-            // --- Önizleme Modunda LaTeX Render Etme ---
+            // --- 2. CANLI GÜNCELLEME ---
             useEffect(() => {
-                if (view === 'preview' && previewRef.current && window.renderMathInElement) {
-                    // DOM güncellendikten hemen sonra çalıştır
+                const cleanContent = editorHtml
+                    .replace(/"/g, "'")
+                    .replace(/<p><br><\/p>/g, "");
+
+                const dataObj = {
+                    id: Math.floor(Math.random() * 9999),
+                    date: new Date().toISOString().split('T')[0],
+                    readTime: { tr: `${readTime} dk`, en: `${readTime} min` },
+                    category: CATEGORIES[categoryIndex],
+                    title: { tr: title, en: title + " (EN)" },
+                    summary: { tr: summary, en: summary + " (EN)" },
+                    content: { tr: cleanContent, en: cleanContent },
+                    references: references
+                };
+
+                setJsonOutput(JSON.stringify([dataObj], null, 2));
+
+                if (previewRef.current && window.renderMathInElement) {
                     setTimeout(() => {
                         try {
                             window.renderMathInElement(previewRef.current, {
                                 delimiters: [
-                                    {left: '$$', right: '$$', display: true}, // Blok Formül
-                                    {left: '$', right: '$', display: false},  // Satır içi
-                                    {left: '\\(', right: '\\)', display: false},
-                                    {left: '\\[', right: '\\]', display: true}
+                                    {left: '$$', right: '$$', display: true},
+                                    {left: '$', right: '$', display: false}
                                 ],
                                 throwOnError: false
                             });
-                        } catch (e) {
-                            console.error("KaTeX Render Hatası:", e);
-                        }
+                        } catch (e) {}
                     }, 50);
                 }
-            }, [view, editorHtml]);
 
-            // --- Yardımcı Fonksiyonlar ---
-            const addMathBox = () => {
-                if (quillRef.current) {
-                    const range = quillRef.current.getSelection(true);
-                    // Kullanıcıya kolaylık olsun diye hazır şablon ekliyoruz
-                    const html = `<div class="math-box">$$ E = mc^2 $$</div><p><br></p>`;
-                    quillRef.current.clipboard.dangerouslyPasteHTML(range.index, html);
-                }
-            };
+            }, [title, summary, categoryIndex, references, editorHtml]);
 
+            // --- YARDIMCILAR ---
             const addReference = () => {
                 if (refInput.trim()) {
                     setReferences([...references, refInput.trim()]);
@@ -206,240 +233,83 @@
                 }
             };
 
-            const removeReference = (index) => {
-                setReferences(references.filter((_, i) => i !== index));
-            };
-
-            const generateJson = () => {
-                const today = new Date().toISOString().split('T')[0];
-                // Math Box içindeki HTML encode edilmiş karakterleri düzelt
-                let cleanContent = editorHtml
-                    .replace(/"/g, "'") // JSON için tırnakları tek tırnağa çevir
-                    .replace(/&lt;/g, '<').replace(/&gt;/g, '>'); 
-
-                const result = {
-                    id: Math.floor(Math.random() * 10000),
-                    date: today,
-                    readTime: { tr: `${readTime} dk`, en: `${readTime} min` },
-                    category: CATEGORIES[categoryIndex],
-                    title: { tr: title, en: title + " (EN)" },
-                    summary: { tr: summary, en: summary + " (EN)" },
-                    content: {
-                        tr: cleanContent,
-                        en: cleanContent // Şimdilik aynısını koyuyoruz
-                    },
-                    references: references
-                };
-                setJsonOutput(JSON.stringify([result], null, 2));
-                setView('json');
-            };
-
-            const handleImport = () => {
-                const val = importValue.trim();
-                if (!val) return;
-
-                if (val.startsWith('<')) {
-                    // HTML Import
-                    if (quillRef.current) {
-                        quillRef.current.root.innerHTML = val;
-                        setEditorHtml(val);
-                    }
-                } else {
-                    // JSON Import
-                    try {
-                        const parsed = JSON.parse(val);
-                        const data = Array.isArray(parsed) ? parsed[0] : parsed;
-                        setTitle(data.title?.tr || "");
-                        setSummary(data.summary?.tr || "");
-                        setReferences(data.references || []);
-                        const catIdx = CATEGORIES.findIndex(c => c.tr === data.category?.tr);
-                        if (catIdx !== -1) setCategoryIndex(catIdx);
-                        
-                        if (data.content?.tr && quillRef.current) {
-                            const htmlContent = data.content.tr.replace(/'/g, '"');
-                            quillRef.current.root.innerHTML = htmlContent;
-                            setEditorHtml(htmlContent);
-                        }
-                    } catch (e) {
-                        alert("Geçersiz veri formatı!");
-                        return;
-                    }
-                }
-                setShowImportModal(false);
-                setImportValue("");
-                setView('preview');
-            };
-
-            const copyToClipboard = () => {
+            const copyJson = () => {
                 navigator.clipboard.writeText(jsonOutput);
-                const btn = document.getElementById('copyBtn');
-                const originalText = btn.innerText;
-                btn.innerText = "Kopyalandı!";
-                setTimeout(() => btn.innerText = originalText, 2000);
+                alert("JSON Kopyalandı!");
             };
 
             return (
-                <div className="max-w-[1600px] mx-auto p-4 md:p-8">
-                    {/* Header */}
-                    <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-cyan-500 rounded-xl flex items-center justify-center font-black text-slate-900 text-xl shadow-lg shadow-cyan-500/30">HN</div>
-                            <div>
-                                <h1 className="text-2xl font-bold text-white tracking-tight">HybNotes Editor Pro</h1>
-                                <div className="flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">KaTeX Engine Ready</span>
-                                </div>
+                <div className="flex h-screen w-full">
+                    
+                    {/* --- SOL PANEL: EDİTÖR --- */}
+                    <div className="w-1/2 h-full flex flex-col border-r border-slate-800 bg-slate-900/50 p-6 overflow-y-auto custom-scrollbar">
+                        <header className="mb-6 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center font-black text-slate-900">HN</div>
+                                <h1 className="text-xl font-bold text-white">Live Studio</h1>
+                            </div>
+                        </header>
+
+                        <div className="space-y-4 mb-6">
+                            <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none font-bold text-lg" placeholder="Başlık" />
+                            <textarea value={summary} onChange={e => setSummary(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-300 focus:border-cyan-500 outline-none resize-none h-20" placeholder="Özet" />
+                            <div className="grid grid-cols-2 gap-4">
+                                <select value={categoryIndex} onChange={e => setCategoryIndex(Number(e.target.value))} className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white outline-none">
+                                    {CATEGORIES.map((c, i) => <option key={i} value={i}>{c.tr}</option>)}
+                                </select>
+                                <div className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-center text-cyan-400 font-mono font-bold">{readTime} dk</div>
                             </div>
                         </div>
-                        
-                        <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
-                            <button onClick={() => setView('json')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${view === 'json' ? 'bg-cyan-500 text-slate-900 shadow-lg' : 'text-slate-400 hover:text-white'}`}>JSON ÇIKTI</button>
-                            <button onClick={() => setView('preview')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${view === 'preview' ? 'bg-cyan-500 text-slate-900 shadow-lg' : 'text-slate-400 hover:text-white'}`}>CANLI ÖNİZLEME</button>
-                        </div>
-                    </header>
 
-                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                        {/* Sol Kolon: Editör */}
-                        <div className="xl:col-span-7 space-y-6">
-                            {/* Meta Veriler */}
-                            <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="md:col-span-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Başlık</label>
-                                        <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none transition-colors" placeholder="Makale başlığı..." />
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Özet</label>
-                                        <textarea value={summary} onChange={e => setSummary(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none transition-colors h-20 resize-none" placeholder="Kısa özet..." />
-                                    </div>
-                                    <div>
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Kategori</label>
-                                        <select value={categoryIndex} onChange={e => setCategoryIndex(Number(e.target.value))} className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none appearance-none cursor-pointer">
-                                            {CATEGORIES.map((c, i) => <option key={i} value={i}>{c.tr}</option>)}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Tahmini Okuma</label>
-                                        <div className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-cyan-400 font-bold text-center">{readTime} Dk</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Ana Editör */}
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-end px-2">
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">İçerik Editörü</span>
-                                    <button onClick={addMathBox} className="text-[10px] bg-slate-700 hover:bg-cyan-500 hover:text-slate-900 text-white px-3 py-1 rounded-lg font-bold transition-all uppercase flex items-center gap-2">
-                                        <span>+ Vurgu Kutusu Ekle</span>
-                                        <span className="bg-black/20 px-1 rounded text-[9px] font-mono">$$</span>
-                                    </button>
-                                </div>
-                                <div className="rounded-2xl overflow-hidden shadow-2xl border border-slate-700">
-                                    <div ref={editorContainerRef}></div>
-                                </div>
-                                <div className="text-[10px] text-slate-500 px-2">
-                                    * İpucu: Editördeki <b>∑</b> butonunu kullanarak formül ekleyebilir veya vurgu kutusuna <code>$$ formül $$</code> yazabilirsiniz.
-                                </div>
-                            </div>
-
-                            {/* Kaynakça & Aksiyon */}
-                            <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl space-y-4">
-                                <div className="flex gap-2">
-                                    <input type="text" value={refInput} onChange={e => setRefInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addReference()} className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:border-cyan-500 outline-none" placeholder="Kaynak ekle..." />
-                                    <button onClick={addReference} className="bg-slate-700 px-6 rounded-xl text-white text-xs font-bold hover:bg-slate-600 transition-colors">EKLE</button>
-                                </div>
-                                {references.length > 0 && (
-                                    <div className="space-y-2">
-                                        {references.map((ref, i) => (
-                                            <div key={i} className="flex justify-between items-center text-xs bg-slate-900/50 p-2 rounded-lg border border-slate-700/50">
-                                                <span className="text-slate-300 italic truncate mr-2">{ref}</span>
-                                                <button onClick={() => removeReference(i)} className="text-red-400 hover:text-red-300 font-bold px-2">Sil</button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            <button onClick={generateJson} className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-cyan-500/20 transition-all transform active:scale-95 uppercase tracking-widest text-sm">
-                                Paketi Oluştur ve JSON Üret
-                            </button>
+                        <div className="flex-grow flex flex-col min-h-[400px]">
+                            <div id="editor-container" className="flex-grow rounded-b-xl"></div>
                         </div>
 
-                        {/* Sağ Kolon: Çıktı / Önizleme */}
-                        <div className="xl:col-span-5">
-                            <div className="sticky top-6 space-y-4">
-                                <div className="flex justify-between items-center px-2">
-                                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{view === 'json' ? 'JSON Çıktısı' : 'Mobil Önizleme'}</h3>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => setShowImportModal(true)} className="text-[10px] bg-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded-lg border border-slate-700 transition-colors">İçe Aktar</button>
-                                        {view === 'json' && jsonOutput && (
-                                            <button id="copyBtn" onClick={copyToClipboard} className="text-[10px] bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500 hover:text-slate-900 px-3 py-1 rounded-lg border border-cyan-500/30 transition-all font-bold">Kopyala</button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="bg-slate-900 border border-slate-800 rounded-3xl h-[calc(100vh-100px)] overflow-hidden relative shadow-2xl">
-                                    {view === 'json' ? (
-                                        jsonOutput ? (
-                                            <div className="h-full overflow-auto p-6 custom-scrollbar">
-                                                <pre className="text-cyan-400 font-mono text-[11px] whitespace-pre-wrap">{jsonOutput}</pre>
-                                            </div>
-                                        ) : (
-                                            <div className="h-full flex flex-col items-center justify-center text-slate-600 gap-4">
-                                                <div className="w-16 h-16 border-4 border-slate-700 border-t-cyan-500 rounded-full animate-spin"></div>
-                                                <span className="text-xs font-bold uppercase tracking-widest">Veri Bekleniyor</span>
-                                            </div>
-                                        )
-                                    ) : (
-                                        <div className="h-full overflow-auto p-8 custom-scrollbar bg-slate-900">
-                                            <div ref={previewRef} className="prose-preview max-w-none">
-                                                <div className="flex flex-wrap gap-3 text-[10px] font-bold uppercase text-slate-500 mb-6 font-mono tracking-wider">
-                                                    <span>{new Date().toISOString().split('T')[0]}</span>
-                                                    <span className="text-cyan-500">•</span>
-                                                    <span>{readTime} dk</span>
-                                                    <span className="text-cyan-500">•</span>
-                                                    <span className="text-cyan-400">{CATEGORIES[categoryIndex].tr}</span>
-                                                </div>
-                                                <h1 className="text-3xl md:text-4xl font-black text-white mb-6 leading-tight">{title || 'Başlık Yok'}</h1>
-                                                
-                                                {/* İÇERİK RENDER ALANI */}
-                                                <div className="text-slate-300 leading-relaxed text-base" dangerouslySetInnerHTML={{ __html: editorHtml || '<p class="text-slate-600 italic">İçerik bekleniyor...</p>' }} />
-                                                
-                                                {references.length > 0 && (
-                                                    <div className="mt-12 pt-8 border-t border-slate-800">
-                                                        <h5 className="text-[10px] font-black uppercase text-slate-500 mb-4 tracking-widest">Referanslar</h5>
-                                                        <ul className="space-y-2 m-0 p-0 list-none">
-                                                            {references.map((r, i) => <li key={i} className="text-xs text-slate-500 italic flex gap-2"><span>{i+1}.</span> <span>{r}</span></li>)}
-                                                        </ul>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                        <div className="mt-6 pt-6 border-t border-slate-800">
+                            <div className="flex gap-2 mb-2">
+                                <input type="text" value={refInput} onChange={e => setRefInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addReference()} className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none" placeholder="Kaynak ekle..." />
+                                <button onClick={addReference} className="bg-slate-700 px-4 rounded-lg text-xs font-bold hover:bg-slate-600">EKLE</button>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {references.map((ref, i) => (
+                                    <span key={i} className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700 cursor-pointer hover:text-red-400" onClick={() => {const n = [...references]; n.splice(i,1); setReferences(n);}}>{ref} ×</span>
+                                ))}
                             </div>
                         </div>
                     </div>
 
-                    {/* Import Modal */}
-                    {showImportModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                            <div className="bg-slate-800 w-full max-w-2xl rounded-2xl border border-slate-700 p-6 space-y-4 shadow-2xl">
-                                <h3 className="text-lg font-bold text-white">İçe Aktar</h3>
-                                <textarea 
-                                    value={importValue} 
-                                    onChange={e => setImportValue(e.target.value)} 
-                                    className="w-full h-48 bg-slate-900 border border-slate-700 rounded-xl p-4 text-xs font-mono text-cyan-400 outline-none focus:border-cyan-500 resize-none"
-                                    placeholder='JSON formatını veya HTML kodunu buraya yapıştırın...'
-                                ></textarea>
-                                <div className="flex gap-4">
-                                    <button onClick={() => setShowImportModal(false)} className="flex-1 py-3 rounded-xl bg-slate-700 text-white font-bold text-xs uppercase hover:bg-slate-600">İptal</button>
-                                    <button onClick={handleImport} className="flex-1 py-3 rounded-xl bg-cyan-500 text-slate-900 font-bold text-xs uppercase hover:bg-cyan-400">Yükle</button>
+                    {/* --- SAĞ PANEL: ÇIKTI --- */}
+                    <div className="w-1/2 h-full flex flex-col bg-[#0f172a]">
+                        <div className="h-[60%] border-b border-slate-800 p-8 overflow-y-auto custom-scrollbar relative">
+                            <div className="absolute top-4 right-4 bg-black/50 text-slate-500 text-[10px] font-bold px-2 py-1 rounded uppercase">Canlı Önizleme</div>
+                            <div ref={previewRef} className="rich-text-content max-w-2xl mx-auto">
+                                <div className="flex gap-2 text-[10px] font-bold uppercase text-slate-500 mb-4 font-mono tracking-wider">
+                                    <span className="text-cyan-500">{CATEGORIES[categoryIndex].tr}</span>
+                                    <span>•</span>
+                                    <span>{new Date().toISOString().split('T')[0]}</span>
                                 </div>
+                                <h1>{title}</h1>
+                                <div dangerouslySetInnerHTML={{ __html: editorHtml }} />
+                                {references.length > 0 && (
+                                    <div className="mt-8 pt-6 border-t border-slate-800/50">
+                                        <h5 className="text-[10px] font-black text-slate-500 uppercase mb-2">Referanslar</h5>
+                                        <ul className="text-xs text-slate-500 space-y-1">
+                                            {references.map((r, i) => <li key={i}>{r}</li>)}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    )}
+                        <div className="h-[40%] bg-[#0b1120] p-4 flex flex-col">
+                            <div className="flex justify-between items-center mb-2">
+                                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canlı JSON Çıktısı</h3>
+                                <button onClick={copyJson} className="text-[10px] font-bold text-cyan-400 hover:text-white uppercase transition-colors">Kopyala</button>
+                            </div>
+                            <div className="flex-grow overflow-auto custom-scrollbar rounded-xl border border-slate-800 bg-[#020617] p-4">
+                                <pre className="text-[11px] font-mono text-emerald-400 whitespace-pre-wrap leading-relaxed">{jsonOutput}</pre>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             );
         };
