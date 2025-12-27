@@ -3,6 +3,104 @@
 
 window.HybNotesData = {
     posts: [
+        // --- YENİ EKLENEN SHOWCASE MAKALESİ (ID: 999) ---
+        {
+            "id": 999,
+            "date": "2024-01-01",
+            "readTime": { "tr": "5 dk", "en": "5 min" },
+            "category": { "tr": "Sistem Kılavuzu", "en": "System Guide" },
+            "title": { "tr": "HybNotes Tipografi ve LaTeX Kılavuzu: Neler Yapabiliriz?", "en": "HybNotes Typography & LaTeX Guide: What Can We Do?" },
+            "summary": { 
+                "tr": "Bu makale, uygulamanın desteklediği tüm matematiksel formatları, metin stillerini ve görsel düzenleri test etmek için oluşturulmuştur.", 
+                "en": "This article is created to test all mathematical formats, text styles, and visual layouts supported by the application." 
+            }, 
+            "content": { 
+                "tr": `
+                    <p>Bu yazı, <strong>HybNotes</strong> altyapısının desteklediği tüm içerik türlerini sergilemektedir. KaTeX entegrasyonu sayesinde artık akademik düzeyde formülleri doğrudan render edebiliyoruz.</p>
+                    
+                    <h3>1. Matematiksel Formüller</h3>
+                    <p>Satır içi formüller metnin akışını bozmadan (örneğin $E=mc^2$ gibi) kullanılabilir. Blok formüller ise ortalanmış ve büyük görünür:</p>
+                    
+                    <h4>Temel Cebir ve Kesirler</h4>
+                    $$ x = \frac{-b \pm \sqrt{b^2-4ac}}{2a} $$
+
+                    <h4>İntegral ve Limitler</h4>
+                    $$ \int_{a}^{b} f(x)dx = F(b) - F(a) $$
+                    
+                    $$ \lim_{x \to \infty} \left(1 + \frac{1}{x}\right)^x = e $$
+
+                    <h3>2. Matrisler ve Diziler</h3>
+                    <p>Karmaşık veri setleri veya vektörler için matris kullanımı:</p>
+                    $$ 
+                    A = \begin{pmatrix} 
+                    a & b \\ 
+                    c & d 
+                    \end{pmatrix} 
+                    \times 
+                    \begin{pmatrix} 
+                    x \\ 
+                    y 
+                    \end{pmatrix}
+                    $$
+
+                    <h3>3. Kimyasal Denklemler ve Reaksiyonlar</h3>
+                    <p>Spor fizyolojisindeki metabolik süreçleri anlatmak için kimyasal oklar ve bileşikler:</p>
+                    $$ C_6H_{12}O_6 + 6O_2 \rightarrow 6CO_2 + 6H_2O + Enerji $$
+
+                    <h3>4. Tipografik Elementler</h3>
+                    <p>Metin içi vurgular ve listeler:</p>
+                    <ul style="list-style-type: disc; padding-left: 20px;">
+                        <li><strong>Kalın Metin:</strong> Önemli kavramlar için.</li>
+                        <li><em>İtalik Metin:</em> Vurgular ve yabancı terimler için.</li>
+                        <li><u>Altı Çizili:</u> Dikkat çekmek için.</li>
+                    </ul>
+
+                    <blockquote>
+                        "Bu bir blok alıntı (blockquote) örneğidir. Önemli sözler veya vurgulanması gereken paragraflar bu şekilde, sol tarafı çizgili ve hafif farklı bir arka planla gösterilir."
+                    </blockquote>
+
+                    <h3>5. Karmaşık Fonksiyonlar (Örnek: Kardiyovasküler)</h3>
+                    <p>Hem metin hem matematiği birleştiren karmaşık durumlar:</p>
+                    $$ 
+                    \text{Stroke Volume} = \frac{\text{EDV} - \text{ESV}}{\text{Body Surface Area}} 
+                    $$
+                `,
+                "en": `
+                    <p>This post showcases all content types supported by the <strong>HybNotes</strong> infrastructure. Thanks to KaTeX integration, we can now render academic-level formulas directly.</p>
+                    
+                    <h3>1. Mathematical Formulas</h3>
+                    <p>Inline formulas can be used without breaking the text flow (like $E=mc^2$). Block formulas appear centered and large:</p>
+                    
+                    <h4>Basic Algebra and Fractions</h4>
+                    $$ x = \frac{-b \pm \sqrt{b^2-4ac}}{2a} $$
+
+                    <h4>Integrals and Limits</h4>
+                    $$ \int_{a}^{b} f(x)dx = F(b) - F(a) $$
+                    
+                    $$ \lim_{x \to \infty} \left(1 + \frac{1}{x}\right)^x = e $$
+
+                    <h3>2. Matrices and Arrays</h3>
+                    <p>Using matrices for complex datasets or vectors:</p>
+                    $$ 
+                    A = \begin{pmatrix} 
+                    a & b \\ 
+                    c & d 
+                    \end{pmatrix} 
+                    \times 
+                    \begin{pmatrix} 
+                    x \\ 
+                    y 
+                    \end{pmatrix}
+                    $$
+                `
+            }, 
+            "references": [
+                "HybNotes Technical Documentation v2.0",
+                "KaTeX Supported Functions List"
+            ] 
+        },
+        
+        // --- GÜNCELLENMİŞ MEVCUT MAKALELER ---
         { 
             "id": 101, 
             "date": "2024-11-15", 
@@ -15,320 +113,221 @@ window.HybNotesData = {
             }, 
             "content": { 
                 "tr": `
-                    <p>Dayanıklılık sporlarında performansın "altın standardı" olarak kabul edilen <strong>VO<sub>2max</sub></strong>, bir sporcunun deniz seviyesinde, maksimum efor sırasında kullanabildiği en yüksek oksijen hacmini ifade eder. Ancak yaygın inanışın aksine, bu değer sadece akciğer kapasitesiyle sınırlı değildir; asıl sınırlayıcı faktör genellikle kalbin pompalama kapasitesi ve kasların bu oksijeni kandan çekebilme yeteneğidir.</p>
+                    <p>Dayanıklılık sporlarında performansın "altın standardı" olarak kabul edilen <strong>VO<sub>2max</sub></strong>, bir sporcunun deniz seviyesinde, maksimum efor sırasında kullanabildiği en yüksek oksijen hacmini ifade eder.</p>
                     
                     <h3>Fick Prensibi ve Matematiksel Model</h3>
                     <p>Adolf Fick tarafından 1870'de geliştirilen prensip, VO<sub>2max</sub>'ı belirleyen fizyolojik bileşenleri şu temel denklemle açıklar:</p>
                     
-                    <div class="latex-formula" style="background: rgba(79, 209, 197, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
-                        <span>VO</span><sub>2max</sub> <span class="op">=</span> <span>Q</span> <span class="op">×</span> <span>(a-v)O</span><sub>2</sub>
-                    </div>
+                    $$ VO_{2max} = Q \times (a-v)O_2 $$
 
                     <p>Bu denklemde:</p>
                     <ul style="list-style-type: disc; padding-left: 20px; color: #a9b3d9;">
-                        <li><strong>Q (Kardiyak Çıktı):</strong> Kalbin bir dakikada pompaladığı kan miktarıdır. <br><em>Formül: Atım Hacmi (SV) × Kalp Atım Hızı (HR)</em>. Elit sporcularda 35-40 L/dk'ya kadar çıkabilir.</li>
-                        <li><strong>(a-v)O<sub>2</sub> Farkı:</strong> Arteriyel (temiz) ve venöz (kirli) kan arasındaki oksijen farkıdır. Bu, kasların gelen kandan ne kadar oksijen çekebildiğini (ekstraksiyon kapasitesi) gösterir.</li>
+                        <li><strong>Q (Kardiyak Çıktı):</strong> Kalbin bir dakikada pompaladığı kan miktarıdır. Formülü şöyledir: $$ Q = SV \times HR $$ (Atım Hacmi × Kalp Atım Hızı). Elit sporcularda 35-40 L/dk'ya kadar çıkabilir.</li>
+                        <li><strong>(a-v)O<sub>2</sub> Farkı:</strong> Arteriyel (temiz) ve venöz (kirli) kan arasındaki oksijen farkıdır.</li>
                     </ul>
 
                     <blockquote>
                         "VO2max motorun hacmini belirler, ancak o motorla ne kadar hızlı gidebileceğinizi Koşu Ekonomisi ve Laktat Eşiği belirler." — Dr. Stephen Seiler
                     </blockquote>
 
-                    <h3>Genetik ve Antrenman Uyarlamaları</h3>
-                    <p>Bouchard ve arkadaşlarının (1999) yaptığı ünlü <em>HERITAGE Aile Çalışması</em>, VO<sub>2max</sub>'ın antrenmana yanıtının (trainability) %47 oranında kalıtsal olduğunu göstermiştir. Yani başlangıç seviyeniz düşük olsa bile, "yüksek yanıt veren" (high responder) bir genetiğe sahipseniz, düzenli antrenmanla bu değeri %40-50 artırabilirsiniz.</p>
-                    
-                    <p>Antrenmanla gelişimin fizyolojik mekanizmaları şunlardır:</p>
-                    <ol style="list-style-type: decimal; padding-left: 20px; color: #e7ecff;">
-                        <li><strong>Atım Hacmi Artışı:</strong> Sol ventrikülün büyümesi (eksantrik hipertrofi) sayesinde kalp her atışta daha fazla kan pompalar.</li>
-                        <li><strong>Kapillarizasyon:</strong> Tip I kas lifleri etrafındaki kılcal damar ağı artar, bu da (a-v)O<sub>2</sub> farkını iyileştirir.</li>
-                        <li><strong>Mitokondriyal Yoğunluk:</strong> Oksijeni işleyen organellerin sayısı artar.</li>
-                    </ol>
+                    <h3>Genetik ve Antrenman</h3>
+                    <p>Eğer "high responder" bir genetiğe sahipseniz, düzenli antrenmanla VO2max değerinizi şu oranda artırabilirsiniz:</p>
+                    $$ \Delta VO_{2max} \approx \%40 - \%50 $$
                 `,
                 "en": `
-                    <p>Considered the "gold standard" of performance in endurance sports, <strong>VO<sub>2max</sub></strong> refers to the maximum volume of oxygen an athlete can utilize during maximal effort at sea level. Contrary to popular belief, this value is not limited merely by lung capacity; the primary limiting factors are often the heart's pumping capacity and the muscles' ability to extract this oxygen from the blood.</p>
+                    <p>Considered the "gold standard" of performance in endurance sports, <strong>VO<sub>2max</sub></strong> refers to the maximum volume of oxygen an athlete can utilize during maximal effort at sea level.</p>
                     
-                    <h3>The Fick Principle and Mathematical Model</h3>
-                    <p>Developed by Adolf Fick in 1870, the principle describes the physiological components determining VO<sub>2max</sub> with the following fundamental equation:</p>
+                    <h3>The Fick Principle</h3>
+                    <p>Adolf Fick's principle describes the components determining VO<sub>2max</sub>:</p>
                     
-                    <div class="latex-formula" style="background: rgba(79, 209, 197, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
-                        <span>VO</span><sub>2max</sub> <span class="op">=</span> <span>Q</span> <span class="op">×</span> <span>(a-v)O</span><sub>2</sub>
-                    </div>
+                    $$ VO_{2max} = Q \times (a-v)O_2 $$
 
                     <p>In this equation:</p>
                     <ul style="list-style-type: disc; padding-left: 20px; color: #a9b3d9;">
-                        <li><strong>Q (Cardiac Output):</strong> The amount of blood the heart pumps in one minute. <br><em>Formula: Stroke Volume (SV) × Heart Rate (HR)</em>. Can reach up to 35-40 L/min in elite athletes.</li>
-                        <li><strong>(a-v)O<sub>2</sub> Difference:</strong> The difference in oxygen content between arterial and venous blood. This indicates the extraction capacity of the muscles.</li>
+                        <li><strong>Q (Cardiac Output):</strong> $$ Q = SV \times HR $$ Can reach up to 35-40 L/min in elite athletes.</li>
+                        <li><strong>(a-v)O<sub>2</sub> Difference:</strong> The difference in oxygen content between arterial and venous blood.</li>
                     </ul>
-
-                    <blockquote>
-                        "VO2max defines the size of the engine, but Running Economy and Lactate Threshold determine how fast you can go with that engine." — Dr. Stephen Seiler
-                    </blockquote>
-
-                    <h3>Genetics and Training Adaptations</h3>
-                    <p>The famous <em>HERITAGE Family Study</em> by Bouchard et al. (1999) demonstrated that the training response (trainability) of VO<sub>2max</sub> is approximately 47% heritable. This means even if your baseline is low, if you have "high responder" genetics, you could increase this value by 40-50% with regular training.</p>
                 `
             }, 
             "references": [
-                "Bassett, D. R., & Howley, E. T. (2000). Limiting factors for maximum oxygen uptake and determinants of endurance performance. Medicine and Science in Sports and Exercise.",
-                "Lundby, C., Montero, D., & Joyner, M. J. (2017). Biology of cardiovascular endurance capacity. Physiological Reviews.",
-                "Bouchard, C., et al. (1999). Familial aggregation of VO2max response to exercise training: results from the HERITAGE Family Study."
+                "Bassett, D. R., & Howley, E. T. (2000). Medicine and Science in Sports and Exercise.",
+                "Lundby, C., et al. (2017). Physiological Reviews."
             ] 
         },
 
-{
+        {
             "id": 105,
             "date": "2025-12-27",
-            "readTime": {
-                "tr": "6 dk",
-                "en": "6 min"
-            },
-            "category": {
-                "tr": "Spor Fizyolojisi",
-                "en": "Exercise Physiology"
-            },
-            "title": {
-                "tr": "Koşunun Yeni Denkleminde 4. Değişken: Fizyolojik Direnç (Resilience)",
-                "en": "The 4th Variable in the New Equation of Running: Physiological Resilience"
-            },
+            "readTime": { "tr": "6 dk", "en": "6 min" },
+            "category": { "tr": "Spor Fizyolojisi", "en": "Exercise Physiology" },
+            "title": { "tr": "Koşunun Yeni Denkleminde 4. Değişken: Fizyolojik Direnç (Resilience)", "en": "The 4th Variable in the New Equation of Running: Physiological Resilience" },
             "summary": {
-                "tr": "Prof. Andrew M. Jones'un çığır açan çalışması, 30 yıllık klasik dayanıklılık modelini güncelliyor. Yorgunluk altında performansın nasıl korunduğunu açıklayan 'Fizyolojik Direnç', denkleme dördüncü boyut olarak ekleniyor.",
-                "en": "Prof. Andrew M. Jones's groundbreaking work updates the 30-year-old classical endurance model. 'Physiological Resilience,' which explains how performance is maintained under fatigue, is added as the fourth dimension to the equation."
+                "tr": "Prof. Andrew M. Jones'un çığır açan çalışması, 30 yıllık klasik dayanıklılık modelini güncelliyor.",
+                "en": "Prof. Andrew M. Jones's groundbreaking work updates the 30-year-old classical endurance model."
             },
             "content": {
                 "tr": `
-                    <p>Bir maratoncunun potansiyelini tahmin etmek için yıllardır güvenilen ve 3 temel değişkene dayalı 'Klasik Model', yorgunluk faktörünün devreye girdiği gerçek yarış senaryolarında artık yetersiz kalmaktadır. Prof. Andrew M. Jones'un 2023 tarihli makalesi, bu kavramsal çerçeveyi güncelleyerek modele <strong>'Fizyolojik Direnç' (Resilience)</strong> adında, bağımsız bir değişken eklenmesini önermektedir.</p>
-                    <h3>Klasik Modelin Sınırları</h3>
-                    <p>Dr. Michael Joyner tarafından 1991 yılında tanımlanan model, dayanıklılık performansını üç ana sütun üzerine kurmuştu:</p>
-                    <ol style="list-style-type: decimal; padding-left: 20px; color: #e7ecff;">
-                        <li><strong>Maksimal Oksijen Alımı (VO2max):</strong> Sporcunun aerobik motorunun hacmi.</li>
-                        <li><strong>Koşu Ekonomisi:</strong> Belirli bir hızda harcanan enerji miktarı veya yakıt verimliliği.</li>
-                        <li><strong>Fraksiyonel Kullanım (Laktat Eşiği/Kritik Hız):</strong> Oksijen kapasitesinin sürdürülebilir yüzdesi.</li>
-                    </ol>
-                    <p>Ancak bu model, fizyolojik değişkenleri büyük ölçüde <em>statik</em> kabul etmekteydi. Yani start çizgisindeki ölçümlerin yarışın sonuna kadar sabit kaldığı varsayılıyordu.</p>
-                    <h3>Dördüncü Boyut: Fizyolojik Direnç</h3>
-                    <p>Jones, bu değişkenlerin sabit olmadığını ve yorgunlukla birlikte bozulduğunu vurgulamaktadır. 'Fizyolojik Direnç', bu bozulmaya karşı koyabilme kapasitesidir.</p>
-                    <div style="background: #1e293b; padding: 15px; border-left: 4px solid var(--primary-rgb); margin: 15px 0;">
-                        <p><strong>Kritik Veri:</strong> Yapılan çalışmalarda, 2 saatlik ağır egzersiz sonrasında sporcuların Kritik Güç (CP) değerlerinde ortalama <strong>~%10</strong> oranında bir düşüş saptanmıştır. Bireyler arası değişkenlik ise %1 ile %32 arasındadır.</p>
-                    </div>
-                    <p>Bu veriler, iki sporcunun başlangıç VO2max veya Eşik değerleri aynı olsa bile, 'direnç' kapasitesi yüksek olanın (yani parametreleri daha az bozulanın) yarışı kazanacağını göstermektedir. Bu nedenle Resilience, diğer faktörlerden bağımsız bir belirleyici olarak kabul edilmelidir.</p>
-                    <h3>Direnci Geliştiren Stratejiler</h3>
-                    <p>Makale, bu kapasiteyi artırmak için kanıta dayalı stratejiler sunmaktadır:</p>
-                    <p><strong>1. Yakıt Stratejisi:</strong> Egzersiz sırasında saatte 60g karbonhidrat alımının, Kritik Güç (CP) düşüşünü plaseboya kıyasla önemli ölçüde engellediği gösterilmiştir.</p>
-                    <p><strong>2. Antrenman Hacmi:</strong> Profesyonel bisikletçilerin, genç sporculara kıyasla yorgunluk altında güçlerini çok daha iyi korudukları gözlemlenmiştir. Bu durum, direncin uzun yıllara dayanan antrenman birikimiyle geliştiğini düşündürmektedir.</p>
-                    <p><strong>3. Teknoloji:</strong> Yeni nesil ayakkabılar, kas hasarını azaltarak yorgunluğa bağlı ekonomi kaybını muhtemelen hafifletebilir.</p>
+                    <p>Klasik model yorgunluk faktörünü göz ardı etmekteydi. Prof. Andrew M. Jones, modele <strong>'Fizyolojik Direnç'</strong> değişkenini ekledi.</p>
+                    
+                    <h3>Direnç ve Güç Kaybı</h3>
+                    <p>Yorgunlukla birlikte Kritik Güç (CP) değerindeki düşüş şu şekilde modellenebilir:</p>
+                    
+                    $$ CP(t) = CP_{başlangıç} \cdot e^{-kt} $$
+                    
+                    <p>Burada $k$, sporcunun yorgunluk katsayısıdır (direnç). Yapılan çalışmalarda 2 saat sonunda ortalama düşüş:</p>
+                    
+                    $$ \Delta CP \approx \%10 $$
+                    
+                    <p>Bu veriler, iki sporcunun başlangıç değerleri aynı olsa bile ($VO_{2max}^A = VO_{2max}^B$), direnç kapasitesi yüksek olanın yarışı kazanacağını gösterir.</p>
                 `,
                 "en": `
-                    <p>The 'Classical Model', relied upon for years to predict a marathoner's potential based on three fundamental variables, falls short in real-world racing scenarios where fatigue comes into play. Prof. Andrew M. Jones's 2023 paper updates this conceptual framework, proposing the addition of an independent variable called <strong>'Physiological Resilience'</strong> to the model.</p>
-                    <h3>Limits of the Classical Model</h3>
-                    <p>Defined by Dr. Michael Joyner in 1991, the model established endurance performance on three main pillars:</p>
-                    <ol style="list-style-type: decimal; padding-left: 20px; color: #e7ecff;">
-                        <li><strong>Maximal Oxygen Uptake (VO2max):</strong> The volume of the athlete's aerobic engine.</li>
-                        <li><strong>Running Economy:</strong> The amount of energy expended at a given speed, or fuel efficiency.</li>
-                        <li><strong>Fractional Utilization (Lactate Threshold/Critical Speed):</strong> The sustainable percentage of oxygen capacity.</li>
-                    </ol>
-                    <p>However, this model largely assumed physiological variables to be <em>static</em>. That is, measurements taken at the starting line were assumed to remain constant until the end of the race.</p>
-                    <h3>The Fourth Dimension: Physiological Resilience</h3>
-                    <p>Jones emphasizes that these variables are not constant and deteriorate with fatigue. 'Physiological Resilience' is the capacity to resist this deterioration.</p>
-                    <div style="background: #1e293b; padding: 15px; border-left: 4px solid var(--primary-rgb); margin: 15px 0;">
-                        <p><strong>Critical Data:</strong> Studies have found an average drop of <strong>~10%</strong> in athletes' Critical Power (CP) values after 2 hours of heavy exercise. Inter-individual variability ranges from 1% to 32%.</p>
-                    </div>
-                    <p>These data indicate that even if two athletes have the same starting VO2max or Threshold values, the one with higher 'resilience' capacity (i.e., whose parameters deteriorate less) will win the race. Therefore, Resilience should be considered an independent determinant.</p>
-                    <h3>Strategies to Improve Resilience</h3>
-                    <p>The paper offers evidence-based strategies to enhance this capacity:</p>
-                    <p><strong>1. Fueling Strategy:</strong> Carbohydrate intake of 60g per hour during exercise has been shown to significantly prevent the decline in Critical Power (CP) compared to placebo.</p>
-                    <p><strong>2. Training Volume:</strong> It has been observed that professional cyclists maintain their power under fatigue much better than younger athletes. This suggests that resilience develops with accumulated training over many years.</p>
-                    <p><strong>3. Technology:</strong> New generation footwear may likely mitigate fatigue-induced loss of economy by reducing muscle damage.</p>
+                    <p>The classical model ignored the fatigue factor. Prof. Andrew M. Jones added the <strong>'Physiological Resilience'</strong> variable.</p>
+                    
+                    <h3>Resilience and Power Loss</h3>
+                    <p>The decline in Critical Power (CP) with fatigue can be modeled as:</p>
+                    
+                    $$ CP(t) = CP_{initial} \cdot e^{-kt} $$
+                    
+                    <p>Where $k$ is the fatigue coefficient. Studies show an average drop after 2 hours:</p>
+                    
+                    $$ \Delta CP \approx \%10 $$
                 `
             },
             "references": [
-                "Jones, A. M. (2023). The fourth dimension: physiological resilience as an independent determinant of endurance exercise performance. The Journal of Physiology.",
-                "Joyner, M. J. (1991). Modeling: optimal marathon performance on the basis of physiological factors. Journal of Applied Physiology.",
-                "Clark, I. E., Vanhatalo, A., Thompson, C., et al. (2019). Dynamics of the power-duration relationship during prolonged endurance exercise and influence of carbohydrate ingestion. Journal of Applied Physiology."
+                "Jones, A. M. (2023). The Journal of Physiology."
             ]
         },
 
-
-        
         { 
             "id": 102, 
             "date": "2024-11-10", 
             "readTime": { "tr": "12 dk", "en": "12 min" }, 
             "category": { "tr": "Beslenme", "en": "Nutrition" }, 
-            "title": { "tr": "Kafein ve Nöromüsküler Performans: Moleküler Bakış", "en": "Caffeine & Neuromuscular Performance: A Molecular View" }, 
+            "title": { "tr": "Kafein ve Nöromüsküler Performans", "en": "Caffeine & Neuromuscular Performance" }, 
             "summary": { 
-                "tr": "Adenozin reseptör blokajı, kalsiyum salınımı ve CYP1A2 polimorfizmleri. Kafein sadece 'uyanık tutmak'la kalmaz, kas kasılma gücünü nasıl değiştirir?", 
-                "en": "Adenosine receptor blockade, calcium release, and CYP1A2 polymorphisms. How does caffeine alter muscle contraction power beyond just 'keeping you awake'?" 
+                "tr": "Kafeinin moleküler etkileri ve adenozin reseptörleri.", 
+                "en": "Molecular effects of caffeine and adenosine receptors." 
             }, 
             "content": { 
                 "tr": `
-                    <p>Kafein (1,3,7-trimetilksantin), dünyada en yaygın kullanılan psikoaktif maddedir ve dayanıklılık sporlarında performansı %2-4 oranında artırdığı kanıtlanmıştır. Ancak etkisi, sadece "uyarıcı" olmasından çok daha karmaşık biyokimyasal süreçlere dayanır.</p>
+                    <p>Kafein ($C_8H_{10}N_4O_2$), dünyada en yaygın kullanılan psikoaktif maddedir.</p>
                     
                     <h3>Etki Mekanizmaları</h3>
-                    <p>Kafeinin ergojenik etkisi üç ana mekanizma üzerinden gerçekleşir:</p>
+                    <p>Kafein, adenozin reseptörlerine bağlanma eğilimindedir. Reseptör bağlanma afinitesi şu denklemle ifade edilebilir:</p>
+                    
+                    $$ K_d = \frac{[R][L]}{[RL]} $$
+                    
                     <ol style="list-style-type: decimal; padding-left: 20px; color: #e7ecff;">
-                        <li><strong>Adenozin Antagonizmi:</strong> Kafein molekülü, yapısal olarak <em>adenozin</em>e benzer. Beyindeki A1 ve A2a reseptörlerine bağlanarak adenozini bloke eder. Normalde adenozin biriktiğinde yorgunluk ve uyku hali yaratır; kafein bunu engelleyerek dopamin ve nörotransmitter salınımını artırır, Algılanan Zorluk Derecesini (RPE) düşürür.</li>
-                        <li><strong>Kalsiyum (Ca<sup>2+</sup>) Mobilizasyonu:</strong> Kafein, sarkoplazmik retikulumdan kalsiyum salınımını artırır. Bu, aktin-miyozin çapraz köprü döngüsünü güçlendirerek kas kasılma kuvvetini artırabilir (özellikle yorgunluk durumunda).</li>
-                        <li><strong>Na<sup>+</sup>/K<sup>+</sup> Pompası Aktivitesi:</strong> Hücre dışı potasyum birikimini azaltarak kas yorgunluğunu geciktirir.</li>
+                        <li><strong>Adenozin Antagonizmi:</strong> Beyindeki $A_1$ ve $A_{2a}$ reseptörlerini bloke eder.</li>
+                        <li><strong>Kalsiyum ($Ca^{2+}$) Mobilizasyonu:</strong> Sarkoplazmik retikulumdan kalsiyum salınımını artırır.</li>
                     </ol>
 
-                    <h3>Dozaj ve "U-Şekilli" Etki Eğrisi</h3>
-                    <p>Araştırmalar, kafein dozajı ile performans arasında doğrusal olmayan bir ilişki olduğunu göstermektedir. Optimal bölge <strong>3 - 6 mg/kg</strong> aralığıdır.</p>
-                    <ul>
-                        <li><strong>Düşük Doz (< 3 mg/kg):</strong> Bilişsel fayda sağlar ancak fizyolojik etki sınırlıdır.</li>
-                        <li><strong>Optimal Doz (3-6 mg/kg):</strong> Maksimum performans artışı, minimum yan etki.</li>
-                        <li><strong>Yüksek Doz (> 9 mg/kg):</strong> Performans artışı durur; titreme, anksiyete ve taşikardi gibi yan etkiler performansı <em>düşürür</em>.</li>
-                    </ul>
-
-                    <h3>Genetik Faktör: CYP1A2 Enzimi</h3>
-                    <p>Kafeinin karaciğerde parçalanma hızı, CYP1A2 genindeki bir polimorfizme (rs762551) bağlıdır. Sporcular genetik olarak üç gruba ayrılır:</p>
-                    <div style="background: #1e293b; padding: 15px; border-left: 4px solid var(--primary-rgb); margin: 15px 0;">
-                        <strong>AA Genotipi (Hızlı Metabolizörler):</strong> Kafeini hızla paraksantine dönüştürürler. En yüksek performans artışını bu grup sağlar.<br><br>
-                        <strong>AC/CC Genotipi (Yavaş Metabolizörler):</strong> Kafein kanlarında uzun süre kalır. Bu grupta kafein, damar daralmasına (vazokonstriksiyon) yol açarak performansı <em>negatif</em> etkileyebilir.
-                    </div>
+                    <h3>Dozaj Eğrisi</h3>
+                    <p>Optimal dozaj aralığı:</p>
+                    $$ 3 \le \text{Dozaj} \le 6 \text{ mg/kg} $$
                 `,
                 "en": `
-                    <p>Caffeine (1,3,7-trimethylxanthine) is the most widely consumed psychoactive substance globally and is proven to enhance endurance performance by 2-4%. However, its effect relies on biochemical processes far more complex than simply being a "stimulant."</p>
+                    <p>Caffeine ($C_8H_{10}N_4O_2$) is the most widely consumed psychoactive substance.</p>
                     
-                    <h3>Mechanisms of Action</h3>
-                    <p>The ergogenic effect of caffeine occurs through three main mechanisms:</p>
+                    <h3>Mechanisms</h3>
+                    <p>Receptor binding affinity:</p>
+                    $$ K_d = \frac{[R][L]}{[RL]} $$
+                    
                     <ol style="list-style-type: decimal; padding-left: 20px; color: #e7ecff;">
-                        <li><strong>Adenosine Antagonism:</strong> The caffeine molecule is structurally similar to <em>adenosine</em>. It binds to A1 and A2a receptors in the brain, blocking adenosine. Normally, adenosine accumulation causes fatigue; caffeine prevents this, increasing dopamine release and lowering the Rate of Perceived Exertion (RPE).</li>
-                        <li><strong>Calcium (Ca<sup>2+</sup>) Mobilization:</strong> Caffeine enhances calcium release from the sarcoplasmic reticulum. This can potentiate actin-myosin cross-bridge cycling, increasing muscle contraction force.</li>
+                        <li><strong>Adenosine Antagonism:</strong> Blocks $A_1$ and $A_{2a}$ receptors.</li>
+                        <li><strong>Calcium ($Ca^{2+}$) Mobilization:</strong> Increases release from SR.</li>
                     </ol>
                 ` 
             }, 
             "references": [
-                "Guest, N., et al. (2018). Caffeine, CYP1A2 Genotype, and Endurance Performance in Athletes: A Systematic Review and Meta-Analysis.",
-                "Pickering, C., & Kiely, J. (2018). Are the Current Guidelines on Caffeine Use in Sport Optimal for Everyone? Inter-individual Variation in Caffeine Ergogenicity."
+                "Guest, N., et al. (2018). Caffeine, CYP1A2 Genotype."
             ] 
         },
+
         { 
             "id": 103, 
             "date": "2024-11-05", 
             "readTime": { "tr": "18 dk", "en": "18 min" }, 
             "category": { "tr": "Antrenman Bilimi", "en": "Training Science" }, 
-            "title": { "tr": "Laktat Eşiği Fizyolojisi: Metabolik Esneklik", "en": "Lactate Threshold Physiology: Metabolic Flexibility" }, 
+            "title": { "tr": "Laktat Eşiği Fizyolojisi", "en": "Lactate Threshold Physiology" }, 
             "summary": { 
-                "tr": "Laktat bir düşman mı yoksa yakıt mı? LT1 ve LT2 eşiklerini yukarı taşımak için mitokondriyal biyogenez ve monokarboksilat taşıyıcıların (MCT) rolü.", 
-                "en": "Is lactate an enemy or a fuel? The role of mitochondrial biogenesis and monocarboxylate transporters (MCT) in raising LT1 and LT2." 
+                "tr": "Laktat metabolizması ve eşiklerin kimyasal temeli.", 
+                "en": "Lactate metabolism and chemical basis of thresholds." 
             }, 
             "content": { 
                 "tr": `
-                    <p>Geçmişte "yorgunluk asidi" olarak bilinen laktat, günümüzde modern spor fizyolojisinin en önemli biyo-belirteçlerinden biri ve hayati bir enerji kaynağı olarak kabul edilmektedir. George Brooks'un "Laktat Mekik Teorisi" (Lactate Shuttle Theory), laktatın tip II (hızlı kasılan) liflerde üretilip, tip I (yavaş kasılan) liflere veya kalbe taşınarak okside edildiğini kanıtlamıştır.</p>
+                    <p>Laktat bir atık değil, yakıttır. Glikoliz sonucu oluşan Pirüvat, oksijen yokluğunda laktata dönüşür:</p>
                     
-                    <h3>İki Eşik Modeli: LT1 ve LT2</h3>
-                    <p>Dayanıklılık performansını belirleyen asıl faktör, laktat üretiminden ziyade, laktatın temizlenme (clearance) hızıdır. Antrenman yoğunluğuna göre iki fizyolojik kırılma noktası vardır:</p>
+                    $$ \text{Pirüvat} + NADH + H^+ \leftrightarrow \text{Laktat} + NAD^+ $$
                     
+                    <h3>Eşik Modeli</h3>
                     <ul style="list-style-type: none; padding: 0;">
                         <li style="margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-                            <strong style="color:rgb(var(--primary-rgb)); font-size: 1.1em;">LT1 (Aerobik Eşik):</strong><br>
-                            Kan laktatının dinlenik seviyenin (yaklaşık 1.0 - 1.5 mmol/L) üzerine çıkmaya başladığı ilk noktadır. Genellikle maraton temposuna veya Zone 2'nin üst sınırına denk gelir. Bu noktada yağ oksidasyonu maksimuma yakındır (FatMax).
+                            <strong style="color:rgb(var(--primary-rgb)); font-size: 1.1em;">LT1:</strong> Kan laktatı $\approx 1.5 \text{ mmol/L}$
                         </li>
                         <li style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-                            <strong style="color:rgb(var(--primary-rgb)); font-size: 1.1em;">LT2 (Anaerobik Eşik / MLSS):</strong><br>
-                            Laktat üretim hızının, vücudun temizleme hızına eşit olduğu son noktadır (Maksimum Laktat Kararlı Durumu). Genellikle 4.0 mmol/L civarındadır ancak kişiye göre değişir. Bu noktanın üzerinde metabolik asidoz (H<sup>+</sup> iyonları) hızla artar ve yorgunluk kaçınılmaz olur.
+                            <strong style="color:rgb(var(--primary-rgb)); font-size: 1.1em;">LT2 (MLSS):</strong> Üretim = Temizleme olduğu nokta. $$ \frac{d[La^-]}{dt} = 0 $$ Genellikle $\approx 4.0 \text{ mmol/L}$ civarındadır.
                         </li>
                     </ul>
-
-                    <h3>Geliştirme Stratejileri</h3>
-                    <p>Bu iki eşiği sağa (daha yüksek hıza/güce) kaydırmak için hücresel düzeyde iki adaptasyon gereklidir:</p>
-                    
-                    <h4>1. Mitokondriyal Biyogenez (LT1 için)</h4>
-                    <p>Yüksek hacimli, düşük yoğunluklu antrenmanlar (Zone 2), PGC-1α genini aktive ederek mitokondri sayısını artırır. Mitokondri ne kadar fazlaysa, pirüvat o kadar verimli işlenir ve laktata dönüşmeden enerjiye çevrilir.</p>
-                    
-                    <h4>2. MCT Taşıyıcı Yoğunluğu (LT2 için)</h4>
-                    <p>Laktatın hücre dışına atılması ve başka hücrelere taşınması <strong>MCT1</strong> ve <strong>MCT4</strong> proteinleri ile olur. "Threshold" (eşik) antrenmanları ve yüksek yoğunluklu interval çalışmaları (HIIT), bu taşıyıcı proteinlerin yoğunluğunu artırarak laktatın kandan temizlenme hızını (clearance rate) iyileştirir.</p>
                 `,
                 "en": `
-                    <p>Once known as "fatigue acid," lactate is now recognized as a vital fuel source and a key biomarker in modern sports physiology. George Brooks' "Lactate Shuttle Theory" proved that lactate produced in Type II fibers is transported to Type I fibers or the heart to be oxidized.</p>
+                    <p>Lactate is fuel. Pyruvate converts to lactate:</p>
                     
-                    <h3>The Two-Threshold Model: LT1 and LT2</h3>
-                    <p>The decisive factor in endurance performance is not lactate production, but clearance rate.</p>
+                    $$ \text{Pyruvate} + NADH + H^+ \leftrightarrow \text{Lactate} + NAD^+ $$
                     
+                    <h3>Threshold Model</h3>
                     <ul style="list-style-type: none; padding: 0;">
-                        <li style="margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-                            <strong style="color:rgb(var(--primary-rgb)); font-size: 1.1em;">LT1 (Aerobic Threshold):</strong><br>
-                            The point where blood lactate begins to rise above resting levels (~1.5 mmol/L). Corresponds to Marathon pace or upper Zone 2.
-                        </li>
-                        <li style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-                            <strong style="color:rgb(var(--primary-rgb)); font-size: 1.1em;">LT2 (Anaerobic Threshold / MLSS):</strong><br>
-                            Maximum Lactate Steady State. The limit where production equals clearance (~4.0 mmol/L). Above this, acidosis spikes.
-                        </li>
+                        <li><strong>LT1:</strong> Blood lactate $\approx 1.5 \text{ mmol/L}$</li>
+                        <li><strong>LT2 (MLSS):</strong> Where Production = Clearance. $$ \frac{d[La^-]}{dt} = 0 $$</li>
                     </ul>
                 ` 
             }, 
             "references": [
-                "Brooks, G. A. (2018). The Science and Translation of Lactate Shuttle Theory. Cell Metabolism.",
-                "San-Millán, I., & Brooks, G. A. (2018). Assessment of Metabolic Flexibility in Elite Athletes. Sports Medicine.",
-                "Seiler, S. (2010). What is best practice for training intensity and duration distribution in endurance athletes?"
+                "Brooks, G. A. (2018). Cell Metabolism."
             ] 
         },
+
         { 
             "id": 104, 
             "date": "2024-10-30", 
             "readTime": { "tr": "14 dk", "en": "14 min" }, 
             "category": { "tr": "Koşu Mekaniği", "en": "Running Mechanics" }, 
-            "title": { "tr": "Koşu Ekonomisi: Yay-Kütle Modeli ve Enerji Maliyeti", "en": "Running Economy: Spring-Mass Model & Energy Cost" }, 
+            "title": { "tr": "Koşu Ekonomisi: Yay-Kütle Modeli", "en": "Running Economy: Spring-Mass Model" }, 
             "summary": { 
-                "tr": "Aynı VO2max değerine sahip iki koşucu neden farklı hızlarda koşar? Koşu ekonomisini (RE) belirleyen biyomekanik faktörler ve hesaplama formülü.", 
-                "en": "Why do two runners with the same VO2max run at different speeds? Biomechanical factors determining Running Economy (RE) and calculation formula." 
+                "tr": "Koşu ekonomisi hesaplaması ve biyomekanik formüller.", 
+                "en": "Running economy calculation and biomechanical formulas." 
             }, 
             "content": { 
                 "tr": `
-                    <p>Koşu Ekonomisi (RE), belirli bir hızda koşmak için gereken oksijen maliyetidir (enerji harcaması). Otomobillerdeki "yakıt tasarrufu" gibidir. Elit koşucular, amatörlere göre aynı hızda %20-30 daha az enerji harcarlar. Bu, VO<sub>2max</sub> değeri daha düşük olan bir atletin, daha ekonomik koşarak daha yüksek VO<sub>2max</sub>'a sahip bir rakibi geçebileceği anlamına gelir.</p>
+                    <p>Koşu Ekonomisi (RE), belirli bir hızda tüketilen oksijen miktarıdır.</p>
                     
                     <h3>RE'nin Hesaplanması</h3>
-                    <p>Koşu ekonomisi genellikle kg başına bir kilometrede tüketilen oksijen miktarı ile ifade edilir:</p>
+                    <p>Eski karmaşık HTML yapısı yerine artık net bir formül kullanıyoruz:</p>
                     
-                    <div class="latex-formula" style="background: rgba(79, 209, 197, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
-                        <span>RE</span> <span class="op">=</span> 
-                        <div class="fraction">
-                            <span class="numerator">VO<sub>2</sub> (ml/kg/dk)</span>
-                            <span class="denominator">Hız (m/dk)</span>
-                        </div>
-                    </div>
+                    $$ RE = \frac{VO_2 \; (ml/kg/dk)}{v \; (m/dk)} $$
 
-                    <h3>Biyomekanik ve "Yay-Kütle" Modeli</h3>
-                    <p>İnsan bacağı koşu sırasında bir yay (spring) gibi davranır. Yerle temas anında tendonlar elastik enerji depolar ve itiş (push-off) fazında bu enerjiyi geri verir. Bu "bedava" enerjidir.</p>
-                    <ul>
-                        <li><strong>Dikey Salınım (Vertical Oscillation):</strong> Çok fazla zıplamak enerjiyi dikey düzlemde boşa harcar. Elitlerde bu değer 6-8 cm arasındadır.</li>
-                        <li><strong>Yerle Temas Süresi (GCT):</strong> Ayak yerde ne kadar az kalırsa, elastik enerji kaybı o kadar az olur. Elit sprinterlerde <100ms, maratoncularda <200ms hedeflenir.</li>
-                        <li><strong>Bacak Sertliği (Leg Stiffness):</strong> Tendonların sertliği ne kadar yüksekse, enerji geri dönüşümü o kadar verimli olur.</li>
-                    </ul>
-
-                    <h3>RE Nasıl Geliştirilir?</h3>
-                    <p>Sadece koşmak ekonomiyi yıllar içinde geliştirir, ancak süreci hızlandırmanın yolları vardır:</p>
-                    <ol>
-                        <li><strong>Ağır Kuvvet Antrenmanı:</strong> (1-5 tekrar, %85+ 1RM). Kas hipertrofisine yol açmadan nöromüsküler verimliliği artırır.</li>
-                        <li><strong>Plyometrikler:</strong> (Kutu zıplamaları, ip atlama). Tendon sertliğini (stiffness) artırarak "yay" etkisini güçlendirir.</li>
-                        <li><strong>Karbon Plakalı Ayakkabılar:</strong> Araştırmalar, metatarsofalangeal eklemin bükülmesini engelleyerek ve köpük enerjisiyle ekonomiyi %2-4 oranında artırdığını göstermektedir.</li>
-                    </ol>
+                    <h3>Yay-Kütle Modeli (Spring-Mass)</h3>
+                    <p>Bacak bir yay gibi davranır. Hooke kanununa göre yaydaki kuvvet:</p>
+                    
+                    $$ F_{yay} = k \cdot \Delta x $$
+                    
+                    <p>Burada $k$ bacak sertliğini (leg stiffness), $\Delta x$ ise sıkışma miktarını gösterir.</p>
                 `,
                 "en": `
-                    <p>Running Economy (RE) represents the oxygen cost (energy expenditure) required to run at a given submaximal speed. It is analogous to fuel economy in cars. Elite runners expend 20-30% less energy than amateurs at the same speed.</p>
+                    <p>Running Economy (RE) is the oxygen cost at a given speed.</p>
                     
                     <h3>Calculation of RE</h3>
-                    <p>RE is typically expressed as the volume of oxygen consumed per kilogram per kilometer:</p>
                     
-                    <div class="latex-formula" style="background: rgba(79, 209, 197, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
-                        <span>RE</span> <span class="op">=</span> 
-                        <div class="fraction">
-                            <span class="numerator">VO<sub>2</sub> (ml/kg/min)</span>
-                            <span class="denominator">Speed (m/min)</span>
-                        </div>
-                    </div>
+                    $$ RE = \frac{VO_2 \; (ml/kg/min)}{v \; (m/min)} $$
 
-                    <h3>Biomechanics and the "Spring-Mass" Model</h3>
-                    <p>The human leg acts like a spring during running. Tendons store elastic energy upon impact and return it during the push-off phase. This is essentially "free" energy.</p>
-                    <ul>
-                        <li><strong>Vertical Oscillation:</strong> Bouncing too high wastes energy vertically. Elite values are typically 6-8 cm.</li>
-                        <li><strong>Ground Contact Time (GCT):</strong> Shorter contact time minimizes energy dissipation.</li>
-                    </ul>
+                    <h3>Spring-Mass Model</h3>
+                    <p>Leg acts like a spring. According to Hooke's Law:</p>
+                    
+                    $$ F_{spring} = k \cdot \Delta x $$
                 ` 
             }, 
             "references": [
-                "Barnes, K. R., & Kilding, A. E. (2015). Strategies to improve running economy. Sports Medicine.",
-                "Hoogkamer, W., et al. (2018). A comparison of the energetic cost of running in marathon racing shoes. Sports Medicine."
+                "Barnes, K. R., & Kilding, A. E. (2015). Sports Medicine."
             ] 
         }
     ],
