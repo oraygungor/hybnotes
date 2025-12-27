@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HybNotes Live Studio</title>
+    <title>HybNotes Live Studio (Bi-Directional)</title>
     
     <!-- React & Libraries -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- KaTeX (Matematik) -->
+    <!-- KaTeX -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -24,78 +24,61 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 
     <style>
-        /* --- TEMEL AYARLAR --- */
         body { background-color: #020617; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow: hidden; }
         
-        /* --- RICH TEXT CONTENT --- */
-        .rich-text-content { font-family: 'Inter', sans-serif; line-height: 1.8; font-size: 16px; color: #cbd5e1; }
-        .rich-text-content h1 { font-size: 2em; font-weight: 800; color: #fff; margin: 1em 0 0.5em; }
-        .rich-text-content h2 { font-size: 1.5em; font-weight: 700; color: #e2e8f0; margin: 1.5em 0 0.5em; border-bottom: 1px solid #334155; padding-bottom: 5px; }
-        .rich-text-content h3 { font-size: 1.25em; font-weight: 600; color: #94a3b8; margin: 1.5em 0 0.5em; }
-        .rich-text-content p { margin-bottom: 1em; }
-        .rich-text-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
-        .rich-text-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+        /* ORTAK STİLLER */
+        .rich-text-content, .ql-editor { font-family: 'Inter', sans-serif !important; line-height: 1.8 !important; font-size: 16px !important; color: #cbd5e1 !important; }
+        .rich-text-content h1, .ql-editor h1 { font-size: 2em !important; font-weight: 800 !important; color: #fff !important; margin: 1em 0 0.5em !important; line-height: 1.2 !important; }
+        .rich-text-content h2, .ql-editor h2 { font-size: 1.5em !important; font-weight: 700 !important; color: #e2e8f0 !important; margin: 1.5em 0 0.5em !important; border-bottom: 1px solid #334155 !important; padding-bottom: 5px !important; }
+        .rich-text-content h3, .ql-editor h3 { font-size: 1.25em !important; font-weight: 600 !important; color: #94a3b8 !important; margin: 1.5em 0 0.5em !important; }
+        .rich-text-content p, .ql-editor p { margin-bottom: 1em !important; }
+        .rich-text-content ul, .ql-editor ul { list-style-type: disc !important; padding-left: 1.5rem !important; margin-bottom: 1rem !important; }
+        .rich-text-content ol, .ql-editor ol { list-style-type: decimal !important; padding-left: 1.5rem !important; margin-bottom: 1rem !important; }
         
-        .rich-text-content blockquote {
-            border-left: 4px solid #f59e0b;
-            background: rgba(245, 158, 11, 0.1);
-            padding: 1rem 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 0 8px 8px 0;
-            color: #fbbf24;
-            font-style: italic;
+        .rich-text-content blockquote, .ql-editor blockquote {
+            border-left: 4px solid #f59e0b !important;
+            background: rgba(245, 158, 11, 0.1) !important;
+            padding: 1rem 1.5rem !important;
+            margin: 1.5rem 0 !important;
+            border-radius: 0 8px 8px 0 !important;
+            color: #fbbf24 !important;
+            font-style: italic !important;
         }
 
-        .math-box {
-            display: block;
-            margin: 1.5rem 0;
-            padding: 1.5rem;
-            background: rgba(6, 182, 212, 0.1);
-            border-left: 4px solid #06b6d4;
-            border-radius: 0 8px 8px 0;
-            color: #22d3ee;
-            font-family: 'JetBrains Mono', monospace;
-            text-align: center;
-            font-weight: 600;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        .rich-text-content .math-box, .ql-editor .math-box {
+            display: block !important;
+            margin: 1.5rem 0 !important;
+            padding: 1.5rem !important;
+            background: rgba(6, 182, 212, 0.1) !important;
+            border-left: 4px solid #06b6d4 !important;
+            border-radius: 0 8px 8px 0 !important;
+            color: #22d3ee !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            text-align: center !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
         }
 
-        /* --- QUILL EDİTÖR ÖZELLEŞTİRMESİ --- */
-        .ql-toolbar.ql-snow { background: #1e293b; border-color: #334155 !important; border-radius: 12px 12px 0 0; }
+        /* QUILL */
+        .ql-toolbar.ql-snow { background: #1e293b; border-color: #334155 !important; border-radius: 12px 12px 0 0; padding: 12px; }
         .ql-container.ql-snow { background: #0f172a; border-color: #334155 !important; border-radius: 0 0 12px 12px; color: #cbd5e1; font-family: 'Inter', sans-serif; font-size: 16px; }
-        .ql-editor.ql-blank::before { color: #475569; font-style: italic; }
-        
-        .ql-editor h2 { font-size: 1.5em; font-weight: 700; color: #e2e8f0; margin-top: 1em; border-bottom: 1px solid #334155; }
-        .ql-editor blockquote { border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.1); color: #fbbf24; font-style: italic; }
-        .ql-editor .math-box { border-left: 4px solid #06b6d4; background: rgba(6, 182, 212, 0.1); color: #22d3ee; font-family: 'JetBrains Mono'; text-align: center; padding: 1rem; margin: 1rem 0; }
-
-        /* Toolbar İkonları */
+        .ql-editor.ql-blank::before { color: #475569 !important; font-style: italic !important; font-family: 'Inter', sans-serif !important; }
         .ql-snow .ql-stroke { stroke: #94a3b8 !important; }
         .ql-snow .ql-fill { fill: #94a3b8 !important; }
         .ql-snow .ql-picker { color: #94a3b8 !important; }
-        .ql-snow .ql-picker-options { background-color: #1e293b !important; border-color: #334155 !important; }
-        
-        /* ÖZEL TOOLBAR BUTONU (MATHBOX) */
-        .ql-mathbox {
-            font-weight: bold;
-            color: #22d3ee !important; /* Cyan renk */
-            width: auto !important;
-            padding: 0 5px !important;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .ql-mathbox:hover {
-            color: #fff !important;
-        }
-        .ql-mathbox::after {
-            content: "[ MB ]"; /* Buton üzerinde görünecek metin */
-            font-size: 12px;
-        }
+        .ql-snow .ql-active .ql-stroke { stroke: #22d3ee !important; }
+        .ql-snow .ql-active .ql-fill { fill: #22d3ee !important; }
 
-        /* Scrollbars */
+        .ql-mathbox { font-weight: bold; color: #22d3ee !important; width: auto !important; padding: 0 5px !important; font-family: 'JetBrains Mono', monospace; display: flex !important; align-items: center; justify-content: center; }
+        .ql-mathbox:hover { color: #fff !important; background-color: rgba(6, 182, 212, 0.2) !important; border-radius: 4px; }
+        .ql-mathbox::after { content: "[ MB ]"; font-size: 12px; }
+
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        textarea:focus { outline: none; border-color: #22d3ee; }
     </style>
 </head>
 <body>
@@ -112,27 +95,35 @@
         ];
 
         const App = () => {
-            // --- STATE ---
-            const [title, setTitle] = useState("Örnek Makale Başlığı");
-            const [summary, setSummary] = useState("Makalenin kısa özeti buraya gelecek...");
+            // --- MAIN DATA STATE ---
+            const [data, setData] = useState({
+                tr: { title: "Örnek Başlık TR", summary: "Türkçe özet...", content: `<p>İçerik...</p><div class="math-box">$$ E = mc^2 $$</div>` },
+                en: { title: "Example Title EN", summary: "English summary...", content: `<p>Content...</p><div class="math-box">$$ E = mc^2 $$</div>` }
+            });
+
+            // State
+            const [editLang, setEditLang] = useState('tr'); // Editörde hangi dil var?
+            const [viewLang, setViewLang] = useState('tr'); // Önizlemede hangi dil var?
             const [categoryIndex, setCategoryIndex] = useState(0);
             const [references, setReferences] = useState([]);
             const [refInput, setRefInput] = useState("");
             const [readTime, setReadTime] = useState(5);
-            const [editorHtml, setEditorHtml] = useState("");
             const [jsonOutput, setJsonOutput] = useState("");
+            
+            // Loop Koruması
+            const [isJsonFocused, setIsJsonFocused] = useState(false); // Kullanıcı JSON kutusuna mı yazıyor?
+            const isUpdatingQuill = useRef(false); // Quill'i programatik olarak mı güncelliyoruz?
 
             const quillRef = useRef(null);
             const previewRef = useRef(null);
 
-            // --- 1. QUILL BAŞLATMA ---
+            // --- 1. QUILL KURULUM ---
             useEffect(() => {
                 if (window.katex) window.katex = katex;
 
                 if (!quillRef.current) {
                     const container = document.getElementById('editor-container');
                     
-                    // Custom Blot
                     const Block = Quill.import('blots/block');
                     class MathBox extends Block {}
                     MathBox.blotName = 'math-box';
@@ -140,10 +131,9 @@
                     MathBox.className = 'math-box';
                     Quill.register(MathBox);
 
-                    // Custom Toolbar Handler
                     const addMathBoxHandler = function() {
                         const range = this.quill.getSelection(true) || { index: this.quill.getLength() };
-                        const html = `<div class="math-box">$$ x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a} $$</div><p><br></p>`;
+                        const html = `<div class="math-box">$$ x = ... $$</div><p><br></p>`;
                         this.quill.clipboard.dangerouslyPasteHTML(range.index, html);
                     };
 
@@ -154,15 +144,13 @@
                                 container: [
                                     [{ 'header': [2, 3, false] }],
                                     ['bold', 'italic', 'underline', 'strike'],
-                                    ['blockquote', 'code-block', 'mathbox'], // 'mathbox' butonu buraya eklendi
+                                    ['blockquote', 'code-block', 'mathbox'], 
                                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                                     [{ 'script': 'sub'}, { 'script': 'super' }],
                                     [{ 'color': [] }, { 'background': [] }],
                                     ['link', 'formula', 'clean']
                                 ],
-                                handlers: {
-                                    'mathbox': addMathBoxHandler
-                                }
+                                handlers: { 'mathbox': addMathBoxHandler }
                             }
                         },
                         placeholder: 'İçerik yazmaya başla...'
@@ -170,45 +158,98 @@
 
                     quillRef.current = quill;
 
-                    // Başlangıç İçeriği
-                    const initialContent = `
-                        <p>Toolbar'daki <strong>[ MB ]</strong> butonuna basarak aşağıdakini oluşturabilirsin:</p>
-                        <div class="math-box">$$ E = mc^2 $$</div>
-                        <p>Bu bir formül kutusudur.</p>
-                        <blockquote>"Bu bir alıntıdır."</blockquote>
-                    `;
-                    quill.clipboard.dangerouslyPasteHTML(0, initialContent);
-
-                    // Değişiklikleri Dinle
+                    // Quill -> State Güncellemesi
                     quill.on('text-change', () => {
+                        // Eğer güncelleme kod tarafından (JSON'dan) geldiyse state'i tekrar güncelleme (Loop koruması)
+                        if (isUpdatingQuill.current) return;
+
                         const html = quill.root.innerHTML;
                         const text = quill.getText();
                         const wordCount = text.trim().split(/\s+/).length;
                         setReadTime(Math.max(1, Math.ceil(wordCount / 180)));
-                        setEditorHtml(html);
+
+                        setData(prev => ({
+                            ...prev,
+                            [editLang]: { ...prev[editLang], content: html }
+                        }));
                     });
                 }
             }, []);
 
-            // --- 2. CANLI GÜNCELLEME ---
+            // --- 2. DİL DEĞİŞTİRME & SENKRONİZASYON ---
+            // Editlenen dil değiştiğinde veya JSON'dan veri geldiğinde Quill'i güncelle
             useEffect(() => {
-                const cleanContent = editorHtml
-                    .replace(/"/g, "'")
-                    .replace(/<p><br><\/p>/g, "");
+                if (quillRef.current && !isUpdatingQuill.current) {
+                    const currentContent = quillRef.current.root.innerHTML;
+                    const newContent = data[editLang].content;
+                    
+                    // Sadece fark varsa güncelle (İmleç zıplamasını önler)
+                    if (currentContent !== newContent) {
+                        isUpdatingQuill.current = true; // Kilit
+                        quillRef.current.root.innerHTML = newContent;
+                        isUpdatingQuill.current = false; // Kilit Aç
+                    }
+                }
+            }, [editLang, data]);
 
-                const dataObj = {
-                    id: Math.floor(Math.random() * 9999),
-                    date: new Date().toISOString().split('T')[0],
-                    readTime: { tr: `${readTime} dk`, en: `${readTime} min` },
-                    category: CATEGORIES[categoryIndex],
-                    title: { tr: title, en: title + " (EN)" },
-                    summary: { tr: summary, en: summary + " (EN)" },
-                    content: { tr: cleanContent, en: cleanContent },
-                    references: references
-                };
+            // --- 3. STATE -> JSON OLUŞTURMA ---
+            // Veri değiştikçe JSON kutusunu güncelle (Kullanıcı oraya yazmıyorsa)
+            useEffect(() => {
+                if (!isJsonFocused) {
+                    const cleanContentTR = data.tr.content.replace(/"/g, "'").replace(/<p><br><\/p>/g, "");
+                    const cleanContentEN = data.en.content.replace(/"/g, "'").replace(/<p><br><\/p>/g, "");
 
-                setJsonOutput(JSON.stringify([dataObj], null, 2));
+                    const dataObj = {
+                        id: Math.floor(Math.random() * 9999),
+                        date: new Date().toISOString().split('T')[0],
+                        readTime: { tr: `${readTime} dk`, en: `${readTime} min` },
+                        category: CATEGORIES[categoryIndex],
+                        title: { tr: data.tr.title, en: data.en.title },
+                        summary: { tr: data.tr.summary, en: data.en.summary },
+                        content: { tr: cleanContentTR, en: cleanContentEN },
+                        references: references
+                    };
 
+                    setJsonOutput(JSON.stringify([dataObj], null, 2));
+                }
+            }, [data, categoryIndex, references, readTime, isJsonFocused]);
+
+            // --- 4. JSON -> STATE GÜNCELLEME (CANLI EDİT) ---
+            const handleJsonChange = (e) => {
+                const newVal = e.target.value;
+                setJsonOutput(newVal); // UI hemen güncellensin
+
+                try {
+                    const parsed = JSON.parse(newVal);
+                    const item = Array.isArray(parsed) ? parsed[0] : parsed;
+
+                    if (item) {
+                        // Kategoriyi bul
+                        if (item.category?.tr) {
+                            const idx = CATEGORIES.findIndex(c => c.tr === item.category.tr);
+                            if (idx !== -1) setCategoryIndex(idx);
+                        }
+
+                        // Referansları al
+                        if (item.references) setReferences(item.references);
+
+                        // İçeriği güncelle (Bu işlem yukarıdaki useEffect'i tetikler ve Quill'i günceller)
+                        // ÖNEMLİ: Quill tırnak düzeltmesi yaptığı için replace'i tersine çeviriyoruz
+                        const newTrContent = item.content?.tr?.replace(/'/g, '"') || "";
+                        const newEnContent = item.content?.en?.replace(/'/g, '"') || "";
+
+                        setData({
+                            tr: { title: item.title?.tr || "", summary: item.summary?.tr || "", content: newTrContent },
+                            en: { title: item.title?.en || "", summary: item.summary?.en || "", content: newEnContent }
+                        });
+                    }
+                } catch (err) {
+                    // JSON geçersizse bir şey yapma, kullanıcının yazmasına izin ver
+                }
+            };
+
+            // --- 5. ÖNİZLEME MATEMATİK RENDER ---
+            useEffect(() => {
                 if (previewRef.current && window.renderMathInElement) {
                     setTimeout(() => {
                         try {
@@ -222,10 +263,12 @@
                         } catch (e) {}
                     }, 50);
                 }
-
-            }, [title, summary, categoryIndex, references, editorHtml]);
+            }, [data, viewLang]);
 
             // --- YARDIMCILAR ---
+            const handleTitleChange = (e) => setData(prev => ({...prev, [editLang]: { ...prev[editLang], title: e.target.value } }));
+            const handleSummaryChange = (e) => setData(prev => ({...prev, [editLang]: { ...prev[editLang], summary: e.target.value } }));
+            
             const addReference = () => {
                 if (refInput.trim()) {
                     setReferences([...references, refInput.trim()]);
@@ -243,16 +286,23 @@
                     
                     {/* --- SOL PANEL: EDİTÖR --- */}
                     <div className="w-1/2 h-full flex flex-col border-r border-slate-800 bg-slate-900/50 p-6 overflow-y-auto custom-scrollbar">
-                        <header className="mb-6 flex justify-between items-center">
+                        <header className="mb-4 flex justify-between items-center">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center font-black text-slate-900">HN</div>
-                                <h1 className="text-xl font-bold text-white">Live Studio</h1>
+                                <div>
+                                    <h1 className="text-sm font-bold text-white">Editor Studio</h1>
+                                    <div className="text-[10px] text-slate-500 font-mono">EDİT MODU: <span className="text-cyan-400 font-bold uppercase">{editLang}</span></div>
+                                </div>
+                            </div>
+                            <div className="flex bg-slate-800 p-1 rounded-lg border border-slate-700">
+                                <button onClick={() => setEditLang('tr')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${editLang === 'tr' ? 'bg-cyan-500 text-slate-900 shadow-lg' : 'text-slate-400 hover:text-white'}`}>TR</button>
+                                <button onClick={() => setEditLang('en')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${editLang === 'en' ? 'bg-cyan-500 text-slate-900 shadow-lg' : 'text-slate-400 hover:text-white'}`}>EN</button>
                             </div>
                         </header>
 
-                        <div className="space-y-4 mb-6">
-                            <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none font-bold text-lg" placeholder="Başlık" />
-                            <textarea value={summary} onChange={e => setSummary(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-300 focus:border-cyan-500 outline-none resize-none h-20" placeholder="Özet" />
+                        <div className="space-y-4 mb-4">
+                            <input type="text" value={data[editLang].title} onChange={handleTitleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none font-bold text-lg" placeholder="Başlık" />
+                            <textarea value={data[editLang].summary} onChange={handleSummaryChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-300 focus:border-cyan-500 outline-none resize-none h-20" placeholder="Özet" />
                             <div className="grid grid-cols-2 gap-4">
                                 <select value={categoryIndex} onChange={e => setCategoryIndex(Number(e.target.value))} className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white outline-none">
                                     {CATEGORIES.map((c, i) => <option key={i} value={i}>{c.tr}</option>)}
@@ -280,16 +330,28 @@
 
                     {/* --- SAĞ PANEL: ÇIKTI --- */}
                     <div className="w-1/2 h-full flex flex-col bg-[#0f172a]">
-                        <div className="h-[60%] border-b border-slate-800 p-8 overflow-y-auto custom-scrollbar relative">
-                            <div className="absolute top-4 right-4 bg-black/50 text-slate-500 text-[10px] font-bold px-2 py-1 rounded uppercase">Canlı Önizleme</div>
-                            <div ref={previewRef} className="rich-text-content max-w-2xl mx-auto">
+                        
+                        {/* 1. Görsel Önizleme */}
+                        <div className="h-[60%] border-b border-slate-800 p-8 overflow-y-auto custom-scrollbar relative bg-slate-900/30">
+                            <div className="absolute top-4 right-4 flex items-center gap-3 z-10">
+                                <div className="bg-black/50 text-slate-500 text-[10px] font-bold px-2 py-1 rounded uppercase">Önizleme</div>
+                                <div className="flex bg-slate-800 p-0.5 rounded-lg border border-slate-700/50">
+                                    <button onClick={() => setViewLang('tr')} className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all ${viewLang === 'tr' ? 'bg-cyan-500 text-slate-900' : 'text-slate-400 hover:text-white'}`}>TR</button>
+                                    <button onClick={() => setViewLang('en')} className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all ${viewLang === 'en' ? 'bg-cyan-500 text-slate-900' : 'text-slate-400 hover:text-white'}`}>EN</button>
+                                </div>
+                            </div>
+                            
+                            <div ref={previewRef} className="rich-text-content max-w-2xl mx-auto mt-4">
                                 <div className="flex gap-2 text-[10px] font-bold uppercase text-slate-500 mb-4 font-mono tracking-wider">
                                     <span className="text-cyan-500">{CATEGORIES[categoryIndex].tr}</span>
                                     <span>•</span>
                                     <span>{new Date().toISOString().split('T')[0]}</span>
+                                    <span>•</span>
+                                    <span>{viewLang.toUpperCase()}</span>
                                 </div>
-                                <h1>{title}</h1>
-                                <div dangerouslySetInnerHTML={{ __html: editorHtml }} />
+                                <h1>{data[viewLang].title || "Başlık Yok"}</h1>
+                                <p className="text-sm italic text-slate-400 border-l-2 border-slate-700 pl-3 mb-6">{data[viewLang].summary}</p>
+                                <div dangerouslySetInnerHTML={{ __html: data[viewLang].content }} />
                                 {references.length > 0 && (
                                     <div className="mt-8 pt-6 border-t border-slate-800/50">
                                         <h5 className="text-[10px] font-black text-slate-500 uppercase mb-2">Referanslar</h5>
@@ -300,15 +362,25 @@
                                 )}
                             </div>
                         </div>
+
+                        {/* 2. Canlı JSON Kodu (EDITABLE) */}
                         <div className="h-[40%] bg-[#0b1120] p-4 flex flex-col">
                             <div className="flex justify-between items-center mb-2">
-                                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canlı JSON Çıktısı</h3>
+                                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canlı JSON (Düzenlenebilir)</h3>
                                 <button onClick={copyJson} className="text-[10px] font-bold text-cyan-400 hover:text-white uppercase transition-colors">Kopyala</button>
                             </div>
-                            <div className="flex-grow overflow-auto custom-scrollbar rounded-xl border border-slate-800 bg-[#020617] p-4">
-                                <pre className="text-[11px] font-mono text-emerald-400 whitespace-pre-wrap leading-relaxed">{jsonOutput}</pre>
+                            <div className="flex-grow overflow-hidden rounded-xl border border-slate-800 bg-[#020617] relative">
+                                <textarea
+                                    value={jsonOutput}
+                                    onChange={handleJsonChange}
+                                    onFocus={() => setIsJsonFocused(true)}
+                                    onBlur={() => setIsJsonFocused(false)}
+                                    spellCheck="false"
+                                    className="w-full h-full p-4 bg-transparent text-[11px] font-mono text-emerald-400 leading-relaxed resize-none focus:bg-[#0f172a] transition-colors"
+                                ></textarea>
                             </div>
                         </div>
+
                     </div>
                 </div>
             );
