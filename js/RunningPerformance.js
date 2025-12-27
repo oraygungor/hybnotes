@@ -1,9 +1,10 @@
 const RunningPerformancePage = ({ lang }) => {
-    // useState'i tekrar import ediyoruz
-    const { useEffect, useState } = React;
+    // useState ve useRef import ediyoruz
+    const { useEffect, useState, useRef } = React;
     
     // Hangi tooltip'in açık olduğunu tutan state (null = hepsi kapalı)
     const [activeTooltip, setActiveTooltip] = useState(null);
+    const formulaRef = useRef(null); // KaTeX için ref
 
     // Dışarı tıklayınca tooltip'i kapatma
     useEffect(() => {
@@ -23,6 +24,19 @@ const RunningPerformancePage = ({ lang }) => {
         e.stopPropagation(); // Tıklamanın document'a gidip hemen kapatmasını engelle
         setActiveTooltip(activeTooltip === id ? null : id);
     };
+
+    // KaTeX Render Effect
+    useEffect(() => {
+        if (window.renderMathInElement && formulaRef.current) {
+            window.renderMathInElement(formulaRef.current, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        }
+    }, [lang]); // Dil değiştiğinde yeniden render et
 
     const tr = {
         title: "Koşu Performansını Etkileyen Faktörler",
@@ -172,13 +186,6 @@ const RunningPerformancePage = ({ lang }) => {
     const IconValid = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
     const IconInfo = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>;
 
-    // MathJax Tetikleyici
-    useEffect(() => {
-        if (window.MathJax && window.MathJax.typesetPromise) {
-            window.MathJax.typesetPromise();
-        }
-    }, [lang]);
-
     return (
         <div className="bg-slate-800 text-slate-200 rounded-3xl p-6 md:p-10 max-w-[1200px] mx-auto border border-slate-700 shadow-2xl font-sans">
             
@@ -309,13 +316,16 @@ const RunningPerformancePage = ({ lang }) => {
                         </p>
                     </div>
 
-                    {/* LaTeX Formülü (Zamana Bağlı) */}
-                    <div className="bg-black/30 px-6 py-4 rounded-xl border border-white/5 text-lg md:text-xl text-emerald-300 overflow-x-auto min-w-[200px] text-center shadow-lg">
+                    {/* LaTeX Formülü (Zamana Bağlı) - KATEX ile Render */}
+                    <div 
+                        ref={formulaRef}
+                        className="bg-black/30 px-6 py-4 rounded-xl border border-white/5 text-lg md:text-xl text-emerald-300 overflow-x-auto min-w-[200px] text-center shadow-lg"
+                    >
                         {`$$ v(t) = \\frac{VO_{2max} \\times f_{util}(t)}{Cr(t)} $$`}
                     </div>
                 </div>
 
-                {/* Resilience Açıklaması (Safe JSX) */}
+                {/* Resilience Açıklaması */}
                 <div className="mt-6 pt-6 border-t border-slate-800 flex items-start gap-3">
                     <div className="mt-1 text-amber-400 shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
