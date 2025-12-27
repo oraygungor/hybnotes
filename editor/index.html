@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HybNotes Live Studio (Bi-Directional)</title>
+    <title>HybNotes Live Studio (Final Stable)</title>
     
     <!-- React & Libraries -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -61,7 +61,7 @@
 
         /* QUILL */
         .ql-toolbar.ql-snow { background: #1e293b; border-color: #334155 !important; border-radius: 12px 12px 0 0; padding: 12px; }
-        .ql-container.ql-snow { background: #0f172a; border-color: #334155 !important; border-radius: 0 0 12px 12px; color: #cbd5e1; font-family: 'Inter', sans-serif; font-size: 16px; }
+        .ql-container.ql-snow { background: #0f172a; border-color: #334155 !important; border-radius: 0 0 12px 12px; color: #cbd5e1; font-family: 'Inter', sans-serif; font-size: 16px; height: 100%; }
         .ql-editor.ql-blank::before { color: #475569 !important; font-style: italic !important; font-family: 'Inter', sans-serif !important; }
         .ql-snow .ql-stroke { stroke: #94a3b8 !important; }
         .ql-snow .ql-fill { fill: #94a3b8 !important; }
@@ -79,6 +79,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
         
         textarea:focus { outline: none; border-color: #22d3ee; }
+        .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
     </style>
 </head>
 <body>
@@ -101,25 +102,38 @@
                 en: { title: "Example Title EN", summary: "English summary...", content: `<p>Content...</p><div class="math-box">$$ E = mc^2 $$</div>` }
             });
 
-            // State
-            const [editLang, setEditLang] = useState('tr'); // Editörde hangi dil var?
-            const [viewLang, setViewLang] = useState('tr'); // Önizlemede hangi dil var?
+            const [editLang, setEditLang] = useState('tr');
+            const [viewLang, setViewLang] = useState('tr');
             const [categoryIndex, setCategoryIndex] = useState(0);
             const [references, setReferences] = useState([]);
             const [refInput, setRefInput] = useState("");
             const [readTime, setReadTime] = useState(5);
             const [jsonOutput, setJsonOutput] = useState("");
             
-            // Loop Koruması
-            const [isJsonFocused, setIsJsonFocused] = useState(false); // Kullanıcı JSON kutusuna mı yazıyor?
-            const isUpdatingQuill = useRef(false); // Quill'i programatik olarak mı güncelliyoruz?
+            const jsonFocusRef = useRef(false);
+            const isUpdatingQuill = useRef(false);
+            
+            // --- KRİTİK FİX 1: EditLang Ref (Closure Problemi Çözümü) ---
+            const editLangRef = useRef(editLang);
+            useEffect(() => { editLangRef.current = editLang; }, [editLang]);
+
+            // GitHub Modalı
+            const [showGhModal, setShowGhModal] = useState(false);
+            const [ghConfig, setGhConfig] = useState({
+                token: localStorage.getItem('gh_token') || '',
+                owner: localStorage.getItem('gh_owner') || '',
+                repo: localStorage.getItem('gh_repo') || '',
+                path: localStorage.getItem('gh_path') || 'js/Data.js'
+            });
+            const [ghStatus, setGhStatus] = useState({ type: '', msg: '' });
 
             const quillRef = useRef(null);
             const previewRef = useRef(null);
 
             // --- 1. QUILL KURULUM ---
             useEffect(() => {
-                if (window.katex) window.katex = katex;
+                // KRİTİK FİX: KaTeX Global Ataması
+                window.katex = katex;
 
                 if (!quillRef.current) {
                     const container = document.getElementById('editor-container');
@@ -158,114 +172,150 @@
 
                     quillRef.current = quill;
 
-                    // Quill -> State Güncellemesi
                     quill.on('text-change', () => {
-                        // Eğer güncelleme kod tarafından (JSON'dan) geldiyse state'i tekrar güncelleme (Loop koruması)
                         if (isUpdatingQuill.current) return;
 
                         const html = quill.root.innerHTML;
                         const text = quill.getText();
-                        const wordCount = text.trim().split(/\s+/).length;
+                        const trimmedText = text.trim();
+                        const wordCount = trimmedText ? trimmedText.split(/\s+/).length : 0;
                         setReadTime(Math.max(1, Math.ceil(wordCount / 180)));
 
+                        // GÜNCELLEME: editLangRef.current kullanarak doğru dile yazıyoruz
                         setData(prev => ({
                             ...prev,
-                            [editLang]: { ...prev[editLang], content: html }
+                            [editLangRef.current]: { ...prev[editLangRef.current], content: html }
                         }));
                     });
                 }
-            }, []);
+            }, []); 
 
-            // --- 2. DİL DEĞİŞTİRME & SENKRONİZASYON ---
-            // Editlenen dil değiştiğinde veya JSON'dan veri geldiğinde Quill'i güncelle
+            // --- 2. SENKRONİZASYON ---
             useEffect(() => {
                 if (quillRef.current && !isUpdatingQuill.current) {
                     const currentContent = quillRef.current.root.innerHTML;
                     const newContent = data[editLang].content;
                     
-                    // Sadece fark varsa güncelle (İmleç zıplamasını önler)
                     if (currentContent !== newContent) {
-                        isUpdatingQuill.current = true; // Kilit
-                        quillRef.current.root.innerHTML = newContent;
-                        isUpdatingQuill.current = false; // Kilit Aç
+                        isUpdatingQuill.current = true;
+                        const selection = quillRef.current.getSelection();
+                        const delta = quillRef.current.clipboard.convert(newContent);
+                        quillRef.current.setContents(delta, 'silent');
+                        if (selection) {
+                            try { quillRef.current.setSelection(selection); } catch(e) {}
+                        }
+                        isUpdatingQuill.current = false;
                     }
                 }
             }, [editLang, data]);
 
-            // --- 3. STATE -> JSON OLUŞTURMA ---
-            // Veri değiştikçe JSON kutusunu güncelle (Kullanıcı oraya yazmıyorsa)
+            // --- 3. JSON OLUŞTURMA (DÜZELTİLDİ: Replace kaldırıldı) ---
             useEffect(() => {
-                if (!isJsonFocused) {
-                    const cleanContentTR = data.tr.content.replace(/"/g, "'").replace(/<p><br><\/p>/g, "");
-                    const cleanContentEN = data.en.content.replace(/"/g, "'").replace(/<p><br><\/p>/g, "");
-
+                if (!jsonFocusRef.current) {
                     const dataObj = {
-                        id: Math.floor(Math.random() * 9999),
+                        id: Date.now(), 
                         date: new Date().toISOString().split('T')[0],
                         readTime: { tr: `${readTime} dk`, en: `${readTime} min` },
                         category: CATEGORIES[categoryIndex],
                         title: { tr: data.tr.title, en: data.en.title },
                         summary: { tr: data.tr.summary, en: data.en.summary },
-                        content: { tr: cleanContentTR, en: cleanContentEN },
+                        content: { tr: data.tr.content, en: data.en.content },
                         references: references
                     };
 
                     setJsonOutput(JSON.stringify([dataObj], null, 2));
                 }
-            }, [data, categoryIndex, references, readTime, isJsonFocused]);
+            }, [data, categoryIndex, references, readTime]);
 
-            // --- 4. JSON -> STATE GÜNCELLEME (CANLI EDİT) ---
+            // --- 4. GITHUB API ---
+            const saveToGitHub = async () => {
+                const { token, owner, repo, path } = ghConfig;
+                if (!token || !owner || !repo || !path) {
+                    alert("Lütfen GitHub ayarlarını eksiksiz girin.");
+                    setShowGhModal(true);
+                    return;
+                }
+                setGhStatus({ type: 'loading', msg: 'GitHub\'a bağlanılıyor...' });
+                try {
+                    const getRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                        headers: { 
+                            'Authorization': `Bearer ${token}`, 
+                            'Accept': 'application/vnd.github.v3+json' 
+                        }
+                    });
+                    if (!getRes.ok) throw new Error("Dosya bulunamadı.");
+                    const fileData = await getRes.json();
+                    
+                    const content = decodeURIComponent(escape(window.atob(fileData.content)));
+                    
+                    const postsRegex = /(posts\s*:\s*\[)/;
+                    const match = content.match(postsRegex);
+                    
+                    if (!match) throw new Error("Dosya formatı hatalı ('posts: [' bulunamadı).");
+                    
+                    const postsStart = match.index + match[0].length;
+                    
+                    // KRİTİK FİX 2: Virgül Kontrolü
+                    const afterPostsStart = content.slice(postsStart);
+                    const needsComma = !/^\s*\]/.test(afterPostsStart); 
+
+                    const newArticleJson = jsonOutput.trim().substring(1, jsonOutput.trim().length - 1);
+                    
+                    const insertContent = "\n" + newArticleJson + (needsComma ? "," : "");
+                    const newFileContent = content.slice(0, postsStart) + insertContent + afterPostsStart;
+                    
+                    const newContentBase64 = window.btoa(unescape(encodeURIComponent(newFileContent)));
+
+                    const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Authorization': `Bearer ${token}`, 
+                            'Content-Type': 'application/json' 
+                        },
+                        body: JSON.stringify({ message: `Add new article: ${data.tr.title}`, content: newContentBase64, sha: fileData.sha })
+                    });
+                    if (!putRes.ok) throw new Error("Dosya güncellenemedi.");
+                    setGhStatus({ type: 'success', msg: 'Başarıyla Kaydedildi! 🎉' });
+                    setTimeout(() => setGhStatus({ type: '', msg: '' }), 3000);
+                } catch (err) {
+                    setGhStatus({ type: 'error', msg: 'Hata: ' + err.message });
+                }
+            };
+
+            const saveGhConfig = () => {
+                localStorage.setItem('gh_token', ghConfig.token);
+                localStorage.setItem('gh_owner', ghConfig.owner);
+                localStorage.setItem('gh_repo', ghConfig.repo);
+                localStorage.setItem('gh_path', ghConfig.path);
+                setShowGhModal(false);
+            };
+
+            // --- YARDIMCILAR ---
             const handleJsonChange = (e) => {
                 const newVal = e.target.value;
-                setJsonOutput(newVal); // UI hemen güncellensin
-
+                setJsonOutput(newVal); 
                 try {
                     const parsed = JSON.parse(newVal);
                     const item = Array.isArray(parsed) ? parsed[0] : parsed;
-
                     if (item) {
-                        // Kategoriyi bul
                         if (item.category?.tr) {
                             const idx = CATEGORIES.findIndex(c => c.tr === item.category.tr);
                             if (idx !== -1) setCategoryIndex(idx);
                         }
-
-                        // Referansları al
                         if (item.references) setReferences(item.references);
-
-                        // İçeriği güncelle (Bu işlem yukarıdaki useEffect'i tetikler ve Quill'i günceller)
-                        // ÖNEMLİ: Quill tırnak düzeltmesi yaptığı için replace'i tersine çeviriyoruz
-                        const newTrContent = item.content?.tr?.replace(/'/g, '"') || "";
-                        const newEnContent = item.content?.en?.replace(/'/g, '"') || "";
-
+                        
+                        // Replace kullanmadan direkt al
+                        const newTrContent = item.content?.tr || "";
+                        const newEnContent = item.content?.en || "";
+                        
                         setData({
                             tr: { title: item.title?.tr || "", summary: item.summary?.tr || "", content: newTrContent },
                             en: { title: item.title?.en || "", summary: item.summary?.en || "", content: newEnContent }
                         });
                     }
-                } catch (err) {
-                    // JSON geçersizse bir şey yapma, kullanıcının yazmasına izin ver
-                }
+                } catch (err) {}
             };
 
-            // --- 5. ÖNİZLEME MATEMATİK RENDER ---
-            useEffect(() => {
-                if (previewRef.current && window.renderMathInElement) {
-                    setTimeout(() => {
-                        try {
-                            window.renderMathInElement(previewRef.current, {
-                                delimiters: [
-                                    {left: '$$', right: '$$', display: true},
-                                    {left: '$', right: '$', display: false}
-                                ],
-                                throwOnError: false
-                            });
-                        } catch (e) {}
-                    }, 50);
-                }
-            }, [data, viewLang]);
-
-            // --- YARDIMCILAR ---
             const handleTitleChange = (e) => setData(prev => ({...prev, [editLang]: { ...prev[editLang], title: e.target.value } }));
             const handleSummaryChange = (e) => setData(prev => ({...prev, [editLang]: { ...prev[editLang], summary: e.target.value } }));
             
@@ -281,10 +331,27 @@
                 alert("JSON Kopyalandı!");
             };
 
+            // --- 5. ÖNİZLEME RENDER ---
+            useEffect(() => {
+                if (previewRef.current && window.renderMathInElement) {
+                    const timeoutId = setTimeout(() => {
+                        try {
+                            window.renderMathInElement(previewRef.current, {
+                                delimiters: [
+                                    {left: '$$', right: '$$', display: true},
+                                    {left: '$', right: '$', display: false}
+                                ],
+                                throwOnError: false
+                            });
+                        } catch (e) {}
+                    }, 100);
+                    return () => clearTimeout(timeoutId);
+                }
+            }, [data, viewLang]);
+
             return (
                 <div className="flex h-screen w-full">
-                    
-                    {/* --- SOL PANEL: EDİTÖR --- */}
+                    {/* SOL PANEL (Editör) */}
                     <div className="w-1/2 h-full flex flex-col border-r border-slate-800 bg-slate-900/50 p-6 overflow-y-auto custom-scrollbar">
                         <header className="mb-4 flex justify-between items-center">
                             <div className="flex items-center gap-3">
@@ -294,9 +361,15 @@
                                     <div className="text-[10px] text-slate-500 font-mono">EDİT MODU: <span className="text-cyan-400 font-bold uppercase">{editLang}</span></div>
                                 </div>
                             </div>
-                            <div className="flex bg-slate-800 p-1 rounded-lg border border-slate-700">
-                                <button onClick={() => setEditLang('tr')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${editLang === 'tr' ? 'bg-cyan-500 text-slate-900 shadow-lg' : 'text-slate-400 hover:text-white'}`}>TR</button>
-                                <button onClick={() => setEditLang('en')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${editLang === 'en' ? 'bg-cyan-500 text-slate-900 shadow-lg' : 'text-slate-400 hover:text-white'}`}>EN</button>
+                            <div className="flex gap-2">
+                                <button onClick={() => setShowGhModal(true)} className="px-3 py-1.5 rounded-md text-xs font-bold bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition-colors flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                    Ayarlar
+                                </button>
+                                <div className="bg-slate-800 p-1 rounded-lg border border-slate-700 flex">
+                                    <button onClick={() => setEditLang('tr')} className={`px-3 py-1 rounded text-xs font-bold ${editLang === 'tr' ? 'bg-cyan-500 text-slate-900' : 'text-slate-400'}`}>TR</button>
+                                    <button onClick={() => setEditLang('en')} className={`px-3 py-1 rounded text-xs font-bold ${editLang === 'en' ? 'bg-cyan-500 text-slate-900' : 'text-slate-400'}`}>EN</button>
+                                </div>
                             </div>
                         </header>
 
@@ -311,8 +384,8 @@
                             </div>
                         </div>
 
-                        <div className="flex-grow flex flex-col min-h-[400px]">
-                            <div id="editor-container" className="flex-grow rounded-b-xl"></div>
+                        <div className="flex-grow flex flex-col min-h-[400px] h-full">
+                            <div id="editor-container" className="flex-grow rounded-b-xl h-full"></div>
                         </div>
 
                         <div className="mt-6 pt-6 border-t border-slate-800">
@@ -328,10 +401,8 @@
                         </div>
                     </div>
 
-                    {/* --- SAĞ PANEL: ÇIKTI --- */}
+                    {/* SAĞ PANEL */}
                     <div className="w-1/2 h-full flex flex-col bg-[#0f172a]">
-                        
-                        {/* 1. Görsel Önizleme */}
                         <div className="h-[60%] border-b border-slate-800 p-8 overflow-y-auto custom-scrollbar relative bg-slate-900/30">
                             <div className="absolute top-4 right-4 flex items-center gap-3 z-10">
                                 <div className="bg-black/50 text-slate-500 text-[10px] font-bold px-2 py-1 rounded uppercase">Önizleme</div>
@@ -340,7 +411,6 @@
                                     <button onClick={() => setViewLang('en')} className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all ${viewLang === 'en' ? 'bg-cyan-500 text-slate-900' : 'text-slate-400 hover:text-white'}`}>EN</button>
                                 </div>
                             </div>
-                            
                             <div ref={previewRef} className="rich-text-content max-w-2xl mx-auto mt-4">
                                 <div className="flex gap-2 text-[10px] font-bold uppercase text-slate-500 mb-4 font-mono tracking-wider">
                                     <span className="text-cyan-500">{CATEGORIES[categoryIndex].tr}</span>
@@ -362,26 +432,70 @@
                                 )}
                             </div>
                         </div>
-
-                        {/* 2. Canlı JSON Kodu (EDITABLE) */}
                         <div className="h-[40%] bg-[#0b1120] p-4 flex flex-col">
                             <div className="flex justify-between items-center mb-2">
-                                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canlı JSON (Düzenlenebilir)</h3>
-                                <button onClick={copyJson} className="text-[10px] font-bold text-cyan-400 hover:text-white uppercase transition-colors">Kopyala</button>
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canlı JSON (Düzenlenebilir)</h3>
+                                    {ghStatus.msg && (
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${ghStatus.type === 'error' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                                            {ghStatus.msg}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex gap-2">
+                                    <button onClick={saveToGitHub} className="text-[10px] bg-green-600 hover:bg-green-500 text-white font-bold px-3 py-1.5 rounded transition-all flex items-center gap-1">
+                                        {ghStatus.type === 'loading' ? 'Kaydediliyor...' : 'GitHub\'a Kaydet'}
+                                    </button>
+                                    <button onClick={copyJson} className="text-[10px] font-bold text-cyan-400 hover:text-white uppercase transition-colors px-2">Kopyala</button>
+                                </div>
                             </div>
                             <div className="flex-grow overflow-hidden rounded-xl border border-slate-800 bg-[#020617] relative">
                                 <textarea
                                     value={jsonOutput}
                                     onChange={handleJsonChange}
-                                    onFocus={() => setIsJsonFocused(true)}
-                                    onBlur={() => setIsJsonFocused(false)}
+                                    onFocus={() => jsonFocusRef.current = true}
+                                    onBlur={() => jsonFocusRef.current = false}
                                     spellCheck="false"
                                     className="w-full h-full p-4 bg-transparent text-[11px] font-mono text-emerald-400 leading-relaxed resize-none focus:bg-[#0f172a] transition-colors"
                                 ></textarea>
                             </div>
                         </div>
-
                     </div>
+
+                    {/* MODAL */}
+                    {showGhModal && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
+                            <div className="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-700 shadow-2xl overflow-hidden">
+                                <div className="p-6 space-y-4">
+                                    <h3 className="text-lg font-bold text-white mb-4">GitHub Bağlantı Ayarları</h3>
+                                    
+                                    <div>
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Personal Access Token (Repo Read/Write)</label>
+                                        <input type="password" value={ghConfig.token} onChange={e => setGhConfig({...ghConfig, token: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none" placeholder="ghp_..." />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Kullanıcı Adı</label>
+                                            <input type="text" value={ghConfig.owner} onChange={e => setGhConfig({...ghConfig, owner: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none" placeholder="Orn: alivelib" />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Repo Adı</label>
+                                            <input type="text" value={ghConfig.repo} onChange={e => setGhConfig({...ghConfig, repo: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none" placeholder="Orn: hybnotes" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Dosya Yolu</label>
+                                        <input type="text" value={ghConfig.path} onChange={e => setGhConfig({...ghConfig, path: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none" placeholder="js/Data.js" />
+                                    </div>
+                                </div>
+                                <div className="bg-slate-800 p-4 flex gap-3">
+                                    <button onClick={() => setShowGhModal(false)} className="flex-1 text-xs font-bold text-slate-400 hover:text-white py-2">İptal</button>
+                                    <button onClick={saveGhConfig} className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold py-2 rounded-lg">Kaydet</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                 </div>
             );
         };
