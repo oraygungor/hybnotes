@@ -8,16 +8,15 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <script>
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-            svg: { fontCache: 'global' }
-        };
-    </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
@@ -59,28 +58,26 @@
         body { background-color: #0f172a; color: #e2e8f0; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Prosedeki başlıklar ve paragraflar */
         .prose p { margin-bottom: 1rem; }
-        .prose h4 { color: white; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .prose h3, .prose h4 { color: white; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .prose ul, .prose ol { margin-bottom: 1rem; }
+        
+        /* Form elemanları */
         input:focus, select:focus { outline: none; }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; margin: 8px 0; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #334155; border-radius: 3px; transition: background 0.2s; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; cursor: pointer; margin-top: -7px; box-shadow: 0 0 0 4px #0f172a; transition: transform 0.1s; background-color: rgb(var(--primary-rgb)); }
+        
+        /* Animasyonlar */
         .animate-shimmer-text { background: linear-gradient(to right, #ffffff 0%, rgb(var(--primary-rgb)) 20%, #ffffff 40%, rgb(var(--primary-rgb)) 60%, #ffffff 100%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: textShimmer 4s linear infinite; }
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(var(--primary-rgb), 0.3); }
         .pulse-path { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawPath 3s linear infinite; }
         @keyframes drawPath { 0% { stroke-dashoffset: 100; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
-        /* Latex Formula Styling */
-        .latex-formula { display: flex; align-items: center; justify-content: center; font-family: "Times New Roman", Times, serif; font-size: 20px; color: #e2e8f0; margin: 15px 0; flex-wrap: wrap; }
-        .latex-formula .op { font-size: 20px; margin: 0 0.5em; color: #94a3b8; }
-        .product-notation { display: inline-grid; grid-template-areas: "upper" "symbol" "lower"; text-align: center; margin-right: 5px; }
-        .prod-symbol { grid-area: symbol; font-size: 38px; line-height: 1; color: rgb(var(--primary-rgb)); }
-        .prod-limit-upper { grid-area: upper; font-size: 12px; line-height: 1; }
-        .prod-limit-lower { grid-area: lower; font-size: 12px; line-height: 1; }
-        .fraction { display: inline-grid; grid-template-areas: "num" "den"; text-align: center; margin: 0 5px; }
-        .numerator { grid-area: num; padding: 3px 5px; font-family: ui-monospace, monospace; font-size: 16px; border-bottom: 1px solid #94a3b8; }
-        .denominator { grid-area: den; padding: 3px 5px; font-family: ui-monospace, monospace; font-size: 16px; }
-        .numerator span, .denominator span { color: rgb(var(--primary-rgb)); font-weight: 700; }
+        
+        /* Not: Eski .latex-formula stilleri kaldırıldı çünkü artık gerçek LaTeX kullanacağız */
     </style>
 </head>
 <body class="font-sans antialiased">
