@@ -157,9 +157,10 @@ const App = () => {
     }, [activeTheme, lang, user]);
 
     // --- COMPONENT: ARTICLE DETAIL (UPDATED for Rich Text & KaTeX) ---
+// --- COMPONENT: ARTICLE DETAIL (GÜNCELLENDİ) ---
     const ArticleDetail = ({ article, goBack, lang }) => {
         const [copied, setCopied] = useState(false);
-        const contentRef = useRef(null); // İçerik referansı
+        const contentRef = useRef(null);
 
         const handleShare = () => {
             navigator.clipboard.writeText(window.location.href);
@@ -172,8 +173,8 @@ const App = () => {
             if (window.renderMathInElement && contentRef.current) {
                 window.renderMathInElement(contentRef.current, {
                     delimiters: [
-                        {left: '$$', right: '$$', display: true}, // Blok formül
-                        {left: '$', right: '$', display: false}   // Satır içi formül
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
                     ],
                     throwOnError: false
                 });
@@ -197,6 +198,7 @@ const App = () => {
                 </div>
 
                 <article className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden">
+                    {/* Üst Kısım: Başlık ve Meta */}
                     <div className="p-6 md:p-12 border-b border-slate-700 bg-slate-800/50">
                         <div className="flex flex-wrap gap-4 text-xs md:text-sm text-slate-400 mb-4 md:mb-6 font-mono">
                             <span className="flex items-center gap-1"><Icons.Calendar size={12}/> {article.date}</span>
@@ -205,20 +207,39 @@ const App = () => {
                         </div>
                         <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight">{article.title[lang]}</h1>
                     </div>
+
+                    {/* Orta Kısım: İçerik */}
                     <div className="p-6 md:p-12">
-                        {/* İçerik Container - GÜNCELLENDİ */}
-                        {/* rich-text-content sınıfı eklendi, manuel replace kaldırıldı */}
                         <div 
                             ref={contentRef}
                             className="rich-text-content text-base md:text-lg max-w-none leading-relaxed" 
                             dangerouslySetInnerHTML={{ __html: article.content[lang] }} 
                         />
                     </div>
+
+                    {/* --- YENİ EKLENEN KISIM: REFERANSLAR --- */}
+                    {article.references && article.references.length > 0 && (
+                        <div className="p-6 md:p-12 border-t border-slate-700 bg-slate-900/30">
+                            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                <Icons.BookOpen size={18} className="text-primary" />
+                                {lang === 'tr' ? 'Referanslar & Kaynakça' : 'References & Bibliography'}
+                            </h3>
+                            <ul className="space-y-3">
+                                {article.references.map((ref, index) => (
+                                    <li key={index} className="flex gap-3 text-sm text-slate-400 font-mono leading-relaxed">
+                                        <span className="text-slate-600 select-none">[{index + 1}]</span>
+                                        <span className="hover:text-slate-200 transition-colors">{ref}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {/* --- EKLENEN KISIM SONU --- */}
+
                 </article>
             </div>
         );
     };
-
     // --- COMPONENT: RESEARCH PAGE ---
     const ResearchPage = ({ posts, lang }) => {
         const [searchTerm, setSearchTerm] = useState("");
