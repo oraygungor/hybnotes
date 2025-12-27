@@ -3,8 +3,11 @@ const UTMBLotteryPage = ({ lang }) => {
     const [race, setRace] = useState('UTMB');
     const [method, setMethod] = useState('cagr');
     const [stones, setStones] = useState(1);
+    
+    // Grafikler ve Matematik için Ref'ler
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
+    const formulaRef = useRef(null); // KaTeX render için yeni ref
 
     const data = useMemo(() => ({ 
         UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } }, 
@@ -35,7 +38,7 @@ const UTMBLotteryPage = ({ lang }) => {
             tableAvgStones: "Avg. Stones",
             tableProjection: "2026 (Projection)",
             modelTitle: "Calculation Model & Methodology",
-            formulaTitle: "Exact Calculation Formula:",
+            formulaTitle: "Exact Calculation Formula (Hypergeometric):",
             defP: "Probability of winning",
             defW: "Your number of stones",
             defB: "Race capacity (Bib number)",
@@ -79,7 +82,7 @@ const UTMBLotteryPage = ({ lang }) => {
             tableAvgStones: "Ort. Taş",
             tableProjection: "2026 (Tahmin)",
             modelTitle: "Hesaplama Modeli ve Metodolojisi",
-            formulaTitle: "Kesin Hesaplama Formülü:",
+            formulaTitle: "Kesin Hesaplama Formülü (Hipergeometrik):",
             defP: "Kazanma olasılığı",
             defW: "Sizin taş sayınız",
             defB: "Yarış kapasitesi (Bib sayısı)",
@@ -130,6 +133,7 @@ const UTMBLotteryPage = ({ lang }) => {
         return { N, mean, B, p, T };
     }, [race, method, stones, data]);
 
+    // --- CHART EFFECT ---
     useEffect(() => {
         if (chartInstance.current) chartInstance.current.destroy();
         if (!chartRef.current) return;
@@ -187,6 +191,19 @@ const UTMBLotteryPage = ({ lang }) => {
         });
         return () => chartInstance.current?.destroy();
     }, [vals, stones, t]);
+
+    // --- KATEX RENDER EFFECT ---
+    useEffect(() => {
+        if (window.renderMathInElement && formulaRef.current) {
+            window.renderMathInElement(formulaRef.current, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        }
+    }, [lang]); // Dil değiştiğinde veya bileşen yüklendiğinde render et
 
     return (
         <div className="bg-slate-800 text-slate-200 rounded-3xl p-6 max-w-[1100px] mx-auto border border-slate-700 shadow-2xl animate-fade-in font-sans">
@@ -273,20 +290,10 @@ const UTMBLotteryPage = ({ lang }) => {
                 {/* Formula */}
                 <div className="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-lg">
                     <h3 className="text-white font-bold mb-4">{t.modelTitle}</h3>
-                    <div className="bg-slate-800 rounded-xl p-4 font-mono text-slate-300 text-sm leading-relaxed mb-4 border border-slate-700">
+                    <div ref={formulaRef} className="bg-slate-800 rounded-xl p-4 font-mono text-slate-300 text-sm leading-relaxed mb-4 border border-slate-700">
                         <div className="mb-2 text-slate-500 text-xs font-bold uppercase font-sans">{t.formulaTitle}</div>
-                        <div className="latex-formula">
-                            <span>p</span> <span className="op">=</span> <span>1</span> <span className="op">−</span>
-                            <div className="product-notation">
-                                <span className="prod-limit-upper">B-1</span>
-                                <span className="prod-symbol">Π</span>
-                                <span className="prod-limit-lower">i=0</span>
-                            </div>
-                            <div className="fraction">
-                                <span className="numerator">(T − w − i)</span>
-                                <span className="denominator">(T − i)</span>
-                            </div>
-                        </div>
+                        {/* KaTeX Uyumlu Formül */}
+                        $$ p = 1 - \prod_{i=0}^{B-1} \frac{T - w - i}{T - i} $$
                         <div className="text-[1.2em] font-bold text-primary mt-2 text-center">p = % {(vals.p * 100).toFixed(2)}</div>
                     </div>
 
