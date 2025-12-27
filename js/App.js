@@ -1,5 +1,33 @@
 const { useState, useEffect, useMemo, useRef } = React;
 
+// --- EKSİK OLAN IKON TANIMLAMALARI EKLENDİ ---
+const Icons = {
+    Activity: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
+    BookOpen: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
+    Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+    Zap: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+    Ticket: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>,
+    Calculator: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="16" y1="18" x2="16" y2="18"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/></svg>,
+    Calendar: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+    ChevronRight: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
+    ChevronDown: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
+    Search: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    Menu: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>,
+    X: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    Palette: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>,
+    FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
+    SortDesc: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>,
+    ArrowLeft: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+    Info: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>,
+};
+
+// --- EKSİK OLAN LOGO TANIMLAMASI EKLENDİ ---
+const PulseBarLogo = ({ size = 24, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </svg>
+);
+
 const THEMES = [
     { id: 'cyan', name: 'Turkuaz', rgb: '6 182 212', hex: '#06b6d4' },
     { id: 'red', name: 'Kırmızı', rgb: '239 68 68', hex: '#ef4444' },
@@ -13,7 +41,6 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
-// --- ÖZEL HYROX LOGOSU (GÜNCELLENDİ: Daha kalın ve gerçekçi X) ---
 const HyroxLogo = ({ size = 20, className = "" }) => (
     <svg width={size} height={size} viewBox="0 0 398 262" fill="currentColor" className={className}>
         <polygon points="72,37 249,37 243,53 66,53" />
@@ -46,13 +73,11 @@ const App = () => {
         return THEMES.find(t => t.id === saved) || THEMES[0];
     });
 
-    // --- ROUTING / URL YÖNETİMİ (YENİ EKLENEN KISIM) ---
-    // 1. URL değiştiğinde State'i güncelle (Back butonu, refresh ve ilk yükleme için)
+    // --- ROUTING / URL YÖNETİMİ ---
     useEffect(() => {
         const handleHashChange = () => {
             const hash = window.location.hash.replace('#', '');
             
-            // Hash yoksa ana sayfaya dön
             if (!hash) {
                 setActiveTab('home');
                 setReadingArticle(null);
@@ -60,7 +85,6 @@ const App = () => {
                 return;
             }
 
-            // Makale tespiti: #article/101
             if (hash.startsWith('article/')) {
                 const articleId = parseInt(hash.split('/')[1]);
                 const foundArticle = posts.find(p => p.id === articleId);
@@ -70,12 +94,10 @@ const App = () => {
                     setActiveTab('research');
                     window.scrollTo(0, 0);
                 } else {
-                    // Makale bulunamazsa kütüphaneye dön
                     setActiveTab('research');
                     setReadingArticle(null);
                 }
             } 
-            // Diğer sayfalar: #hyrox_calc, #running_perf vb.
             else {
                 setActiveTab(hash);
                 setReadingArticle(null);
@@ -83,30 +105,25 @@ const App = () => {
             }
         };
 
-        // Event listener ekle
         window.addEventListener('hashchange', handleHashChange);
         
-        // İlk yüklemede çalıştır (posts yüklendikten sonra)
         if (posts.length > 0) {
             handleHashChange();
         } else {
-            // Posts henüz yüklenmediyse bile hash varsa bir dene (örneğin statik sayfalar için)
             handleHashChange();
         }
 
         return () => window.removeEventListener('hashchange', handleHashChange);
-    }, [posts]); // posts değişince tekrar kontrol et
+    }, [posts]);
 
-    // 2. Navigasyon Yardımcısı (Tüm tıklamalarda bunu kullanacağız)
     const navigateTo = (destination, param = null) => {
-        setIsMenuOpen(false); // Mobilde menüyü kapat
+        setIsMenuOpen(false);
         if (destination === 'article' && param) {
             window.location.hash = `article/${param.id}`;
         } else {
             window.location.hash = destination;
         }
     };
-    // ----------------------------------------------------
 
     // Rastgele bir bilgi seç
     useEffect(() => {
@@ -132,7 +149,7 @@ const App = () => {
         return () => unsubscribe();
     }, []);
 
-    // --- SAVE SETTINGS (LocalStorage Priority) ---
+    // --- SAVE SETTINGS ---
     useEffect(() => {
         document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
         document.documentElement.lang = lang; 
@@ -148,7 +165,6 @@ const App = () => {
 
     // --- COMPONENTS ---
     
-    // ArticleDetail: "Paylaş" butonu eklendi ve Geri butonu güncellendi
     const ArticleDetail = ({ article, lang }) => {
         const [copied, setCopied] = useState(false);
 
@@ -158,11 +174,12 @@ const App = () => {
             setTimeout(() => setCopied(false), 2000);
         };
 
+        // GÜNCELLENDİ: "HybLib" isimlendirmesi
         return (
             <div className="animate-fade-in pb-20">
                 <div className="flex justify-between items-center mb-6">
                     <button onClick={() => navigateTo('research')} className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base">
-                        <Icons.ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> {lang === 'tr' ? 'Kütüphaneye Dön' : 'Back to Library'}
+                        <Icons.ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> {lang === 'tr' ? "HybLib'e Dön" : 'Back to HybLib'}
                     </button>
                     
                     <button onClick={handleShare} className="flex items-center gap-2 text-primary bg-primary/10 px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-primary/20 transition-all font-bold text-xs md:text-sm border border-primary/20">
@@ -198,8 +215,9 @@ const App = () => {
         const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORY);
         const [sortOption, setSortOption] = useState("newest");
 
+        // GÜNCELLENDİ: "HybLib" isimlendirmesi
         const t = {
-            title: lang === 'tr' ? 'Kütüphane' : 'Library',
+            title: 'HybLib',
             searchPlaceholder: lang === 'tr' ? 'Makale, konu veya içerik ara...' : 'Search articles, topics or content...',
             allCategories: lang === 'tr' ? 'Tümü' : 'All',
             sortBy: lang === 'tr' ? 'Sırala' : 'Sort by',
@@ -283,7 +301,9 @@ const App = () => {
                     <h1 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10 animate-shimmer-text">HybNotes</h1>
                     <div className="absolute top-10 left-10 w-40 h-40 bg-primary rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse-slow"></div>
                     <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">{lang === 'tr' ? 'Sporcular için bilimsel analizlerin, tecrübelerin ve makalelerin yer aldığı kişisel bir not defteri.' : 'A personal notebook containing scientific analysis, experiences, and articles for athletes.'}</p>
-                    <button onClick={() => navigateTo('research')} className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10">{lang === 'tr' ? 'Kütüphaneye Git' : 'Go to Library'}</button>
+                    
+                    {/* GÜNCELLENDİ: "HybLib" isimlendirmesi */}
+                    <button onClick={() => navigateTo('research')} className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10">{lang === 'tr' ? "HybLib'e Git" : 'Go to HybLib'}</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -309,9 +329,10 @@ const App = () => {
 
     const NavBar = ({ activeTab, isMenuOpen, setIsMenuOpen, activeTheme, setActiveTheme, lang, setLang }) => {
         const [showPalette, setShowPalette] = useState(false);
+      
         const MENU_ITEMS = [
             { id: 'home', title: lang === 'tr' ? 'Ana Sayfa' : 'Home', icon: Icons.Activity },
-            { id: 'research', title: lang === 'tr' ? 'Kütüphane' : 'Library', icon: Icons.BookOpen },
+            { id: 'research', title: 'HybLib', icon: Icons.BookOpen },
             { 
                 id: 'hyrox',
                 title: 'HYROX',
