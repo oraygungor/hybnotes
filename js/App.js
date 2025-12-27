@@ -1,6 +1,6 @@
 const { useState, useEffect, useMemo, useRef } = React;
 
-// --- EKSİK OLAN IKON TANIMLAMALARI EKLENDİ ---
+// --- IKONLAR ---
 const Icons = {
     Activity: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
     BookOpen: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
@@ -21,10 +21,22 @@ const Icons = {
     Info: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>,
 };
 
-// --- EKSİK OLAN LOGO TANIMLAMASI EKLENDİ ---
+// --- LOGOLAR ---
 const PulseBarLogo = ({ size = 24, className = "" }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </svg>
+);
+
+const HyroxLogo = ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 398 262" fill="currentColor" className={className}>
+        <polygon points="72,37 249,37 243,53 66,53" />
+        <polygon points="55,67 232,67 226,82 49,82" />
+        <polygon points="38,96 215,96 209,112 32,112" />
+        <polygon points="21,126 375,126 370,141 15,141" />
+        <polygon points="182,155 359,155 353,171 175,171" />
+        <polygon points="164,185 342,185 336,200 159,200" />
+        <polygon points="147,215 325,215 319,230 142,230" />
     </svg>
 );
 
@@ -41,20 +53,8 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
-const HyroxLogo = ({ size = 20, className = "" }) => (
-    <svg width={size} height={size} viewBox="0 0 398 262" fill="currentColor" className={className}>
-        <polygon points="72,37 249,37 243,53 66,53" />
-        <polygon points="55,67 232,67 226,82 49,82" />
-        <polygon points="38,96 215,96 209,112 32,112" />
-        <polygon points="21,126 375,126 370,141 15,141" />
-        <polygon points="182,155 359,155 353,171 175,171" />
-        <polygon points="164,185 342,185 336,200 159,200" />
-        <polygon points="147,215 325,215 319,230 142,230" />
-    </svg>
-);
-
 const App = () => {
-    // --- VERİLERİ HARİCİ DOSYADAN (Data.js) AL ---
+    // --- DATA FETCH ---
     const [posts, setPosts] = useState(window.HybNotesData?.posts || []);
     const [facts, setFacts] = useState(window.HybNotesData?.facts || []);
     const [currentFact, setCurrentFact] = useState(null);
@@ -65,15 +65,14 @@ const App = () => {
     const [readingArticle, setReadingArticle] = useState(null);
     const [user, setUser] = useState(null);
     
-    // --- STATE INITIALIZATION WITH LOCALSTORAGE ---
+    // --- INITIALIZATION ---
     const [lang, setLang] = useState(() => localStorage.getItem('hybnotes_lang') || 'tr');
-    
     const [activeTheme, setActiveTheme] = useState(() => {
         const saved = localStorage.getItem('hybnotes_theme');
         return THEMES.find(t => t.id === saved) || THEMES[0];
     });
 
-    // --- ROUTING / URL YÖNETİMİ ---
+    // --- ROUTING ---
     useEffect(() => {
         const handleHashChange = () => {
             const hash = window.location.hash.replace('#', '');
@@ -106,13 +105,7 @@ const App = () => {
         };
 
         window.addEventListener('hashchange', handleHashChange);
-        
-        if (posts.length > 0) {
-            handleHashChange();
-        } else {
-            handleHashChange();
-        }
-
+        handleHashChange(); // İlk yüklemede çalıştır
         return () => window.removeEventListener('hashchange', handleHashChange);
     }, [posts]);
 
@@ -125,7 +118,7 @@ const App = () => {
         }
     };
 
-    // Rastgele bir bilgi seç
+    // --- RANDOM FACT ---
     useEffect(() => {
         if (facts.length > 0 && !currentFact) {
             setCurrentFact(facts[Math.floor(Math.random() * facts.length)]);
@@ -149,7 +142,7 @@ const App = () => {
         return () => unsubscribe();
     }, []);
 
-    // --- SAVE SETTINGS ---
+    // --- THEME & LANG SAVING ---
     useEffect(() => {
         document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
         document.documentElement.lang = lang; 
@@ -163,10 +156,10 @@ const App = () => {
         }
     }, [activeTheme, lang, user]);
 
-    // --- COMPONENTS ---
-    
+    // --- COMPONENT: ARTICLE DETAIL (KaTeX Entegreli) ---
     const ArticleDetail = ({ article, lang }) => {
         const [copied, setCopied] = useState(false);
+        const contentRef = useRef(null); // KaTeX için referans
 
         const handleShare = () => {
             navigator.clipboard.writeText(window.location.href);
@@ -174,7 +167,19 @@ const App = () => {
             setTimeout(() => setCopied(false), 2000);
         };
 
-        // GÜNCELLENDİ: "HybLib" isimlendirmesi
+        // KaTeX Render Trigger
+        useEffect(() => {
+            if (window.renderMathInElement && contentRef.current) {
+                window.renderMathInElement(contentRef.current, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true}, // Blok formül
+                        {left: '$', right: '$', display: false}   // Satır içi formül
+                    ],
+                    throwOnError: false
+                });
+            }
+        }, [article, lang]);
+
         return (
             <div className="animate-fade-in pb-20">
                 <div className="flex justify-between items-center mb-6">
@@ -201,21 +206,25 @@ const App = () => {
                         <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight">{article.title[lang]}</h1>
                     </div>
                     <div className="p-6 md:p-12">
-                        <div className="prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed" 
-                            dangerouslySetInnerHTML={{ __html: article.content[lang].replace(/class='math-box'/g, `class="my-6 p-4 md:p-6 bg-slate-900 border-l-4 border-primary rounded-r-xl font-mono text-primary text-opacity-90 text-sm md:text-lg text-center shadow-inner italic"`) }} />
+                        {/* İçerik Container ve Ref Bağlantısı */}
+                        <div 
+                            ref={contentRef}
+                            className="prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed" 
+                            dangerouslySetInnerHTML={{ __html: article.content[lang] }} 
+                        />
                     </div>
                 </article>
             </div>
         );
     };
 
+    // --- COMPONENT: RESEARCH PAGE ---
     const ResearchPage = ({ posts, lang }) => {
         const [searchTerm, setSearchTerm] = useState("");
         const ALL_CATEGORY = "ALL_CATEGORY"; 
         const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORY);
         const [sortOption, setSortOption] = useState("newest");
 
-        // GÜNCELLENDİ: "HybLib" isimlendirmesi
         const t = {
             title: 'HybLib',
             searchPlaceholder: lang === 'tr' ? 'Makale, konu veya içerik ara...' : 'Search articles, topics or content...',
@@ -280,6 +289,7 @@ const App = () => {
         );
     };
 
+    // --- COMPONENT: LATEST POSTS WIDGET ---
     const LatestPostsWidget = ({ posts, lang }) => {
         const latest = [...posts].sort((a, b) => b.id - a.id).slice(0, 3);
         const t = { title: lang === 'tr' ? 'Son Eklenenler' : 'Latest Posts', new: lang === 'tr' ? 'Yeni' : 'New', viewAll: lang === 'tr' ? 'Tümünü Gör' : 'View All' };
@@ -292,6 +302,7 @@ const App = () => {
         );
     };
 
+    // --- COMPONENT: HOME PAGE ---
     const HomePage = ({ posts, lang, currentFact }) => {
         const latestPost = posts.length > 0 ? posts[0] : null;
         return (
@@ -302,7 +313,6 @@ const App = () => {
                     <div className="absolute top-10 left-10 w-40 h-40 bg-primary rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse-slow"></div>
                     <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">{lang === 'tr' ? 'Sporcular için bilimsel analizlerin, tecrübelerin ve makalelerin yer aldığı kişisel bir not defteri.' : 'A personal notebook containing scientific analysis, experiences, and articles for athletes.'}</p>
                     
-                    {/* GÜNCELLENDİ: "HybLib" isimlendirmesi */}
                     <button onClick={() => navigateTo('research')} className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10">{lang === 'tr' ? "HybLib'e Git" : 'Go to HybLib'}</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -327,9 +337,10 @@ const App = () => {
         );
     };
 
+    // --- COMPONENT: NAVBAR ---
     const NavBar = ({ activeTab, isMenuOpen, setIsMenuOpen, activeTheme, setActiveTheme, lang, setLang }) => {
         const [showPalette, setShowPalette] = useState(false);
-      
+        
         const MENU_ITEMS = [
             { id: 'home', title: lang === 'tr' ? 'Ana Sayfa' : 'Home', icon: Icons.Activity },
             { id: 'research', title: 'HybLib', icon: Icons.BookOpen },
@@ -402,6 +413,7 @@ const App = () => {
         );
     };
 
+    // --- MAIN RENDER ---
     const renderContent = () => {
         switch (activeTab) {
             case 'home': return <HomePage posts={posts} lang={lang} currentFact={currentFact} />;
