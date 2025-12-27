@@ -74,6 +74,40 @@ window.HybNotesData = {
                 "Bouchard, C., et al. (1999). Familial aggregation of VO2max response to exercise training: results from the HERITAGE Family Study."
             ] 
         },
+
+
+  {
+    "id": 105,
+    "date": "2025-12-27",
+    "readTime": {
+      "tr": "1 dk",
+      "en": "1 min"
+    },
+    "category": {
+      "tr": "Antrenman Bilimi",
+      "en": "Training Science"
+    },
+    "title": {
+      "tr": "Koşunun Yeni Denkleminde 4. Değişken: Fizyolojik Direnç (Resilience)",
+      "en": ""
+    },
+    "summary": {
+      "tr": "Prof. Andrew M. Jones, dayanıklılık performansını belirleyen klasik üçlü modele ($\\dot{V}_{O_{2}max}$, Ekonomi, Eşik) karşı çıkarak, bu değerlerin yorgunlukla bozulabileceğini vurguluyor ve denkleme \"Fizyolojik Direnç\" (Resilience) adında dördüncü bir boyut ekliyor111111111. Bu yeni değişken, sporcunun başlangıçtaki kapasitesinden bağımsız olarak, yarışın sonlarında performans düşüşüne (Kritik Güç/Hız kaybına) ne kadar direnebildiğini temsil ediyor ve şampiyonları belirleyen asıl faktörün bu \"bozulmama yeteneği\" olduğunu savunuyor222222222.",
+      "en": ""
+    },
+    "content": {
+      "tr": "<p><span style='background-color: rgba(0, 0, 0, 0);'>Bir maratoncunun potansiyelini tahmin etmek için elimizde yıllardır güvenilen, 3 temel değişkene dayalı 'Klasik Model' vardı</span><sup style='background-color: transparent; color: rgb(68, 71, 70);'>1</sup><span style='background-color: rgba(0, 0, 0, 0);'>. Ancak bilim insanları, bu modelin kağıt üzerindeki tahminlerinin, yorgunluk faktörü devreye girdiğinde gerçek yarış sonuçlarıyla her zaman örtüşmediğini fark etti.</span></p><p><br></p><p><span style='background-color: rgba(0, 0, 0, 0);'>Prof. Andrew M. Jones’un ses getiren makalesi, 30 yıllık bu kavramsal çerçeveyi güncelliyor ve modele </span><strong style='background-color: rgba(0, 0, 0, 0);'>'Fizyolojik Direnç' (Resilience)</strong><span style='background-color: rgba(0, 0, 0, 0);'> adında, bağımsız bir aday değişken eklenmesini öneriyor.</span></p><p><br></p><p>İşte Jones'un önerdiği güncel modelin detayları ve bilimsel arka planı:</p><p><br></p><h3>1. Klasik Model (1991): Performansın 3 Ayağı</h3><p><br></p><p><span style='background-color: rgba(0, 0, 0, 0);'>Hikaye, Dr. Michael Joyner'ın 1991 yılında yayınladığı ve bugün hala referans alınan modelle başlar</span><sup style='background-color: transparent; color: rgb(68, 71, 70);'>4</sup><span style='background-color: rgba(0, 0, 0, 0);'>. Joyner, dayanıklılık performansını şu 3 fizyolojik sütun üzerine kurmuştu:</span></p><ol><li><strong style='background-color: rgba(0, 0, 0, 0);'>Motorun Hacmi  ($\\dot{V}_{O_{2}max}$):</strong> Sporcunun oksijen kapasitesi.</li><li><strong style='background-color: rgba(0, 0, 0, 0);'>Yakıt Verimliliği (Koşu Ekonomisi):</strong> Belirli bir hızda harcanan enerji miktarı.</li><li><strong style='background-color: rgba(0, 0, 0, 0);'>Sürdürülebilir Eşik (Laktat Eşiği/Kritik Hız):</strong> Motoru boğmadan çıkılabilen maksimum devir.</li></ol><p><span style='background-color: rgba(0, 0, 0, 0);'>Ancak bu model, değişkenleri büyük ölçüde </span><strong style='background-color: rgba(0, 0, 0, 0);'>statik</strong><span style='background-color: rgba(0, 0, 0, 0);'> kabul ediyordu; yani start çizgisindeki fizyolojik değerlerin yarış boyunca sabit kaldığı varsayılıyordu.</span></p>",
+      "en": ""
+    },
+    "references": [
+      "Jones, A. M. (2024). The fourth dimension: physiological resilience as an independent determinant of endurance exercise performance. The Journal of Physiology, 602(17), 4113–4128. https://doi.org/10.1113/JP284205",
+      "Joyner, M. J. (1991). Modeling: optimal marathon performance on the basis of physiological factors. Journal of Applied Physiology, 70(2), 683–687. https://doi.org/10.1152/jappl.1991.70.2.683"
+    ]
+  },
+
+
+
+        
         { 
             "id": 102, 
             "date": "2024-11-10", 
