@@ -156,10 +156,10 @@ const App = () => {
         }
     }, [activeTheme, lang, user]);
 
-    // --- COMPONENT: ARTICLE DETAIL (KaTeX Entegreli) ---
-    const ArticleDetail = ({ article, lang }) => {
+    // --- COMPONENT: ARTICLE DETAIL (UPDATED for Rich Text & KaTeX) ---
+    const ArticleDetail = ({ article, goBack, lang }) => {
         const [copied, setCopied] = useState(false);
-        const contentRef = useRef(null); // KaTeX için referans
+        const contentRef = useRef(null); // İçerik referansı
 
         const handleShare = () => {
             navigator.clipboard.writeText(window.location.href);
@@ -206,10 +206,11 @@ const App = () => {
                         <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-4 leading-tight">{article.title[lang]}</h1>
                     </div>
                     <div className="p-6 md:p-12">
-                        {/* İçerik Container ve Ref Bağlantısı */}
+                        {/* İçerik Container - GÜNCELLENDİ */}
+                        {/* rich-text-content sınıfı eklendi, manuel replace kaldırıldı */}
                         <div 
                             ref={contentRef}
-                            className="prose prose-invert prose-sm md:prose-lg max-w-none text-slate-300 leading-relaxed" 
+                            className="rich-text-content text-base md:text-lg max-w-none leading-relaxed" 
                             dangerouslySetInnerHTML={{ __html: article.content[lang] }} 
                         />
                     </div>
