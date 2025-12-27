@@ -7,7 +7,7 @@ const UTMBLotteryPage = ({ lang }) => {
     // Grafikler ve Matematik için Ref'ler
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
-    const formulaRef = useRef(null); // KaTeX render için yeni ref
+    const formulaRef = useRef(null); 
 
     const data = useMemo(() => ({ 
         UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } }, 
@@ -203,7 +203,7 @@ const UTMBLotteryPage = ({ lang }) => {
                 throwOnError: false
             });
         }
-    }, [lang]); // Dil değiştiğinde veya bileşen yüklendiğinde render et
+    }, [lang, race, method, stones]); // Bağımlılıklar güncellendi
 
     return (
         <div className="bg-slate-800 text-slate-200 rounded-3xl p-6 max-w-[1100px] mx-auto border border-slate-700 shadow-2xl animate-fade-in font-sans">
@@ -292,8 +292,8 @@ const UTMBLotteryPage = ({ lang }) => {
                     <h3 className="text-white font-bold mb-4">{t.modelTitle}</h3>
                     <div ref={formulaRef} className="bg-slate-800 rounded-xl p-4 font-mono text-slate-300 text-sm leading-relaxed mb-4 border border-slate-700">
                         <div className="mb-2 text-slate-500 text-xs font-bold uppercase font-sans">{t.formulaTitle}</div>
-                        {/* KaTeX Uyumlu Formül */}
-                        $$ p = 1 - \prod_{i=0}^{B-1} \frac{T - w - i}{T - i} $$
+                        {/* HATA DÜZELTİLDİ: Formül string literal olarak verildi */}
+                        {`$$ p = 1 - \\prod_{i=0}^{B-1} \\frac{T - w - i}{T - i} $$`}
                         <div className="text-[1.2em] font-bold text-primary mt-2 text-center">p = % {(vals.p * 100).toFixed(2)}</div>
                     </div>
 
