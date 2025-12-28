@@ -28,7 +28,7 @@
         Stethoscope: (p) => <SvgIcon {...p}><path d="M6 3v6a6 6 0 0 0 12 0V3" /><path d="M9 3v5" /><path d="M15 3v5" /><path d="M12 15v2a5 5 0 0 0 5 5" /><circle cx="20" cy="19" r="2" /></SvgIcon>,
         Zap: (p) => <SvgIcon {...p}><path d="M13 2 4 14h7l-1 8 10-12h-7l0-8Z" /></SvgIcon>,
         ChevronRight: (p) => <SvgIcon {...p}><path d="M10 6l6 6-6 6" /></SvgIcon>,
-        Info: (p) => <SvgIcon {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><path d="M12 7h.01" /></SvgIcon>,
+     Info: (p) => <SvgIcon width="16" height="16" {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><path d="M12 7h.01" /></SvgIcon>,
         Shuffle: (p) => <SvgIcon {...p}><path d="M3 8h5c1 0 2 .4 2.7 1.1L21 19" /><path d="M3 16h5c1 0 2-.4 2.7-1.1L14 11" /><path d="M19 6h2v2" /><path d="M21 6l-4 4" /><path d="M19 18h2v-2" /><path d="M21 18l-4-4" /></SvgIcon>,
     };
 
