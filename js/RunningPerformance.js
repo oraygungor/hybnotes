@@ -513,5 +513,3 @@ const CurveChart = ({ title, colorClass, pathD, label, dashed = false, fill = fa
 
 // Global'e aktar
 window.RunningPerformancePage = RunningPerformancePage;
-
-export default RunningPerformancePage;
