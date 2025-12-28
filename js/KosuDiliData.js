@@ -2,253 +2,253 @@ window.KosuDiliData = [
   { 
     "id": 1,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "Pace (Tempo/Ritim)", "def": "Dakika/km cinsinden hızın. (Örn: 06:00/km pace). Koşucunun hızını ifade etmek için kullandığı evrensel dildir." },
-    "en": { "category": "Basic Metrics", "term": "Pace", "def": "Your speed in minutes per kilometer/mile. (e.g., 06:00/km). The universal language runners use to describe speed." }
+    "tr": { "category": "Temel Metrikler", "term": "Tempo (Pace)", "def": "Koşunun hız dili. 1 kilometreyi kaç dakikada tamamladığını gösterir (dk/km). Sayı küçüldükçe hız artar." },
+    "en": { "category": "Basic Metrics", "term": "Pace", "def": "The universal language of speed. Shows how many minutes it takes to run 1 km/mile. Lower numbers mean faster running." }
   },
   { 
     "id": 2,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "Cadence (Kadans)", "def": "Dakikada attığın adım sayısıdır (SPM). 170–180+ SPM bandı verimlilik ve sakatlık riski açısından sıkça referans verilir." },
-    "en": { "category": "Basic Metrics", "term": "Cadence", "def": "Steps per minute (SPM). A range of 170–180+ SPM is often cited as efficient and helpful for reducing injury risk." }
+    "tr": { "category": "Temel Metrikler", "term": "Kadans", "def": "Dakikadaki adım sayısı (SPM). Verimlilik ve sakatlık riskini azaltmak için genelde 170-180+ aralığı hedeflenir. Kişiseldir." },
+    "en": { "category": "Basic Metrics", "term": "Cadence", "def": "Steps per minute (SPM). A higher cadence (170-180+) is often linked to better efficiency and reduced injury risk. It is personal." }
   },
   { 
     "id": 3,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "VO₂ Max", "def": "Vücudunun kullanabildiği maksimum oksijen tüketim hızıdır. Aerobik kapasitenin en temel göstergesidir." },
-    "en": { "category": "Basic Metrics", "term": "VO₂ Max", "def": "The maximum rate of oxygen consumption. It is the primary indicator of aerobic capacity and cardiovascular fitness." }
+    "tr": { "category": "Temel Metrikler", "term": "VO₂Max", "def": "Vücudunun yoğun egzersiz sırasında kullanabildiği maksimum oksijen miktarını ifade eder." },
+    "en": { "category": "Basic Metrics", "term": "VO₂Max", "def": "The maximum amount of oxygen your body can utilize during intense exercise." }
   },
   { 
     "id": 4,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "PB / PR", "def": "Personal Best / Personal Record. Bir mesafedeki (5K, 10K, Maraton vb.) en iyi derecen." },
-    "en": { "category": "Basic Metrics", "term": "PB / PR", "def": "Personal Best / Personal Record. Your fastest time for a specific distance (5K, 10K, Marathon, etc.)." }
+    "tr": { "category": "Temel Metrikler", "term": "PB / PR", "def": "Kişisel En İyi derecen (Personal Best). Belirli bir mesafede (5K, Maraton vb.) bugüne kadar koştuğun en hızlı süredir." },
+    "en": { "category": "Basic Metrics", "term": "PB / PR", "def": "Personal Best / Record. Your fastest time ever recorded for a specific distance (e.g., 5K, Marathon)." }
   },
   { 
     "id": 5,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Easy Run (Kolay Koşu)", "def": "Yanındakiyle rahatça konuşarak koşabildiğin düşük tempo. Aerobik tabanı büyütür." },
-    "en": { "category": "Training", "term": "Easy Run", "def": "A low-intensity run where you can hold a conversation. Builds aerobic base and recovery." }
+    "tr": { "category": "Antrenman", "term": "Easy Run", "def": "Konuşma hızında, düşük eforlu koşu. Aerobik tabanı geliştirir, yağ yakımını destekler ve vücudu yormadan kondisyon sağlar." },
+    "en": { "category": "Training", "term": "Easy Run", "def": "A conversational, low-effort run. Builds aerobic base and burns fat without stressing the body." }
   },
   { 
     "id": 6,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Long Run (Uzun Koşu)", "def": "Haftanın en uzun koşusudur. Vücuda 'ayakta kalma/direnç' yeteneği kazandırır." },
-    "en": { "category": "Training", "term": "Long Run", "def": "The longest run of the week. Builds aerobic endurance and mental resilience." }
+    "tr": { "category": "Antrenman", "term": "Long Run", "def": "Haftanın en uzun koşusu. Kaslara ve zihne 'ayakta kalmayı' öğretir, dayanıklılığı (enduransı) temelden inşa eder." },
+    "en": { "category": "Training", "term": "Long Run", "def": "The longest run of the week. Teaches muscles and mind to endure, building the foundation of stamina." }
   },
   { 
     "id": 7,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Recovery Run", "def": "Çok kolay tempoda yapılan toparlanma koşusu. Amaç kan dolaşımını hareketlendirerek toparlanmayı hızlandırmaktır." },
-    "en": { "category": "Training", "term": "Recovery Run", "def": "A very easy run designed to promote blood flow and recovery, not to build fitness." }
+    "tr": { "category": "Antrenman", "term": "Recovery Run", "def": "Aktif dinlenme koşusu. Amaç hız değil, kan dolaşımını artırıp kaslardaki yorgunluğu atmaktır. Çok yavaş tempoda yapılır." },
+    "en": { "category": "Training", "term": "Recovery Run", "def": "Active rest on the move. Done at a very slow pace to flush out fatigue and promote blood flow, not to build fitness." }
   },
   { 
     "id": 8,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Tempo Run", "def": "Sürdürülebilir 'rahat-zor' bir bantta yapılan koşu. Laktat eşiğini geliştirir." },
-    "en": { "category": "Training", "term": "Tempo Run", "def": "A 'comfortably hard' sustained effort run. Improves the body's lactate clearance capability." }
+    "tr": { "category": "Antrenman", "term": "Tempo Run", "def": "'Rahat ama zor' bir tempoda sürdürülen koşu. Vücudun laktatı temizleme hızını artırarak yarış temposuna dayanıklılık kazandırır." },
+    "en": { "category": "Training", "term": "Tempo Run", "def": "A 'comfortably hard' sustained effort. Improves the body's ability to clear lactate and hold race pace longer." }
   },
   { 
     "id": 9,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Threshold Run", "def": "Laktat eşiğine çok yakın 'kontrollü zor' tempoda yapılır. Yüksek şiddeti daha uzun süre sürdürebilmeyi hedefler." },
-    "en": { "category": "Training", "term": "Threshold Run", "def": "Run at a 'controlled hard' pace near your lactate threshold. Increases the ability to hold speed." }
+    "tr": { "category": "Antrenman", "term": "Laktik Eşiği Koşusu", "def": "Laktat eşiği sınırında, 'kontrollü acı' temposu. Yüksek hızı daha uzun süre koruyabilmek için eşiği yukarı taşır." },
+    "en": { "category": "Training", "term": "Threshold Run", "def": "Running right at your lactate limit. Raises your threshold to sustain higher speeds for longer periods." }
   },
   { 
     "id": 10,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Intervals", "def": "Yüksek eforlu tekrarlar ve aralarda dinlenme bölümlerinden oluşur. Hız gelişimi için kritiktir." },
-    "en": { "category": "Training", "term": "Intervals", "def": "High-effort repetitions with rest periods in between. Critical for speed and power development." }
+    "tr": { "category": "Antrenman", "term": "Interval", "def": "Yüksek hızda koşu ve dinlenme (jog) bölümlerinin tekrarı. Hız, güç ve patlayıcılığı artırmanın en etkili yoludur." },
+    "en": { "category": "Training", "term": "Interval", "def": "Alternating between high-speed bursts and rest periods. The most effective way to build speed and power." }
   },
   { 
     "id": 11,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Fartlek", "def": "Sürekli koşu içinde değişken hızların uygulandığı esnek antrenman (İsveççe 'Hız Oyunu')." },
-    "en": { "category": "Training", "term": "Fartlek", "def": "Swedish for 'Speed Play'. A continuous run with varying mix of fast and slow segments." }
+    "tr": { "category": "Antrenman", "term": "Fartlek", "def": "İsveççe 'Hız Oyunu'. Yapısı esnek, kuralsız, hızlı ve yavaş bölümlerin iç içe geçtiği eğlenceli bir antrenmandır." },
+    "en": { "category": "Training", "term": "Fartlek", "def": "Swedish for 'Speed Play'. A flexible, unstructured run mixing fast and slow segments naturally." }
   },
   { 
     "id": 12,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Progression Run", "def": "Yavaş başlayıp antrenman sonuna doğru kademeli olarak hızlanma." },
-    "en": { "category": "Training", "term": "Progression Run", "def": "Starting slow and gradually increasing speed throughout the run. A controlled negative split." }
+    "tr": { "category": "Antrenman", "term": "Hızlanarak Koşu", "def": "Yavaş başlayıp her kilometrede biraz daha hızlandığın antrenman. Yarışın sonunu güçlü bitirmeyi öğretir." },
+    "en": { "category": "Training", "term": "Progression Run", "def": "Starting slow and getting faster with every mile/km. Teaches you to finish races strong." }
   },
   { 
     "id": 13,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Hill Repeats", "def": "Yokuşu güçlü çıkıp, inişte yavaşça toparlanma egzersizi. Güç ve koşu formunu geliştirir." },
-    "en": { "category": "Training", "term": "Hill Repeats", "def": "Running hard up a hill and jogging down. Great for building power and running economy." }
+    "tr": { "category": "Antrenman", "term": "Tepe Tekrarı", "def": "Yokuş yukarı sert koşup, aşağı yavaş inme. Koşu formunu düzeltir ve ağırlık kaldırmadan bacakları güçlendirir." },
+    "en": { "category": "Training", "term": "Hill Repeats", "def": "Sprinting up hills and jogging down. Builds leg strength and improves running form without weights." }
   },
   { 
     "id": 14,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Drills", "def": "Teknik odaklı egzersizlerdir (High knees, skipping vb.). Koordinasyonu artırır." },
-    "en": { "category": "Training", "term": "Drills", "def": "Technical exercises (High knees, skipping, etc.) to improve neuromuscular coordination and form." }
+    "tr": { "category": "Antrenman", "term": "Drilller", "def": "Koşu tekniğini geliştiren hareketler (Diz çekme, topuk çekme vb.). Beyin-kas bağlantısını ve koordinasyonu güçlendirir." },
+    "en": { "category": "Training", "term": "Drills", "def": "Technical exercises (High knees, etc.) to improve running mechanics, coordination, and brain-muscle connection." }
   },
   { 
     "id": 15,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Cross-Training", "def": "Koşu yerine bisiklet, yüzme gibi farklı branşlar ekleyerek kondisyonu koruma yaklaşımı." },
-    "en": { "category": "Training", "term": "Cross-Training", "def": "Using other sports like cycling or swimming to maintain fitness while resting running muscles." }
+    "tr": { "category": "Antrenman", "term": "Cross-Antrenman", "def": "Koşu dışı kardiyo (bisiklet, yüzme). Eklemlere yük bindirmeden kondisyonu korumanın en iyi yoludur." },
+    "en": { "category": "Training", "term": "Cross-Training", "def": "Non-running cardio (cycling, swimming). The best way to maintain fitness without impact on joints." }
   },
   { 
     "id": 16,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "RPE", "def": "Algılanan Zorluk Derecesi (1-10). 1 çok kolay, 10 maksimum efor anlamına gelir." },
-    "en": { "category": "Physiology", "term": "RPE", "def": "Rate of Perceived Exertion (1-10 scale). 1 is very easy, 10 is maximum effort." }
+    "tr": { "category": "Fizyoloji", "term": "RPE", "def": "Algılanan Efor Derecesi (1-10). Saate bakmadan, 'Hissim ne diyor?' sorusuna verilen cevaptır. 1 çok rahat, 10 tükeniştir." },
+    "en": { "category": "Physiology", "term": "RPE", "def": "Rate of Perceived Exertion (1-10). Judging effort by feel rather than a watch. 1 is very easy, 10 is exhaustion." }
   },
   { 
     "id": 17,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "HR Zones", "def": "Antrenman şiddetini nabız aralıklarıyla sınıflandırma yöntemidir. Genellikle 5 bölge kullanılır." },
-    "en": { "category": "Physiology", "term": "HR Zones", "def": "Heart Rate Zones. Classifying training intensity based on heart rate ranges (usually 5 zones)." }
+    "tr": { "category": "Fizyoloji", "term": "HR Aralıkları", "def": "Nabız Bölgeleri. Antrenman şiddetini kalbin atış hızına göre 5 farklı zorluk derecesine ayıran sistemdir." },
+    "en": { "category": "Physiology", "term": "HR Zones", "def": "Training zones based on heart rate, usually divided into 5 intensity levels to guide effort." }
   },
   { 
     "id": 18,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Zone 2", "def": "'Rahatça konuşulabilir' aerobik bölgedir. Dayanıklılık inşa etmek için en önemli banttır." },
-    "en": { "category": "Physiology", "term": "Zone 2", "def": "The 'conversational' aerobic zone. The most critical zone for building endurance and base." }
+    "tr": { "category": "Fizyoloji", "term": "Zone 2", "def": "Konuşulabilir aerobik bölge. Yorulmadan, yağ yakarak çok uzun süre koşulabilen temel gelişim bölgesidir." },
+    "en": { "category": "Physiology", "term": "Zone 2", "def": "The conversational zone. The foundational intensity where you burn fat and can run for hours without fatigue." }
   },
   { 
     "id": 19,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Base (Taban)", "def": "Sezon başı yapılan, düşük yoğunluklu dönem. Amaç dayanıklılık altyapısını büyütmektir." },
-    "en": { "category": "Physiology", "term": "Base", "def": "Period of low-intensity training to build aerobic foundation before high-intensity work." }
+    "tr": { "category": "Fizyoloji", "term": "Base", "def": "Hız çalışmadan önce, düşük yoğunluklu koşularla yapılan koşu ekonomisi ve form inşa dönemi." },
+    "en": { "category": "Physiology", "term": "Base", "def": "The foundation. A period of low-intensity running to build endurance before adding speed work." }
   },
   { 
     "id": 20,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Lactate Threshold", "def": "Laktatın kanda temizlenme hızını aştığı nokta. Bu eşiğin üzerinde yorgunluk hızla artar." },
-    "en": { "category": "Physiology", "term": "Lactate Threshold", "def": "The intensity where lactate accumulates in blood faster than it can be removed. Fatigue spikes here." }
+    "tr": { "category": "Fizyoloji", "term": "Laktak Eşiği", "def": "Egzersiz şiddeti arttıkça, kandaki laktatın sabit kalamadığı ve belirgin şekilde yükselmeye başladığı yoğunluk. Bu noktanın üstünde sürdürülebilirlik hızla azalır." },
+    "en": { "category": "Physiology", "term": "Lactate Threshold", "def": "As exercise intensity increases, this is the point where blood lactate can no longer remain steady and begins to rise noticeably. Above this threshold, sustainability drops rapidly." }
   },
-  { 
+  {
     "id": 21,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Aerobik", "def": "Oksijen kullanılarak üretilen enerji. Uzun süre sürdürülebilen eforlar." },
-    "en": { "category": "Physiology", "term": "Aerobic", "def": "Energy production using oxygen. Sustainable efforts like long distance running." }
+    "tr": { "category": "Fizyoloji", "term": "Aerobik", "def": "Oksijen kullanarak enerji üretimi. Genellikle düşük-orta şiddette, uzun süre sürdürülebilen eforları ifade eder." },
+    "en": { "category": "Physiology", "term": "Aerobic", "def": "Energy production that relies on oxygen. Typically refers to low-to-moderate intensity efforts that can be sustained for long durations." }
   },
-  { 
+  {
     "id": 22,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Anaerobik", "def": "Oksijenden bağımsız enerji üretimi. Kısa ve çok yoğun eforlar (sprint)." },
-    "en": { "category": "Physiology", "term": "Anaerobic", "def": "Energy production without oxygen. Short, high-intensity efforts (sprints)." }
+    "tr": { "category": "Fizyoloji", "term": "Anaerobik", "def": "Oksijenin enerji üretimini karşılamaya yetmediği yüksek şiddetli eforlar. Kısa süreli, yoğun çalışmalarda (sprint/çok sert interval) anaerobik enerji sistemleri daha baskın olur." },
+    "en": { "category": "Physiology", "term": "Anaerobic", "def": "High-intensity efforts where oxygen cannot meet the energy demand. During short, hard work (sprints/very hard intervals), anaerobic energy systems become dominant." }
   },
-  { 
+  {
     "id": 23,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Taper (Azaltma)", "def": "Yarış öncesi performansı zirvelemek için antrenman yükünü azaltma dönemi." },
-    "en": { "category": "Race Strategy", "term": "Taper", "def": "Reducing training volume before a race to allow the body to recover and peak." }
+    "tr": { "category": "Yarış Stratejisi", "term": "Taper (Azaltma)", "def": "Yarışa yaklaşırken vücudun tam toparlanıp yarış günü zirve yapması için antrenman yükünü (özellikle hacmi) planlı biçimde azaltma dönemi." },
+    "en": { "category": "Race Strategy", "term": "Taper", "def": "The planned reduction in training load (especially volume) before a race, so the body fully recovers and peaks on race day." }
   },
   { 
     "id": 24,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Negative Split", "def": "Yarışın ikinci yarısını, ilk yarısına göre daha hızlı koşma stratejisi." },
-    "en": { "category": "Race Strategy", "term": "Negative Split", "def": "Running the second half of a race faster than the first half." }
+    "tr": { "category": "Yarış Stratejisi", "term": "Negative Split", "def": "Yarışı, başladığından daha hızlı bitirme stratejisi. Sabır ve güç gerektirir, en iyi dereceler genelde böyle gelir." },
+    "en": { "category": "Race Strategy", "term": "Negative Split", "def": "Finishing faster than you started. A disciplined strategy that often leads to personal bests." }
   },
   { 
     "id": 25,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Positive Split", "def": "Yarışın ilk yarısını hızlı koşup, ikinci yarıda yavaşlama durumu." },
-    "en": { "category": "Race Strategy", "term": "Positive Split", "def": "Running the first half fast and slowing down in the second half due to fatigue." }
+    "tr": { "category": "Yarış Stratejisi", "term": "Positive Split", "def": "Hızlı başlayıp yavaşlayarak bitirme. Genelde heyecanla yarışın başında enerjiyi tüketmenin sonucudur." },
+    "en": { "category": "Race Strategy", "term": "Positive Split", "def": "Starting fast and fading late. Usually the result of burning too much energy in the excitement of the start." }
   },
   { 
     "id": 26,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Even Split", "def": "Tüm yarış boyunca hedeflenen pace’i sabit tutma stratejisi." },
-    "en": { "category": "Race Strategy", "term": "Even Split", "def": "Maintaining a consistent pace throughout the entire race." }
+    "tr": { "category": "Yarış Stratejisi", "term": "Even Split", "def": "Robot gibi koşmak. Yarışın başından sonuna kadar tempoyu sabit tutma stratejisi." },
+    "en": { "category": "Race Strategy", "term": "Even Split", "def": "Running like a metronome. Maintaining a consistent pace from start to finish." }
   },
   { 
     "id": 27,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "The Wall (Duvar)", "def": "Glikojen depolarının tükenmesiyle gelen ani enerji çöküşü (genelde maratonda)." },
-    "en": { "category": "Race Strategy", "term": "The Wall", "def": "Sudden fatigue caused by glycogen depletion, famously occurring around km 30-35 in marathons." }
+    "tr": { "category": "Yarış Stratejisi", "term": "The Wall", "def": "Duvara çarpmak. Genelde maratonun 30. km'sinden sonra glikojenin bitmesiyle gelen ani fiziksel ve zihinsel tükeniş." },
+    "en": { "category": "Race Strategy", "term": "The Wall", "def": "Sudden depletion. Hitting a physical and mental barrier, usually around km 30 of a marathon, due to lack of fuel." }
   },
   { 
     "id": 28,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "CP (Checkpoint)", "def": "Parkur üzerinde geçişin kaydedildiği nokta." },
-    "en": { "category": "Race Strategy", "term": "CP (Checkpoint)", "def": "A location on the course where timing is recorded." }
+    "tr": { "category": "Yarış Stratejisi", "term": "CP (Checkpoint)", "def": "Kontrol Noktası. Yarış parkurunda sürenin kaydedildiği ve bazen yiyecek/içecek ikmalinin yapıldığı ara istasyonlar." },
+    "en": { "category": "Race Strategy", "term": "CP (Checkpoint)", "def": "Timing mats or aid stations along the course where your split time is recorded." }
   },
   { 
     "id": 29,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Cut-off", "def": "Belirli bir noktaya belirlenen saatte ulaşamazsan yarıştan çıkarılma kuralı." },
-    "en": { "category": "Race Strategy", "term": "Cut-off", "def": "The time limit to reach a certain point or finish line; failing to meet it results in disqualification." }
+    "tr": { "category": "Yarış Stratejisi", "term": "Cut-off", "def": "Zaman sınırı. Yarışta belirli bir noktaya veya bitişe, organizasyonun belirlediği saatten önce ulaşma zorunluluğu." },
+    "en": { "category": "Race Strategy", "term": "Cut-off", "def": "The strict time limit to reach a checkpoint or finish line to be allowed to continue or receive a medal." }
   },
   { 
     "id": 30,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Pacer (Tavşan)", "def": "Belirli bir hedef süreye sabit giden lider/görevli koşucu." },
-    "en": { "category": "Race Strategy", "term": "Pacer", "def": "A runner who maintains a specific speed to help others achieve a target time." }
+    "tr": { "category": "Yarış Stratejisi", "term": "Pacer (Tavşan)", "def": "Hedef süresi sırtında yazan rehber koşucu. Onu takip edersen hedeflediğin sürede yarışı bitirirsin." },
+    "en": { "category": "Race Strategy", "term": "Pacer", "def": "A guide runner marking a specific finish time. Sticking with them helps you hit your time goal." }
   },
   { 
     "id": 31,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "DNS / DNF", "def": "DNS: Başlamadı (Did Not Start). DNF: Bitiremedi (Did Not Finish)." },
-    "en": { "category": "Race Strategy", "term": "DNS / DNF", "def": "DNS: Did Not Start. DNF: Did Not Finish." }
+    "tr": { "category": "Yarış Stratejisi", "term": "DNS / DNF", "def": "DNS: Başlamadı (Sakatlık vb. nedenlerle start almadı). DNF: Bitiremedi (Yarışı yarıda bıraktı)." },
+    "en": { "category": "Race Strategy", "term": "DNS / DNF", "def": "DNS: Did Not Start (Skipped the race). DNF: Did Not Finish (Dropped out during the race)." }
   },
   { 
     "id": 32,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Stride Length", "def": "Adım Uzunluğu. Aynı ayağın iki yer teması arasındaki mesafe." },
-    "en": { "category": "Biomechanics", "term": "Stride Length", "def": "The distance covered between two consecutive ground contacts of the same foot." }
+    "tr": { "category": "Biyomekanik", "term": "Stride Length", "def": "Adım Uzunluğu. Bir adımda katettiğin mesafe. Hızlandıkça uzar, ama aşırı uzatmak verimi düşürebilir." },
+    "en": { "category": "Biomechanics", "term": "Stride Length", "def": "The distance covered in a single step. Increases with speed, but overextending can reduce efficiency." }
   },
   { 
     "id": 33,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Overstriding", "def": "Ayağın gövdenin çok önüne düşmesi. 'Fren etkisi' yaratır ve sakatlık riskini artırır." },
-    "en": { "category": "Biomechanics", "term": "Overstriding", "def": "Landing with the foot too far in front of the body, causing braking forces and injury risk." }
+    "tr": { "category": "Biyomekanik", "term": "Overstriding", "def": "Ayağı vücudun çok önüne basmak. Her adımda fren etkisi yaratır ve dizlere binen yükü artırır." },
+    "en": { "category": "Biomechanics", "term": "Overstriding", "def": "Landing with your foot too far ahead of your body. Creates braking forces and increases injury risk." }
   },
   { 
     "id": 34,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Running Economy", "def": "Belirli bir hızda koşarken harcadığın enerji maliyeti." },
-    "en": { "category": "Biomechanics", "term": "Running Economy", "def": "How efficiently you use oxygen/energy at a specific running velocity." }
+    "tr": { "category": "Biyomekanik", "term": "Running Economy", "def": "Yakıt tasarrufu. Belirli bir hızda koşarken vücudunun ne kadar az enerji/oksijen harcadığının göstergesi." },
+    "en": { "category": "Biomechanics", "term": "Running Economy", "def": "Fuel efficiency. A measure of how much energy/oxygen you use to maintain a certain speed." }
   },
   { 
     "id": 35,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Drop", "def": "Ayakkabının topuk yüksekliği ile burun yüksekliği arasındaki fark (mm)." },
-    "en": { "category": "Biomechanics", "term": "Drop", "def": "The height difference (mm) between the heel and the toe of a running shoe." }
+    "tr": { "category": "Biyomekanik", "term": "Drop", "def": "Topuk-Burun farkı. Ayakkabının topuğunun, ön kısmından kaç mm daha yüksekte olduğunu gösterir. Basış mekaniğini etkiler." },
+    "en": { "category": "Biomechanics", "term": "Drop", "def": "Heel-to-toe drop. The height difference (mm) between the heel and forefoot of the shoe. Affects landing mechanics." }
   },
   { 
     "id": 36,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Shin Splints", "def": "Kaval kemiği boyunca hissedilen ağrı. Aşırı yüklenmede sık görülür." },
-    "en": { "category": "Health", "term": "Shin Splints", "def": "Pain along the shin bone (tibia), common in new runners or when increasing volume too fast." }
+    "tr": { "category": "Sağlık", "term": "Shin Splints", "def": "Kaval kemiği ağrısı. Genelde çok hızlı, çok erken yüklenme sonucu kaval kemiği zarında oluşan iltihaptır." },
+    "en": { "category": "Health", "term": "Shin Splints", "def": "Pain along the shin bone. Common in new runners, caused by increasing mileage or intensity too quickly." }
   },
   { 
     "id": 37,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "IT Band Syndrome", "def": "Bacağın dış yanındaki IT bandın gerilmesi sonucu dizin dış yanında oluşan ağrı." },
-    "en": { "category": "Health", "term": "IT Band Syndrome", "def": "Pain on the outside of the knee caused by inflammation of the Iliotibial band." }
+    "tr": { "category": "Sağlık", "term": "IT Band Syndrome", "def": "Koşucu dizi. Bacağın yanındaki şeridin gerilmesiyle dizin dış tarafında oluşan keskin ağrı." },
+    "en": { "category": "Health", "term": "IT Band Syndrome", "def": "Runner's Knee. Sharp pain on the outside of the knee caused by tightness in the iliotibial band." }
   },
   { 
     "id": 38,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Overtraining", "def": "Yetersiz dinlenme sonucu oluşan kronik performans düşüşü ve bitkinlik." },
-    "en": { "category": "Health", "term": "Overtraining", "def": "Chronic fatigue and performance decline caused by excessive training without adequate rest." }
+    "tr": { "category": "Sağlık", "term": "Overtraining", "def": "Sürantrene olmak. Yetersiz dinlenme sonucu vücudun toparlanamayıp performansın kronik olarak düşmesi." },
+    "en": { "category": "Health", "term": "Overtraining", "def": "Burnout. Chronic fatigue and performance decline when training load exceeds the body's ability to recover." }
   },
   { 
     "id": 39,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Runner’s High", "def": "Uzun koşularda görülen öfori, mutluluk ve rahatlama hali." },
-    "en": { "category": "Health", "term": "Runner’s High", "def": "A feeling of euphoria and reduced anxiety experienced after prolonged running." }
+    "tr": { "category": "Sağlık", "term": "Runner’s High", "def": "Koşucu kafası. Uzun koşularda beyin kimyasallarının (Endokannabinoidler) değişimiyle gelen doğal mutluluk hali." },
+    "en": { "category": "Health", "term": "Runner’s High", "def": "A state of euphoria. A natural 'high' and reduced anxiety experienced during or after long runs." }
   },
   { 
     "id": 40,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Carb Loading", "def": "Uzun yarışlar öncesi glikojen depolarını doldurmak için karbonhidrat alımını artırma." },
-    "en": { "category": "Health", "term": "Carb Loading", "def": "Maximizing glycogen stores by increasing carbohydrate intake before a long race." }
+    "tr": { "category": "Sağlık", "term": "Carb Loading", "def": "Depoları fullemek. Maraton öncesi kaslardaki glikojen (yakıt) depolarını ağzına kadar doldurmak için karbonhidrat yüklemesi." },
+    "en": { "category": "Health", "term": "Carb Loading", "def": "Fueling up. Maximizing muscle glycogen stores by eating high carbs in the days leading up to a long race." }
   },
   { 
     "id": 41,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Electrolytes", "def": "Terle kaybedilen mineraller (Sodyum vb.). Krampı önlemek için takviye edilir." },
-    "en": { "category": "Health", "term": "Electrolytes", "def": "Minerals lost in sweat (Sodium, Potassium). Replenished to prevent cramps and dehydration." }
+    "tr": { "category": "Sağlık", "term": "Electrolytes", "def": "Vücudun elektriği. Terle kaybedilen tuz ve mineraller. Eksikliği kramp ve performans düşüşüne yol açar." },
+    "en": { "category": "Health", "term": "Electrolytes", "def": "Essential minerals (Sodium, etc.) lost in sweat. Replenishing them prevents cramps and dehydration." }
   },
   { 
     "id": 42,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Hybrid Athlete", "def": "Hem dayanıklılık (koşu) hem de kuvvet (fitness) kapasitesini geliştiren sporcu." },
-    "en": { "category": "Health", "term": "Hybrid Athlete", "def": "An athlete who trains to excel in both endurance (running) and strength sports simultaneously." }
+    "tr": { "category": "Sağlık", "term": "Hybrid Athlete", "def": "Çok yönlü sporcu. Sadece koşmayan, aynı zamanda kas kütlesi ve kuvvet inşa eden modern sporcu tipi." },
+    "en": { "category": "Health", "term": "Hybrid Athlete", "def": "The all-rounder. An athlete who trains to be proficient in both endurance running and strength/lifting." }
   }
 ];
