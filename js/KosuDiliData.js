@@ -164,7 +164,7 @@ window.KosuDiliData = [
   { 
     "id": 28,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "CP (Checkpoint)", "def": "Kontrol Noktası. Yarış parkurunda sürenin kaydedildiği ve bazen yiyecek/içecek ikmalinin yapıldığı ara istasyonlar." },
+    "tr": { "category": "Yarış Stratejisi", "term": "CP (Checkpoint)", "def": "Kontrol Noktası, İstasyon. Yarış parkurunda sürenin kaydedildiği ve bazen yiyecek/içecek ikmalinin yapıldığı ara istasyonlar." },
     "en": { "category": "Race Strategy", "term": "CP (Checkpoint)", "def": "Timing mats or aid stations along the course where your split time is recorded." }
   },
   { 
