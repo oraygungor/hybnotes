@@ -7,18 +7,18 @@
         </svg>
     );
 
-   const LocalIcons = {
-  Activity: (p) => <SvgIcon {...p}><path d="M4 19V5" /><path d="M4 19h16" /><path d="M7 15l3-4 3 3 4-6" /><path d="M17 8h3" /></SvgIcon>,
-  Dumbbell: (p) => <SvgIcon {...p}><path d="M7 8v8" /><path d="M5 9v6" /><path d="M19 8v8" /><path d="M21 9v6" /><path d="M7 12h12" /></SvgIcon>,
-  Heart: (p) => <SvgIcon {...p}><path d="M20.5 8.9c0 6-8.5 10.6-8.5 10.6S3.5 14.9 3.5 8.9A4.6 4.6 0 0 1 8 4.4c1.6 0 3 .7 4 2 1-1.3 2.4-2 4-2a4.6 4.6 0 0 1 4.5 4.5Z" /><path d="M7 12h2l1-2 2 5 1-3h4" /></SvgIcon>,
-  Flag: (p) => <SvgIcon {...p}><path d="M5 21V3" /><path d="M5 4c3-1.5 5 1.5 8 0s5 1.5 8 0v9c-3 1.5-5-1.5-8 0s-5-1.5-8 0" /></SvgIcon>,
-  Footprints: (p) => <SvgIcon {...p}><path d="M7.5 14.5c1.8 0 3.3-1.9 3.3-4.3S9.7 6 7.9 6 4.6 7.9 4.6 10.2s1.2 4.3 2.9 4.3Z" /><path d="M9 18.5c0 1.2-1.3 2.2-2.8 2.2S3.5 19.7 3.5 18.5 4.8 16.3 6.2 16.3 9 17.3 9 18.5Z" /><path d="M16.5 12.8c1.7 0 3.1-1.7 3.1-3.9s-1.2-4-2.9-4-3.1 1.7-3.1 3.9 1.2 4 2.9 4Z" /><path d="M20.5 17.5c0 1.2-1.3 2.2-2.8 2.2S15 18.7 15 17.5s1.3-2.2 2.7-2.2 2.8 1 2.8 2.2Z" /></SvgIcon>,
-  Stethoscope: (p) => <SvgIcon {...p}><path d="M6 3v6a6 6 0 0 0 12 0V3" /><path d="M9 3v5" /><path d="M15 3v5" /><path d="M12 15v2a5 5 0 0 0 5 5" /><circle cx="20" cy="19" r="2" /></SvgIcon>,
-  Zap: (p) => <SvgIcon {...p}><path d="M13 2 4 14h7l-1 8 10-12h-7l0-8Z" /></SvgIcon>,
-  ChevronRight: (p) => <SvgIcon {...p}><path d="M10 6l6 6-6 6" /></SvgIcon>,
-  Info: (p) => <SvgIcon {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><path d="M12 7h.01" /></SvgIcon>,
-  Shuffle: (p) => <SvgIcon {...p}><path d="M3 8h5c1 0 2 .4 2.7 1.1L21 19" /><path d="M3 16h5c1 0 2-.4 2.7-1.1L14 11" /><path d="M19 6h2v2" /><path d="M21 6l-4 4" /><path d="M19 18h2v-2" /><path d="M21 18l-4-4" /></SvgIcon>,
-};
+    const LocalIcons = {
+        Activity: (p) => <SvgIcon {...p}><path d="M4 19V5" /><path d="M4 19h16" /><path d="M7 15l3-4 3 3 4-6" /><path d="M17 8h3" /></SvgIcon>,
+        Dumbbell: (p) => <SvgIcon {...p}><path d="M7 8v8" /><path d="M5 9v6" /><path d="M19 8v8" /><path d="M21 9v6" /><path d="M7 12h12" /></SvgIcon>,
+        Heart: (p) => <SvgIcon {...p}><path d="M20.5 8.9c0 6-8.5 10.6-8.5 10.6S3.5 14.9 3.5 8.9A4.6 4.6 0 0 1 8 4.4c1.6 0 3 .7 4 2 1-1.3 2.4-2 4-2a4.6 4.6 0 0 1 4.5 4.5Z" /><path d="M7 12h2l1-2 2 5 1-3h4" /></SvgIcon>,
+        Flag: (p) => <SvgIcon {...p}><path d="M5 21V3" /><path d="M5 4c3-1.5 5 1.5 8 0s5 1.5 8 0v9c-3 1.5-5-1.5-8 0s-5-1.5-8 0" /></SvgIcon>,
+        Footprints: (p) => <SvgIcon {...p}><path d="M7.5 14.5c1.8 0 3.3-1.9 3.3-4.3S9.7 6 7.9 6 4.6 7.9 4.6 10.2s1.2 4.3 2.9 4.3Z" /><path d="M9 18.5c0 1.2-1.3 2.2-2.8 2.2S3.5 19.7 3.5 18.5 4.8 16.3 6.2 16.3 9 17.3 9 18.5Z" /><path d="M16.5 12.8c1.7 0 3.1-1.7 3.1-3.9s-1.2-4-2.9-4-3.1 1.7-3.1 3.9 1.2 4 2.9 4Z" /><path d="M20.5 17.5c0 1.2-1.3 2.2-2.8 2.2S15 18.7 15 17.5s1.3-2.2 2.7-2.2 2.8 1 2.8 2.2Z" /></SvgIcon>,
+        Stethoscope: (p) => <SvgIcon {...p}><path d="M6 3v6a6 6 0 0 0 12 0V3" /><path d="M9 3v5" /><path d="M15 3v5" /><path d="M12 15v2a5 5 0 0 0 5 5" /><circle cx="20" cy="19" r="2" /></SvgIcon>,
+        Zap: (p) => <SvgIcon {...p}><path d="M13 2 4 14h7l-1 8 10-12h-7l0-8Z" /></SvgIcon>,
+        ChevronRight: (p) => <SvgIcon {...p}><path d="M10 6l6 6-6 6" /></SvgIcon>,
+        Info: (p) => <SvgIcon {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><path d="M12 7h.01" /></SvgIcon>,
+        Shuffle: (p) => <SvgIcon {...p}><path d="M3 8h5c1 0 2 .4 2.7 1.1L21 19" /><path d="M3 16h5c1 0 2-.4 2.7-1.1L14 11" /><path d="M19 6h2v2" /><path d="M21 6l-4 4" /><path d="M19 18h2v-2" /><path d="M21 18l-4-4" /></SvgIcon>,
+    };
 
     const KosuDili101Page = ({ lang }) => {
         // DOĞRUDAN window.KosuDiliData KULLANILIYOR
@@ -164,8 +164,8 @@
                                         </div>
                                     </div>
                                     {/* BACK */}
-                                    {/* Kartın arka yüzü tamamen tema renginde */}
-                                    <div className="card-back bg-primary rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden">
+                                    {/* Opaklık %85'e (bg-primary/85) düşürüldü */}
+                                    <div className="card-back bg-primary/85 rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden backdrop-blur-sm">
                                          <div className="absolute top-0 right-0 p-4 opacity-10"><LocalIcons.Info size={64}/></div>
                                          <div className="relative z-10 overflow-y-auto pr-1 custom-scrollbar max-h-full">
                                             <div className="flex items-center gap-2 mb-3 opacity-70">
