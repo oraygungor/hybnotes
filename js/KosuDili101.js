@@ -164,15 +164,22 @@
                                         </div>
                                     </div>
                                     {/* BACK */}
-                                    {/* Opaklık %85'e (bg-primary/85) düşürüldü */}
-                                    <div className="card-back bg-primary/81 rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden backdrop-blur-sm">
+                                    {/* Opaklık %80'e (bg-primary/80) düşürüldü */}
+                                    <div className="card-back bg-primary/80 rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden backdrop-blur-sm">
                                          <div className="absolute top-0 right-0 p-4 opacity-10"><LocalIcons.Info size={64}/></div>
                                          <div className="relative z-10 overflow-y-auto pr-1 custom-scrollbar max-h-full">
-                                            <div className="flex items-center gap-2 mb-3 opacity-70">
-                                                <LocalIcons.Info size={16} />
-                                                <span className="font-bold text-xs uppercase">{t.whatIs}</span>
+                                            {/* Header Section on Back */}
+                                            <div className="mb-3">
+                                                <div className="flex items-center gap-2 opacity-70 mb-1">
+                                                    <LocalIcons.Info size={14} />
+                                                    <span className="font-bold text-[10px] uppercase">{t.whatIs}</span>
+                                                </div>
+                                                {/* Added Term Title */}
+                                                <h4 className="font-black text-lg leading-tight">{content.term}</h4>
                                             </div>
-                                            <p className="text-lg font-bold leading-snug">{content.def}</p>
+
+                                            {/* Definition Font Size Reduced (text-base) */}
+                                            <p className="text-base font-medium leading-relaxed">{content.def}</p>
                                         </div>
                                     </div>
                                 </div>
