@@ -212,43 +212,43 @@ window.KosuDiliData = [
   { 
     "id": 36,
     "catId": "health",
-    "tr": { "category": "Sağlık & Yaşam", "term": "Shin Splints", "def": "Kaval kemiği boyunca hissedilen ağrı. Aşırı yüklenmede sık görülür." },
-    "en": { "category": "Health & Lifestyle", "term": "Shin Splints", "def": "Pain along the shin bone (tibia), common in new runners or when increasing volume too fast." }
+    "tr": { "category": "Sağlık", "term": "Shin Splints", "def": "Kaval kemiği boyunca hissedilen ağrı. Aşırı yüklenmede sık görülür." },
+    "en": { "category": "Health", "term": "Shin Splints", "def": "Pain along the shin bone (tibia), common in new runners or when increasing volume too fast." }
   },
   { 
     "id": 37,
     "catId": "health",
-    "tr": { "category": "Sağlık & Yaşam", "term": "IT Band Syndrome", "def": "Bacağın dış yanındaki IT bandın gerilmesi sonucu dizin dış yanında oluşan ağrı." },
-    "en": { "category": "Health & Lifestyle", "term": "IT Band Syndrome", "def": "Pain on the outside of the knee caused by inflammation of the Iliotibial band." }
+    "tr": { "category": "Sağlık", "term": "IT Band Syndrome", "def": "Bacağın dış yanındaki IT bandın gerilmesi sonucu dizin dış yanında oluşan ağrı." },
+    "en": { "category": "Health", "term": "IT Band Syndrome", "def": "Pain on the outside of the knee caused by inflammation of the Iliotibial band." }
   },
   { 
     "id": 38,
     "catId": "health",
-    "tr": { "category": "Sağlık & Yaşam", "term": "Overtraining", "def": "Yetersiz dinlenme sonucu oluşan kronik performans düşüşü ve bitkinlik." },
-    "en": { "category": "Health & Lifestyle", "term": "Overtraining", "def": "Chronic fatigue and performance decline caused by excessive training without adequate rest." }
+    "tr": { "category": "Sağlık", "term": "Overtraining", "def": "Yetersiz dinlenme sonucu oluşan kronik performans düşüşü ve bitkinlik." },
+    "en": { "category": "Health", "term": "Overtraining", "def": "Chronic fatigue and performance decline caused by excessive training without adequate rest." }
   },
   { 
     "id": 39,
     "catId": "health",
-    "tr": { "category": "Sağlık & Yaşam", "term": "Runner’s High", "def": "Uzun koşularda görülen öfori, mutluluk ve rahatlama hali." },
-    "en": { "category": "Health & Lifestyle", "term": "Runner’s High", "def": "A feeling of euphoria and reduced anxiety experienced after prolonged running." }
+    "tr": { "category": "Sağlık", "term": "Runner’s High", "def": "Uzun koşularda görülen öfori, mutluluk ve rahatlama hali." },
+    "en": { "category": "Health", "term": "Runner’s High", "def": "A feeling of euphoria and reduced anxiety experienced after prolonged running." }
   },
   { 
     "id": 40,
     "catId": "health",
-    "tr": { "category": "Sağlık & Yaşam", "term": "Carb Loading", "def": "Uzun yarışlar öncesi glikojen depolarını doldurmak için karbonhidrat alımını artırma." },
-    "en": { "category": "Health & Lifestyle", "term": "Carb Loading", "def": "Maximizing glycogen stores by increasing carbohydrate intake before a long race." }
+    "tr": { "category": "Sağlık", "term": "Carb Loading", "def": "Uzun yarışlar öncesi glikojen depolarını doldurmak için karbonhidrat alımını artırma." },
+    "en": { "category": "Health", "term": "Carb Loading", "def": "Maximizing glycogen stores by increasing carbohydrate intake before a long race." }
   },
   { 
     "id": 41,
     "catId": "health",
-    "tr": { "category": "Sağlık & Yaşam", "term": "Electrolytes", "def": "Terle kaybedilen mineraller (Sodyum vb.). Krampı önlemek için takviye edilir." },
-    "en": { "category": "Health & Lifestyle", "term": "Electrolytes", "def": "Minerals lost in sweat (Sodium, Potassium). Replenished to prevent cramps and dehydration." }
+    "tr": { "category": "Sağlık", "term": "Electrolytes", "def": "Terle kaybedilen mineraller (Sodyum vb.). Krampı önlemek için takviye edilir." },
+    "en": { "category": "Health", "term": "Electrolytes", "def": "Minerals lost in sweat (Sodium, Potassium). Replenished to prevent cramps and dehydration." }
   },
   { 
     "id": 42,
     "catId": "health",
-    "tr": { "category": "Sağlık & Yaşam", "term": "Hybrid Athlete", "def": "Hem dayanıklılık (koşu) hem de kuvvet (fitness) kapasitesini geliştiren sporcu." },
-    "en": { "category": "Health & Lifestyle", "term": "Hybrid Athlete", "def": "An athlete who trains to excel in both endurance (running) and strength sports simultaneously." }
+    "tr": { "category": "Sağlık", "term": "Hybrid Athlete", "def": "Hem dayanıklılık (koşu) hem de kuvvet (fitness) kapasitesini geliştiren sporcu." },
+    "en": { "category": "Health", "term": "Hybrid Athlete", "def": "An athlete who trains to excel in both endurance (running) and strength sports simultaneously." }
   }
 ];
