@@ -1,23 +1,49 @@
 const { useState, useEffect, useMemo, useRef } = React;
 
-// --- 1. ICON SİSTEMİ (Defansif Yapı) ---
+// --- HELPERS: SEO & DOM ---
+const upsertMeta = (name, content) => {
+    if (!content) return;
+    let el = document.querySelector(`meta[name="${name}"]`);
+    if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute("name", name);
+        document.head.appendChild(el);
+    }
+    el.setAttribute("content", content);
+};
+
+const upsertCanonical = (href) => {
+    if (!href) return;
+    let el = document.querySelector(`link[rel="canonical"]`);
+    if (!el) {
+        el = document.createElement("link");
+        el.setAttribute("rel", "canonical");
+        document.head.appendChild(el);
+    }
+    el.setAttribute("href", href);
+};
+
+// --- COMPONENT: HybLink (SEO Friendly Link) ---
+// Hem Google'ın göreceği href'i üretir hem de SPA hızını korur.
+const HybLink = ({ href, onNavigate, className = "", children, ...rest }) => (
+    <a
+        href={href}
+        className={className}
+        onClick={(e) => {
+            e.preventDefault(); // Sayfa yenilenmesini engelle
+            if (onNavigate) onNavigate(); // SPA router'ı tetikle
+        }}
+        {...rest}
+    >
+        {children}
+    </a>
+);
+
+// --- ICON SYSTEM ---
 const IconWrapper = ({ children, size = 24, className = "", ...props }) => {
-    // width/height override'ını engelle, sadece size prop'unu kabul et
     const { width, height, ...rest } = props; 
     return (
-        <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width={size} 
-            height={size} 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-            className={className}
-            {...rest} 
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...rest}>
             {children}
         </svg>
     );
@@ -74,11 +100,7 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
-// --- 2. CONFIG: SAYFA YÖNLENDİRMELERİ ---
-// Geçerli sayfalar
 const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery'];
-
-// Parent kategoriden (Menü başlığı) -> İlk Child sayfaya yönlendirme haritası
 const PARENT_REDIRECTS = {
     'hyrox': 'hyrox_calc',
     'running': 'running_perf',
@@ -87,7 +109,7 @@ const PARENT_REDIRECTS = {
 };
 
 const App = () => {
-    // --- DATA FETCH ---
+    // --- DATA ---
     const [posts, setPosts] = useState(window.HybNotesData?.posts || []);
     const [facts, setFacts] = useState(window.HybNotesData?.facts || []);
     const [currentFact, setCurrentFact] = useState(null);
@@ -98,38 +120,66 @@ const App = () => {
     const [readingArticle, setReadingArticle] = useState(null);
     const [user, setUser] = useState(null);
     
-    // --- INITIALIZATION ---
+    // --- INIT ---
     const [lang, setLang] = useState(() => localStorage.getItem('hybnotes_lang') || 'tr');
     const [activeTheme, setActiveTheme] = useState(() => {
         const saved = localStorage.getItem('hybnotes_theme');
         return THEMES.find(t => t.id === saved) || THEMES[0];
     });
 
-    // --- 3. SEO: JSON-LD SCHEMA (Fallback ile Güvenli Hale Getirildi) ---
+    // --- SEO: DYNAMIC META & TITLE (Crawler Optimization) ---
     useEffect(() => {
-        if (!readingArticle) return;
-        
-        // Eğer o dilde içerik yoksa TR'ye düş (Crash önleme)
-        const safeLang = readingArticle.title[lang] ? lang : 'tr';
-        
-        const schemaData = {
-            "@context": "https://schema.org",
-            "@type": "BlogPosting",
-            "headline": readingArticle.title[safeLang],
-            "datePublished": readingArticle.date,
-            "description": readingArticle.summary[safeLang],
-            "articleBody": readingArticle.content[safeLang].replace(/<[^>]*>?/gm, ''),
-            "author": { "@type": "Person", "name": "HybNotes" },
-            "url": `${window.location.origin}/?article=${readingArticle.id}` 
-        };
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.text = JSON.stringify(schemaData);
-        document.head.appendChild(script);
-        return () => { try { document.head.removeChild(script); } catch(e) {} }
-    }, [readingArticle, lang]);
+        const baseTitle = "HybNotes";
 
-    // --- 4. ROUTING: AKILLI YÖNLENDİRME ---
+        if (readingArticle) {
+            // Makale Okuma Modu
+            const safeLang = readingArticle.title?.[lang] ? lang : "tr";
+            document.title = `${readingArticle.title[safeLang]} | ${baseTitle}`;
+            upsertMeta("description", readingArticle.summary?.[safeLang] || "");
+            // Makale için temiz canonical
+            upsertCanonical(`${window.location.origin}/?article=${readingArticle.id}`);
+            
+            // JSON-LD
+            const schemaData = {
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                "headline": readingArticle.title[safeLang],
+                "datePublished": readingArticle.date,
+                "description": readingArticle.summary[safeLang],
+                "articleBody": readingArticle.content[safeLang].replace(/<[^>]*>?/gm, ''),
+                "author": { "@type": "Person", "name": "HybNotes" },
+                "url": `${window.location.origin}/?article=${readingArticle.id}` 
+            };
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.text = JSON.stringify(schemaData);
+            document.head.appendChild(script);
+            return () => { try { document.head.removeChild(script); } catch(e) {} };
+        } else {
+            // Normal Sayfalar
+            const pageMap = {
+                home: baseTitle,
+                research: `HybLib - Research | ${baseTitle}`,
+                hyrox_calc: `HYROX Calculator | ${baseTitle}`,
+                running_perf: `Running Performance | ${baseTitle}`,
+                caffeine: `Caffeine Strategy | ${baseTitle}`,
+                utmb_lottery: `UTMB Lottery | ${baseTitle}`,
+            };
+
+            document.title = pageMap[activeTab] || baseTitle;
+            upsertMeta(
+                "description",
+                lang === "tr"
+                    ? "Sporcular için bilimsel analizler, tecrübeler ve makaleler."
+                    : "Scientific analysis, experiences, and articles for athletes."
+            );
+            
+            const url = new URL(window.location.href);
+            upsertCanonical(`${url.origin}${url.pathname}${url.search}`);
+        }
+    }, [activeTab, readingArticle, lang]);
+
+    // --- ROUTING ---
     useEffect(() => {
         const handleUrlChange = () => {
             const params = new URLSearchParams(window.location.search);
@@ -142,15 +192,11 @@ const App = () => {
                     setReadingArticle(foundArticle);
                     setActiveTab('research');
                 } else {
-                    // Makale bulunamazsa listeye dön (Fallback)
                     setReadingArticle(null);
                     setActiveTab('research');
                 }
             } else if (pageId) {
-                // Parent Redirect: Eğer ana kategori geldiyse (örn: running) -> alt sayfaya (running_perf) git
                 const targetPage = PARENT_REDIRECTS[pageId] || pageId;
-
-                // Validation: Sadece izin verilen sayfalar
                 if (VALID_PAGES.includes(targetPage)) {
                     setActiveTab(targetPage);
                 } else {
@@ -169,15 +215,12 @@ const App = () => {
         return () => window.removeEventListener('popstate', handleUrlChange);
     }, [posts]);
 
-    // --- 5. NAVİGASYON: GÜVENLİ GEÇİŞ ---
+    // --- NAVIGATE (Internal Logic) ---
     const navigateTo = (destination, param = null) => {
         setIsMenuOpen(false);
         const url = new URL(window.location);
-        
-        // Parent Redirect kontrolü burada da yapılmalı
         let safeDestination = PARENT_REDIRECTS[destination] || destination;
 
-        // Validation
         if (safeDestination !== 'article' && safeDestination !== 'home' && !VALID_PAGES.includes(safeDestination)) {
             safeDestination = 'home';
         }
@@ -202,14 +245,13 @@ const App = () => {
         window.scrollTo(0, 0);
     };
 
-    // --- RANDOM FACT ---
+    // --- SIDE EFFECTS (Auth, Facts, Theme) ---
     useEffect(() => {
         if (facts.length > 0 && !currentFact) {
             setCurrentFact(facts[Math.floor(Math.random() * facts.length)]);
         }
     }, [facts]);
 
-    // --- AUTH ---
     useEffect(() => {
         if (typeof firebase === 'undefined' || !firebase.apps.length) return;
         const initAuth = async () => {
@@ -226,7 +268,6 @@ const App = () => {
         return () => unsubscribe();
     }, []);
 
-    // --- THEME & LANG SAVING ---
     useEffect(() => {
         document.documentElement.style.setProperty('--primary-rgb', activeTheme.rgb);
         document.documentElement.lang = lang; 
@@ -239,7 +280,8 @@ const App = () => {
         }
     }, [activeTheme, lang, user]);
 
-    // --- COMPONENT: ARTICLE DETAIL ---
+    // --- SUB-COMPONENTS ---
+    
     const ArticleDetail = ({ article, lang }) => {
         const [copied, setCopied] = useState(false);
         const contentRef = useRef(null);
@@ -249,9 +291,7 @@ const App = () => {
                 await navigator.clipboard.writeText(window.location.href);
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
-            } catch (err) {
-                console.error('Kopyalama hatası:', err);
-            }
+            } catch (err) { console.error(err); }
         };
 
         useEffect(() => {
@@ -266,16 +306,16 @@ const App = () => {
         return (
             <div className="animate-fade-in pb-20">
                 <div className="flex justify-between items-center mb-6">
-                    <button onClick={() => navigateTo('research')} className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base">
+                    <HybLink 
+                        href="?page=research"
+                        onNavigate={() => navigateTo('research')} 
+                        className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base"
+                    >
                         <Icons.ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> {lang === 'tr' ? "HybLib'e Dön" : 'Back to HybLib'}
-                    </button>
+                    </HybLink>
                     
                     <button onClick={handleShare} className="flex items-center gap-2 text-primary bg-primary/10 px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-primary/20 transition-all font-bold text-xs md:text-sm border border-primary/20">
-                        {copied ? (
-                            <><span className="text-emerald-400">✓</span> {lang === 'tr' ? 'Kopyalandı' : 'Copied'}</>
-                        ) : (
-                            <><Icons.Zap size={14} /> {lang === 'tr' ? 'Paylaş' : 'Share'}</>
-                        )}
+                        {copied ? (<><span className="text-emerald-400">✓</span> {lang === 'tr' ? 'Kopyalandı' : 'Copied'}</>) : (<><Icons.Zap size={14} /> {lang === 'tr' ? 'Paylaş' : 'Share'}</>)}
                     </button>
                 </div>
                 <article className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden">
@@ -311,7 +351,6 @@ const App = () => {
         );
     };
 
-    // --- COMPONENT: RESEARCH PAGE ---
     const ResearchPage = ({ posts, lang }) => {
         const [searchTerm, setSearchTerm] = useState("");
         const ALL_CATEGORY = "ALL_CATEGORY"; 
@@ -373,8 +412,14 @@ const App = () => {
                 {filteredAndSortedPosts.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {filteredAndSortedPosts.map(post => (
-                            <div key={post.id} onClick={() => navigateTo('article', post)} className="bg-slate-800 rounded-2xl border border-slate-700 hover:border-primary/50 transition-all cursor-pointer group hover-lift shadow-lg overflow-hidden flex flex-col h-full">
-                                <div className="p-6 flex-1"><div className="flex justify-between items-start mb-4"><span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">{post.category[lang]}</span><span className="text-xs text-slate-500 font-mono flex items-center gap-1"><Icons.Calendar size={12}/> {post.date}</span></div><h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors leading-tight">{post.title[lang]}</h3><p className="text-slate-400 text-sm line-clamp-3 leading-relaxed">{post.summary[lang]}</p></div><div className="px-6 py-4 bg-slate-900/30 border-t border-slate-700/50 flex justify-between items-center mt-auto"><span className="text-xs text-slate-500 font-medium flex items-center gap-1"><Icons.Clock size={14} /> {post.readTime[lang]}</span><span className="text-xs font-bold text-slate-300 group-hover:text-white flex items-center gap-1 transition-colors">{t.readMore} <Icons.ChevronRight size={14} className="group-hover:translate-x-1 transition-transform"/></span></div></div>
+                            <HybLink 
+                                key={post.id} 
+                                href={`?article=${post.id}`}
+                                onNavigate={() => navigateTo('article', post)} 
+                                className="bg-slate-800 rounded-2xl border border-slate-700 hover:border-primary/50 transition-all cursor-pointer group hover-lift shadow-lg overflow-hidden flex flex-col h-full"
+                            >
+                                <div className="p-6 flex-1"><div className="flex justify-between items-start mb-4"><span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">{post.category[lang]}</span><span className="text-xs text-slate-500 font-mono flex items-center gap-1"><Icons.Calendar size={12}/> {post.date}</span></div><h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors leading-tight">{post.title[lang]}</h3><p className="text-slate-400 text-sm line-clamp-3 leading-relaxed">{post.summary[lang]}</p></div><div className="px-6 py-4 bg-slate-900/30 border-t border-slate-700/50 flex justify-between items-center mt-auto"><span className="text-xs text-slate-500 font-medium flex items-center gap-1"><Icons.Clock size={14} /> {post.readTime[lang]}</span><span className="text-xs font-bold text-slate-300 group-hover:text-white flex items-center gap-1 transition-colors">{t.readMore} <Icons.ChevronRight size={14} className="group-hover:translate-x-1 transition-transform"/></span></div>
+                            </HybLink>
                         ))}
                     </div>
                 ) : (
@@ -384,22 +429,26 @@ const App = () => {
         );
     };
 
-    // --- COMPONENT: LATEST POSTS WIDGET ---
     const LatestPostsWidget = ({ posts, lang }) => {
         const latest = [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 3);
         const t = { title: lang === 'tr' ? 'Son Eklenenler' : 'Latest Posts', new: lang === 'tr' ? 'Yeni' : 'New', viewAll: lang === 'tr' ? 'Tümünü Gör' : 'View All' };
         return (
             <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col h-full hover-lift">
                 <div className="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50"><h3 className="font-bold text-white flex items-center gap-2"><Icons.FileText size={18} className="text-primary"/> {t.title}</h3><span className="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-md">{t.new}</span></div>
-                <div className="divide-y divide-slate-700/50">{latest.map(post => (<div key={post.id} onClick={() => navigateTo('article', post)} className="p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group"><div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div><div className="text-sm font-medium text-slate-200 group-hover:text-primary transition-colors line-clamp-2">{post.title[lang]}</div></div>))}</div>
-                <div onClick={() => navigateTo('research')} className="p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</div>
+                <div className="divide-y divide-slate-700/50">
+                    {latest.map(post => (
+                        <HybLink key={post.id} href={`?article=${post.id}`} onNavigate={() => navigateTo('article', post)} className="block p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group">
+                            <div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div>
+                            <div className="text-sm font-medium text-slate-200 group-hover:text-primary transition-colors line-clamp-2">{post.title[lang]}</div>
+                        </HybLink>
+                    ))}
+                </div>
+                <HybLink href="?page=research" onNavigate={() => navigateTo('research')} className="block p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</HybLink>
             </div>
         );
     };
 
-    // --- COMPONENT: HOME PAGE ---
     const HomePage = ({ posts, lang, currentFact }) => {
-        // 6. FIX: En son ekleneni posts[0] varsayma, tarihe göre sırala
         const latestPost = useMemo(() => {
             if (!posts || posts.length === 0) return null;
             return [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
@@ -413,14 +462,28 @@ const App = () => {
                     <div className="absolute top-10 left-10 w-40 h-40 bg-primary rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse-slow"></div>
                     <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">{lang === 'tr' ? 'Sporcular için bilimsel analizlerin, tecrübelerin ve makalelerin yer aldığı kişisel bir not defteri.' : 'A personal notebook containing scientific analysis, experiences, and articles for athletes.'}</p>
                     
-                    <button onClick={() => navigateTo('research')} className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10">{lang === 'tr' ? "HybLib'e Git" : 'Go to HybLib'}</button>
+                    <HybLink 
+                        href="?page=research"
+                        onNavigate={() => navigateTo('research')} 
+                        className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10 inline-block"
+                    >
+                        {lang === 'tr' ? "HybLib'e Git" : 'Go to HybLib'}
+                    </HybLink>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div onClick={() => latestPost && navigateTo('article', latestPost)} className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift shadow-xl">
-                            <div><div className="flex items-center gap-2 text-primary mb-2"><Icons.Zap size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span></div><h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-primary transition-colors">{latestPost ? latestPost.title[lang] : '...'}</h3><p className="text-sm text-slate-400 line-clamp-2">{latestPost ? latestPost.summary[lang] : ''}</p></div>
-                            <div className="mt-4 flex items-center text-xs font-bold text-slate-500 group-hover:text-white transition-colors">{lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={14} className="ml-1" /></div>
-                        </div>
+                        {latestPost ? (
+                            <HybLink 
+                                href={`?article=${latestPost.id}`}
+                                onNavigate={() => navigateTo('article', latestPost)} 
+                                className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift shadow-xl"
+                            >
+                                <div><div className="flex items-center gap-2 text-primary mb-2"><Icons.Zap size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Son Eklenen' : 'Latest Added'}</span></div><h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-primary transition-colors">{latestPost.title[lang]}</h3><p className="text-sm text-slate-400 line-clamp-2">{latestPost.summary[lang]}</p></div>
+                                <div className="mt-4 flex items-center text-xs font-bold text-slate-500 group-hover:text-white transition-colors">{lang === 'tr' ? 'Okumaya Başla' : 'Start Reading'} <Icons.ChevronRight size={14} className="ml-1" /></div>
+                            </HybLink>
+                        ) : (
+                            <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex items-center justify-center text-slate-500">Loading...</div>
+                        )}
                         <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between hover-lift shadow-xl">
                             <div><div className="flex items-center gap-2 text-blue-400 mb-2"><Icons.Info size={20} /><span className="text-xs font-bold uppercase tracking-wider">{lang === 'tr' ? 'Biliyor Muydunuz?' : 'Did You Know?'}</span></div>
                                 <div className="text-slate-500 text-[10px] font-bold uppercase mb-1">{currentFact ? currentFact.tag : '#Antrenman'}</div>
@@ -437,12 +500,10 @@ const App = () => {
         );
     };
 
-    // --- COMPONENT: NAVBAR ---
     const NavBar = ({ activeTab, isMenuOpen, setIsMenuOpen, activeTheme, setActiveTheme, lang, setLang }) => {
         const [showPalette, setShowPalette] = useState(false);
         const paletteRef = useRef(null);
 
-        // Palette dışına tıklayınca kapanma
         useEffect(() => {
             const handleClickOutside = (event) => {
                 if (paletteRef.current && !paletteRef.current.contains(event.target)) {
@@ -498,12 +559,41 @@ const App = () => {
             <nav className="fixed top-0 w-full z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 md:px-8">
                     <div className="flex items-center justify-between h-20">
-                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigateTo('home')}><PulseBarLogo size={32} /><span className="text-2xl font-black text-white tracking-tighter hidden md:block">HybNotes</span></div>
+                        <HybLink href="/" onNavigate={() => navigateTo('home')} className="flex items-center gap-2 cursor-pointer">
+                            <PulseBarLogo size={32} /><span className="text-2xl font-black text-white tracking-tighter hidden md:block">HybNotes</span>
+                        </HybLink>
                         <div className="hidden md:flex items-center gap-1">
                             {MENU_ITEMS.map((item) => (
                                 <div key={item.id} className="relative group">
-                                    <button onClick={() => !item.children && navigateTo(item.id)} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id || (PARENT_REDIRECTS[item.id] === activeTab) ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}><item.icon size={18} /> {item.title} {item.children && <Icons.ChevronDown size={14}/>}</button>
-                                    {item.children && (<div className="absolute top-full left-0 w-56 pt-2 hidden group-hover:block"><div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">{item.children.map((subItem) => (<button key={subItem.id} onClick={() => navigateTo(subItem.id)} className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3"><subItem.icon size={16} /> {subItem.title}</button>))}</div></div>)}
+                                    {!item.children ? (
+                                        <HybLink 
+                                            href={item.id === "home" ? "/" : `?page=${PARENT_REDIRECTS[item.id] || item.id}`}
+                                            onNavigate={() => navigateTo(item.id)}
+                                            className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id || (PARENT_REDIRECTS[item.id] === activeTab) ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}
+                                        >
+                                            <item.icon size={18} /> {item.title}
+                                        </HybLink>
+                                    ) : (
+                                        <button className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id || (PARENT_REDIRECTS[item.id] === activeTab) ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}>
+                                            <item.icon size={18} /> {item.title} <Icons.ChevronDown size={14}/>
+                                        </button>
+                                    )}
+                                    {item.children && (
+                                        <div className="absolute top-full left-0 w-56 pt-2 hidden group-hover:block">
+                                            <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">
+                                                {item.children.map((subItem) => (
+                                                    <HybLink 
+                                                        key={subItem.id} 
+                                                        href={`?page=${subItem.id}`}
+                                                        onNavigate={() => navigateTo(subItem.id)} 
+                                                        className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3 block"
+                                                    >
+                                                        <subItem.icon size={16} /> {subItem.title}
+                                                    </HybLink>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -520,7 +610,37 @@ const App = () => {
                         </div>
                     </div>
                 </div>
-                {isMenuOpen && (<div className="md:hidden bg-slate-900 border-b border-slate-800 absolute w-full h-[calc(100vh-80px)] overflow-y-auto p-4 space-y-2 z-50">{MENU_ITEMS.map((item) => (<div key={item.id}>{item.children ? (<div className="bg-slate-800/50 rounded-xl p-2"><div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase flex items-center gap-2"><item.icon size={14}/> {item.title}</div>{item.children.map(sub => (<button key={sub.id} onClick={() => navigateTo(sub.id)} className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}>{sub.title}</button>))}</div>) : (<button onClick={() => navigateTo(item.id)} className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold ${activeTab === item.id || (PARENT_REDIRECTS[item.id] === activeTab) ? 'bg-primary text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}><item.icon size={24} /> {item.title}</button>)}</div>))}</div>)}
+                {isMenuOpen && (
+                    <div className="md:hidden bg-slate-900 border-b border-slate-800 absolute w-full h-[calc(100vh-80px)] overflow-y-auto p-4 space-y-2 z-50">
+                        {MENU_ITEMS.map((item) => (
+                            <div key={item.id}>
+                                {item.children ? (
+                                    <div className="bg-slate-800/50 rounded-xl p-2">
+                                        <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase flex items-center gap-2"><item.icon size={14}/> {item.title}</div>
+                                        {item.children.map(sub => (
+                                            <HybLink 
+                                                key={sub.id} 
+                                                href={`?page=${sub.id}`}
+                                                onNavigate={() => navigateTo(sub.id)} 
+                                                className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 block ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}
+                                            >
+                                                {sub.title}
+                                            </HybLink>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <HybLink 
+                                        href={item.id === "home" ? "/" : `?page=${PARENT_REDIRECTS[item.id] || item.id}`}
+                                        onNavigate={() => navigateTo(item.id)} 
+                                        className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold block ${activeTab === item.id ? 'bg-primary text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}
+                                    >
+                                        <item.icon size={24} /> {item.title}
+                                    </HybLink>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </nav>
         );
     };
