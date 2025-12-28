@@ -47,11 +47,11 @@ window.HybNotesData = {
                 "en": "Lactate does not cause acidosis; rather, it is a byproduct of a buffering process attempting to prevent it. The real culprit is H+ ions released from ATP hydrolysis." 
             } 
         },
-        { 
+{ 
   "tag": "#Fizyoloji", 
   "text": { 
-    "tr": "Eşik hızın (LT), aslında motor gücün (VO₂max) + yakıt cimriliğin (koşu ekonomisi) birleşince ortaya çıkan gerçek yarış hızıdır. FU ise bunun oranı: Eşiğin, motor kapasitenin yüzde kaçı? (LT / VO₂max).", 
-    "en": "Your threshold pace (LT) is basically the real-world result of your engine size (VO₂max) plus how fuel-efficient you are (running economy). FU is just the ratio: what percentage of your engine capacity can you hold at threshold? (LT / VO₂max)." 
+    "tr": "Eşik hızın (LT), motor gücün (VO₂max) ve ne kadar verimli koştuğunun (ekonomi) birleşimidir. FU ise şunu söyler: Bu eşiğe, VO₂max’inin yüzde kaçıyla çıkıyorsun?", 
+    "en": "Your threshold pace (LT) comes from your engine size (VO₂max) and how efficiently you run (economy). FU simply answers: what percentage of your VO₂max are you using at that threshold?" 
   } 
 },
         { 
