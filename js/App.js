@@ -1,9 +1,9 @@
 const { useState, useEffect, useMemo, useRef } = React;
 
-// --- 1. DÜZELTME: DEFANSİF ICON WRAPPER ---
-// width ve height props'tan ayrıştırıldı (rest), böylece size prop'u garanti altına alındı.
+// --- 1. ICON SİSTEMİ (Defansif Yapı) ---
 const IconWrapper = ({ children, size = 24, className = "", ...props }) => {
-    const { width, height, ...rest } = props; // width/height override'ını engelle
+    // width/height override'ını engelle, sadece size prop'unu kabul et
+    const { width, height, ...rest } = props; 
     return (
         <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -74,7 +74,17 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
-const VALID_PAGES = ['home', 'research', 'hyrox', 'hyrox_calc', 'running', 'running_perf', 'nutrition', 'caffeine', 'tools', 'utmb_lottery'];
+// --- 2. CONFIG: SAYFA YÖNLENDİRMELERİ ---
+// Geçerli sayfalar
+const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery'];
+
+// Parent kategoriden (Menü başlığı) -> İlk Child sayfaya yönlendirme haritası
+const PARENT_REDIRECTS = {
+    'hyrox': 'hyrox_calc',
+    'running': 'running_perf',
+    'nutrition': 'caffeine',
+    'tools': 'utmb_lottery'
+};
 
 const App = () => {
     // --- DATA FETCH ---
@@ -95,16 +105,20 @@ const App = () => {
         return THEMES.find(t => t.id === saved) || THEMES[0];
     });
 
-    // --- 4. DÜZELTME: DİNAMİK SEO LANG ---
+    // --- 3. SEO: JSON-LD SCHEMA (Fallback ile Güvenli Hale Getirildi) ---
     useEffect(() => {
         if (!readingArticle) return;
+        
+        // Eğer o dilde içerik yoksa TR'ye düş (Crash önleme)
+        const safeLang = readingArticle.title[lang] ? lang : 'tr';
+        
         const schemaData = {
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            "headline": readingArticle.title[lang], // [lang] kullanıldı
+            "headline": readingArticle.title[safeLang],
             "datePublished": readingArticle.date,
-            "description": readingArticle.summary[lang], // [lang] kullanıldı
-            "articleBody": readingArticle.content[lang].replace(/<[^>]*>?/gm, ''), // [lang] kullanıldı
+            "description": readingArticle.summary[safeLang],
+            "articleBody": readingArticle.content[safeLang].replace(/<[^>]*>?/gm, ''),
             "author": { "@type": "Person", "name": "HybNotes" },
             "url": `${window.location.origin}/?article=${readingArticle.id}` 
         };
@@ -113,9 +127,9 @@ const App = () => {
         script.text = JSON.stringify(schemaData);
         document.head.appendChild(script);
         return () => { try { document.head.removeChild(script); } catch(e) {} }
-    }, [readingArticle, lang]); // lang dependency'e eklendi
+    }, [readingArticle, lang]);
 
-    // --- 2. DÜZELTME: ROUTING FALLBACK ---
+    // --- 4. ROUTING: AKILLI YÖNLENDİRME ---
     useEffect(() => {
         const handleUrlChange = () => {
             const params = new URLSearchParams(window.location.search);
@@ -128,14 +142,17 @@ const App = () => {
                     setReadingArticle(foundArticle);
                     setActiveTab('research');
                 } else {
-                    // Bulunamadıysa Research listesine dön (veya Home)
+                    // Makale bulunamazsa listeye dön (Fallback)
                     setReadingArticle(null);
                     setActiveTab('research');
                 }
             } else if (pageId) {
+                // Parent Redirect: Eğer ana kategori geldiyse (örn: running) -> alt sayfaya (running_perf) git
+                const targetPage = PARENT_REDIRECTS[pageId] || pageId;
+
                 // Validation: Sadece izin verilen sayfalar
-                if (VALID_PAGES.includes(pageId)) {
-                    setActiveTab(pageId);
+                if (VALID_PAGES.includes(targetPage)) {
+                    setActiveTab(targetPage);
                 } else {
                     setActiveTab('home'); 
                 }
@@ -152,14 +169,16 @@ const App = () => {
         return () => window.removeEventListener('popstate', handleUrlChange);
     }, [posts]);
 
-    // --- 3. DÜZELTME: NAVIGATE VALIDATION ---
+    // --- 5. NAVİGASYON: GÜVENLİ GEÇİŞ ---
     const navigateTo = (destination, param = null) => {
         setIsMenuOpen(false);
         const url = new URL(window.location);
         
-        // Eğer gidilecek sayfa article/home değilse ve listede yoksa -> Home'a çevir
-        let safeDestination = destination;
-        if (destination !== 'article' && destination !== 'home' && !VALID_PAGES.includes(destination)) {
+        // Parent Redirect kontrolü burada da yapılmalı
+        let safeDestination = PARENT_REDIRECTS[destination] || destination;
+
+        // Validation
+        if (safeDestination !== 'article' && safeDestination !== 'home' && !VALID_PAGES.includes(safeDestination)) {
             safeDestination = 'home';
         }
 
@@ -322,7 +341,6 @@ const App = () => {
                 const matchesCategory = selectedCategory === ALL_CATEGORY || post.category[lang] === selectedCategory;
                 return matchesSearch && matchesCategory;
             });
-            // Tarih sıralaması (Date parse güvenliği eklenebilir ama veri ISO formatındaysa bu OK)
             return result.sort((a, b) => {
                 const dateA = new Date(a.date).getTime();
                 const dateB = new Date(b.date).getTime();
@@ -381,7 +399,12 @@ const App = () => {
 
     // --- COMPONENT: HOME PAGE ---
     const HomePage = ({ posts, lang, currentFact }) => {
-        const latestPost = posts.length > 0 ? posts[0] : null;
+        // 6. FIX: En son ekleneni posts[0] varsayma, tarihe göre sırala
+        const latestPost = useMemo(() => {
+            if (!posts || posts.length === 0) return null;
+            return [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+        }, [posts]);
+
         return (
             <div className="space-y-8 animate-fade-in">
                 <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 md:p-12 border border-slate-700 relative overflow-hidden shadow-2xl">
@@ -479,7 +502,7 @@ const App = () => {
                         <div className="hidden md:flex items-center gap-1">
                             {MENU_ITEMS.map((item) => (
                                 <div key={item.id} className="relative group">
-                                    <button onClick={() => !item.children && navigateTo(item.id)} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}><item.icon size={18} /> {item.title} {item.children && <Icons.ChevronDown size={14}/>}</button>
+                                    <button onClick={() => !item.children && navigateTo(item.id)} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id || (PARENT_REDIRECTS[item.id] === activeTab) ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}><item.icon size={18} /> {item.title} {item.children && <Icons.ChevronDown size={14}/>}</button>
                                     {item.children && (<div className="absolute top-full left-0 w-56 pt-2 hidden group-hover:block"><div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">{item.children.map((subItem) => (<button key={subItem.id} onClick={() => navigateTo(subItem.id)} className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3"><subItem.icon size={16} /> {subItem.title}</button>))}</div></div>)}
                                 </div>
                             ))}
@@ -497,7 +520,7 @@ const App = () => {
                         </div>
                     </div>
                 </div>
-                {isMenuOpen && (<div className="md:hidden bg-slate-900 border-b border-slate-800 absolute w-full h-[calc(100vh-80px)] overflow-y-auto p-4 space-y-2 z-50">{MENU_ITEMS.map((item) => (<div key={item.id}>{item.children ? (<div className="bg-slate-800/50 rounded-xl p-2"><div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase flex items-center gap-2"><item.icon size={14}/> {item.title}</div>{item.children.map(sub => (<button key={sub.id} onClick={() => navigateTo(sub.id)} className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}>{sub.title}</button>))}</div>) : (<button onClick={() => navigateTo(item.id)} className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold ${activeTab === item.id ? 'bg-primary text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}><item.icon size={24} /> {item.title}</button>)}</div>))}</div>)}
+                {isMenuOpen && (<div className="md:hidden bg-slate-900 border-b border-slate-800 absolute w-full h-[calc(100vh-80px)] overflow-y-auto p-4 space-y-2 z-50">{MENU_ITEMS.map((item) => (<div key={item.id}>{item.children ? (<div className="bg-slate-800/50 rounded-xl p-2"><div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase flex items-center gap-2"><item.icon size={14}/> {item.title}</div>{item.children.map(sub => (<button key={sub.id} onClick={() => navigateTo(sub.id)} className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}>{sub.title}</button>))}</div>) : (<button onClick={() => navigateTo(item.id)} className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold ${activeTab === item.id || (PARENT_REDIRECTS[item.id] === activeTab) ? 'bg-primary text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}><item.icon size={24} /> {item.title}</button>)}</div>))}</div>)}
             </nav>
         );
     };
