@@ -17,17 +17,15 @@
         Zap: (p) => <SvgIcon {...p}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></SvgIcon>,
         ChevronRight: (p) => <SvgIcon {...p}><polyline points="9 18 15 12 9 6"/></SvgIcon>,
         Info: (p) => <SvgIcon {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></SvgIcon>,
-        RefreshCw: (p) => <SvgIcon {...p}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></SvgIcon>,
         Shuffle: (p) => <SvgIcon {...p}><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l14.2-12.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="M2 6h1.4c1.3 0 2.5.6 3.3 1.7l14.2 12.6c.8 1.1 2 1.7 3.3 1.7H22"/></SvgIcon>
     };
 
     const KosuDili101Page = ({ lang }) => {
-        // --- DOĞRUDAN window.KosuDiliData KULLANILIYOR ---
+        // DOĞRUDAN window.KosuDiliData KULLANILIYOR
         const [allTerms] = useState(window.KosuDiliData || []); 
         const [displayedIndices, setDisplayedIndices] = useState([]);
         const [flippedCards, setFlippedCards] = useState({});
 
-        // Veri zaten hazır olduğu için useEffect ile fetch yapmaya gerek yok
         useEffect(() => {
             if (allTerms.length > 0) {
                 shuffleAll();
@@ -74,7 +72,7 @@
 
         const getIcon = (catId) => {
             switch (catId) {
-                case 'metrics': return <LocalIcons.Activity className="w-10 h-10 text-lime-400" />;
+                case 'metrics': return <LocalIcons.Activity className="w-10 h-10 text-primary" />; // Ana tema rengi
                 case 'training': return <LocalIcons.Dumbbell className="w-10 h-10 text-orange-400" />;
                 case 'physiology': return <LocalIcons.Heart className="w-10 h-10 text-red-400" />;
                 case 'race': return <LocalIcons.Flag className="w-10 h-10 text-yellow-400" />;
@@ -89,15 +87,13 @@
                 subtitle: "Koşucuların gizli dilini keşfetmeye hazır mısın?",
                 shuffleBtn: "Masayı Karıştır",
                 seeDef: "Tanımı Gör",
-                whatIs: "NEDİR?",
-                footer: "© 2024 Koşu Dili 101. Sonsuz Kombinasyon."
+                whatIs: "NEDİR?"
             },
             en: {
                 subtitle: "Ready to decode the secret language of runners?",
                 shuffleBtn: "Shuffle Deck",
                 seeDef: "See Definition",
-                whatIs: "WHAT IS IT?",
-                footer: "© 2024 Running Lingo 101. Infinite Combinations."
+                whatIs: "WHAT IS IT?"
             }
         }[lang];
 
@@ -118,11 +114,12 @@
 
                 {/* --- HERO SECTION --- */}
                 <header className="bg-slate-800 text-white pt-12 pb-12 px-6 rounded-[2rem] shadow-xl relative overflow-hidden transition-all duration-500 border border-slate-700">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-lime-400 rounded-full blur-[100px] opacity-10 -mr-20 -mt-20"></div>
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500 rounded-full blur-[80px] opacity-10 -ml-10 -mb-10"></div>
+                    {/* Arka plan blob'ları artık primary renginde */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full blur-[100px] opacity-10 -mr-20 -mt-20"></div>
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary rounded-full blur-[80px] opacity-10 -ml-10 -mb-10"></div>
                     <div className="max-w-4xl mx-auto text-center relative z-10">
                         <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
-                            {lang === 'tr' ? 'Koşu Dili' : 'Running Lingo'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-400">101</span>
+                            {lang === 'tr' ? 'Koşu Dili' : 'Running Lingo'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-slate-200">101</span>
                         </h1>
                         <p className="text-lg text-slate-400 font-light">{t.subtitle}</p>
                     </div>
@@ -130,7 +127,8 @@
 
                 {/* --- GRID --- */}
                 <div className="flex justify-end mb-2">
-                    <button onClick={shuffleAll} className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-lime-400 px-5 py-2 rounded-xl transition-all font-bold border border-slate-700 hover:border-lime-500/50 shadow-lg active:scale-95 text-sm">
+                    {/* Buton rengi temaya bağlandı */}
+                    <button onClick={shuffleAll} className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-primary px-5 py-2 rounded-xl transition-all font-bold border border-slate-700 hover:border-primary/50 shadow-lg active:scale-95 text-sm">
                         <LocalIcons.Shuffle size={18} /> {t.shuffleBtn}
                     </button>
                 </div>
@@ -146,12 +144,14 @@
                             <div key={slotIndex} className="card-container h-80 w-full cursor-pointer group" onClick={() => handleCardInteraction(slotIndex)}>
                                 <div className={`card-inner w-full h-full relative ${isFlipped ? 'flipped' : ''}`}>
                                     {/* FRONT */}
-                                    <div className="card-front bg-slate-800 rounded-2xl border border-slate-700 p-6 flex flex-col items-center justify-between shadow-xl group-hover:border-lime-500/50 transition-colors">
+                                    {/* Hover durumunda border rengi temaya göre değişir */}
+                                    <div className="card-front bg-slate-800 rounded-2xl border border-slate-700 p-6 flex flex-col items-center justify-between shadow-xl group-hover:border-primary/50 transition-colors">
                                         <div className="w-full flex justify-between items-start">
                                             <span className="bg-slate-950 text-slate-400 text-[10px] font-bold tracking-wider px-2 py-1 rounded truncate max-w-[120px]">
                                                 {lang === 'tr' ? content.category.toLocaleUpperCase('tr-TR') : content.category.toUpperCase()}
                                             </span>
-                                            <div className="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-lime-500 transition-colors"></div>
+                                            {/* Sağ üstteki nokta rengi temaya bağlandı */}
+                                            <div className="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-primary transition-colors"></div>
                                         </div>
                                         <div className="text-center space-y-4 w-full">
                                             <div className="inline-block p-4 rounded-full bg-slate-900 border border-slate-700 shadow-inner group-hover:scale-110 transition-transform duration-300">
@@ -164,7 +164,8 @@
                                         </div>
                                     </div>
                                     {/* BACK */}
-                                    <div className="card-back bg-lime-500 rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden">
+                                    {/* Kartın arka yüzü tamamen tema renginde */}
+                                    <div className="card-back bg-primary rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden">
                                          <div className="absolute top-0 right-0 p-4 opacity-10"><LocalIcons.Info size={64}/></div>
                                          <div className="relative z-10 overflow-y-auto pr-1 custom-scrollbar max-h-full">
                                             <div className="flex items-center gap-2 mb-3 opacity-70">
@@ -179,7 +180,6 @@
                         );
                     })}
                 </div>
-                <footer className="text-center text-slate-500 text-xs py-8 border-t border-slate-800 mt-8">{t.footer}</footer>
             </div>
         );
     };
