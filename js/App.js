@@ -24,14 +24,13 @@ const upsertCanonical = (href) => {
 };
 
 // --- COMPONENT: HybLink (SEO Friendly Link) ---
-// Hem Google'ın göreceği href'i üretir hem de SPA hızını korur.
 const HybLink = ({ href, onNavigate, className = "", children, ...rest }) => (
     <a
         href={href}
         className={className}
         onClick={(e) => {
-            e.preventDefault(); // Sayfa yenilenmesini engelle
-            if (onNavigate) onNavigate(); // SPA router'ı tetikle
+            e.preventDefault();
+            if (onNavigate) onNavigate();
         }}
         {...rest}
     >
@@ -41,7 +40,7 @@ const HybLink = ({ href, onNavigate, className = "", children, ...rest }) => (
 
 // --- ICON SYSTEM ---
 const IconWrapper = ({ children, size = 24, className = "", ...props }) => {
-    const { width, height, ...rest } = props; 
+    const { width, height, ...rest } = props;
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...rest}>
             {children}
@@ -120,8 +119,16 @@ const App = () => {
     const [readingArticle, setReadingArticle] = useState(null);
     const [user, setUser] = useState(null);
     
-    // --- INIT ---
-    const [lang, setLang] = useState(() => localStorage.getItem('hybnotes_lang') || 'tr');
+    // --- INIT (SEO-READY LANGUAGE) ---
+    const [lang, setLang] = useState(() => {
+        // Öncelik URL'deki lang parametresinde
+        const params = new URLSearchParams(window.location.search);
+        const urlLang = params.get('lang');
+        if (urlLang === 'tr' || urlLang === 'en') return urlLang;
+        // Yoksa localStorage, o da yoksa varsayılan 'tr'
+        return localStorage.getItem('hybnotes_lang') || 'tr';
+    });
+
     const [activeTheme, setActiveTheme] = useState(() => {
         const saved = localStorage.getItem('hybnotes_theme');
         return THEMES.find(t => t.id === saved) || THEMES[0];
@@ -136,8 +143,9 @@ const App = () => {
             const safeLang = readingArticle.title?.[lang] ? lang : "tr";
             document.title = `${readingArticle.title[safeLang]} | ${baseTitle}`;
             upsertMeta("description", readingArticle.summary?.[safeLang] || "");
-            // Makale için temiz canonical
-            upsertCanonical(`${window.location.origin}/?article=${readingArticle.id}`);
+            
+            // Makale için temiz canonical (URL lang içerir)
+            upsertCanonical(`${window.location.origin}/?article=${readingArticle.id}&lang=${lang}`);
             
             // JSON-LD
             const schemaData = {
@@ -148,7 +156,7 @@ const App = () => {
                 "description": readingArticle.summary[safeLang],
                 "articleBody": readingArticle.content[safeLang].replace(/<[^>]*>?/gm, ''),
                 "author": { "@type": "Person", "name": "HybNotes" },
-                "url": `${window.location.origin}/?article=${readingArticle.id}` 
+                "url": `${window.location.origin}/?article=${readingArticle.id}&lang=${lang}` 
             };
             const script = document.createElement('script');
             script.type = 'application/ld+json';
@@ -174,15 +182,23 @@ const App = () => {
                     : "Scientific analysis, experiences, and articles for athletes."
             );
             
+            // Navigasyon URL'yi güncellediği için window.location doğrudur
             const url = new URL(window.location.href);
             upsertCanonical(`${url.origin}${url.pathname}${url.search}`);
         }
     }, [activeTab, readingArticle, lang]);
 
-    // --- ROUTING ---
+    // --- ROUTING (Updated for Lang) ---
     useEffect(() => {
         const handleUrlChange = () => {
             const params = new URLSearchParams(window.location.search);
+            
+            // Dil kontrolü (URL'den)
+            const urlLang = params.get('lang');
+            if (urlLang && (urlLang === 'tr' || urlLang === 'en')) {
+                setLang(urlLang);
+            }
+
             const articleId = params.get('article');
             const pageId = params.get('page');
 
@@ -215,11 +231,14 @@ const App = () => {
         return () => window.removeEventListener('popstate', handleUrlChange);
     }, [posts]);
 
-    // --- NAVIGATE (Internal Logic) ---
+    // --- NAVIGATE (Updated to persist Lang) ---
     const navigateTo = (destination, param = null) => {
         setIsMenuOpen(false);
         const url = new URL(window.location);
         let safeDestination = PARENT_REDIRECTS[destination] || destination;
+
+        // URL'e her zaman mevcut dili ekle
+        url.searchParams.set('lang', lang);
 
         if (safeDestination !== 'article' && safeDestination !== 'home' && !VALID_PAGES.includes(safeDestination)) {
             safeDestination = 'home';
@@ -243,6 +262,14 @@ const App = () => {
         }
         window.history.pushState({}, '', url);
         window.scrollTo(0, 0);
+    };
+
+    // --- CHANGE LANG (Updates URL too) ---
+    const switchLang = (newLang) => {
+        setLang(newLang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', newLang);
+        window.history.pushState({}, '', url);
     };
 
     // --- SIDE EFFECTS (Auth, Facts, Theme) ---
@@ -307,7 +334,7 @@ const App = () => {
             <div className="animate-fade-in pb-20">
                 <div className="flex justify-between items-center mb-6">
                     <HybLink 
-                        href="?page=research"
+                        href={`?page=research&lang=${lang}`}
                         onNavigate={() => navigateTo('research')} 
                         className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base"
                     >
@@ -414,7 +441,7 @@ const App = () => {
                         {filteredAndSortedPosts.map(post => (
                             <HybLink 
                                 key={post.id} 
-                                href={`?article=${post.id}`}
+                                href={`?article=${post.id}&lang=${lang}`}
                                 onNavigate={() => navigateTo('article', post)} 
                                 className="bg-slate-800 rounded-2xl border border-slate-700 hover:border-primary/50 transition-all cursor-pointer group hover-lift shadow-lg overflow-hidden flex flex-col h-full"
                             >
@@ -437,13 +464,13 @@ const App = () => {
                 <div className="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50"><h3 className="font-bold text-white flex items-center gap-2"><Icons.FileText size={18} className="text-primary"/> {t.title}</h3><span className="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-md">{t.new}</span></div>
                 <div className="divide-y divide-slate-700/50">
                     {latest.map(post => (
-                        <HybLink key={post.id} href={`?article=${post.id}`} onNavigate={() => navigateTo('article', post)} className="block p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group">
+                        <HybLink key={post.id} href={`?article=${post.id}&lang=${lang}`} onNavigate={() => navigateTo('article', post)} className="block p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group">
                             <div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div>
                             <div className="text-sm font-medium text-slate-200 group-hover:text-primary transition-colors line-clamp-2">{post.title[lang]}</div>
                         </HybLink>
                     ))}
                 </div>
-                <HybLink href="?page=research" onNavigate={() => navigateTo('research')} className="block p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</HybLink>
+                <HybLink href={`?page=research&lang=${lang}`} onNavigate={() => navigateTo('research')} className="block p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</HybLink>
             </div>
         );
     };
@@ -463,7 +490,7 @@ const App = () => {
                     <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">{lang === 'tr' ? 'Sporcular için bilimsel analizlerin, tecrübelerin ve makalelerin yer aldığı kişisel bir not defteri.' : 'A personal notebook containing scientific analysis, experiences, and articles for athletes.'}</p>
                     
                     <HybLink 
-                        href="?page=research"
+                        href={`?page=research&lang=${lang}`}
                         onNavigate={() => navigateTo('research')} 
                         className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10 inline-block"
                     >
@@ -474,7 +501,7 @@ const App = () => {
                     <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                         {latestPost ? (
                             <HybLink 
-                                href={`?article=${latestPost.id}`}
+                                href={`?article=${latestPost.id}&lang=${lang}`}
                                 onNavigate={() => navigateTo('article', latestPost)} 
                                 className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift shadow-xl"
                             >
@@ -500,7 +527,7 @@ const App = () => {
         );
     };
 
-    const NavBar = ({ activeTab, isMenuOpen, setIsMenuOpen, activeTheme, setActiveTheme, lang, setLang }) => {
+    const NavBar = ({ activeTab, isMenuOpen, setIsMenuOpen, activeTheme, setActiveTheme, lang, switchLang }) => {
         const [showPalette, setShowPalette] = useState(false);
         const paletteRef = useRef(null);
 
@@ -559,7 +586,7 @@ const App = () => {
             <nav className="fixed top-0 w-full z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 md:px-8">
                     <div className="flex items-center justify-between h-20">
-                        <HybLink href="/" onNavigate={() => navigateTo('home')} className="flex items-center gap-2 cursor-pointer">
+                        <HybLink href={`/?lang=${lang}`} onNavigate={() => navigateTo('home')} className="flex items-center gap-2 cursor-pointer">
                             <PulseBarLogo size={32} /><span className="text-2xl font-black text-white tracking-tighter hidden md:block">HybNotes</span>
                         </HybLink>
                         <div className="hidden md:flex items-center gap-1">
@@ -567,7 +594,7 @@ const App = () => {
                                 <div key={item.id} className="relative group">
                                     {!item.children ? (
                                         <HybLink 
-                                            href={item.id === "home" ? "/" : `?page=${PARENT_REDIRECTS[item.id] || item.id}`}
+                                            href={item.id === "home" ? `/?lang=${lang}` : `?page=${PARENT_REDIRECTS[item.id] || item.id}&lang=${lang}`}
                                             onNavigate={() => navigateTo(item.id)}
                                             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === item.id || (PARENT_REDIRECTS[item.id] === activeTab) ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-white'}`}
                                         >
@@ -584,7 +611,7 @@ const App = () => {
                                                 {item.children.map((subItem) => (
                                                     <HybLink 
                                                         key={subItem.id} 
-                                                        href={`?page=${subItem.id}`}
+                                                        href={`?page=${subItem.id}&lang=${lang}`}
                                                         onNavigate={() => navigateTo(subItem.id)} 
                                                         className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3 block"
                                                     >
@@ -603,8 +630,8 @@ const App = () => {
                                 {showPalette && (<div className="absolute top-full right-0 mt-2 p-2 bg-slate-800 border border-slate-700 rounded-xl shadow-xl grid grid-cols-4 gap-2 w-48 z-50">{THEMES.map(t => (<button key={t.id} onClick={() => { setActiveTheme(t); setShowPalette(false); }} className={`w-6 h-6 rounded-full border-2 ${activeTheme.id === t.id ? 'border-white scale-110' : 'border-transparent hover:scale-110'} transition-transform`} style={{ backgroundColor: t.hex }} title={t.name}></button>))}</div>)}
                             </div>
                             <div className="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
-                                <button onClick={() => setLang('tr')} className={`px-2 py-1 text-xs font-bold rounded transition-colors ${lang === 'tr' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'}`}>TR</button>
-                                <button onClick={() => setLang('en')} className={`px-2 py-1 text-xs font-bold rounded transition-colors ${lang === 'en' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'}`}>EN</button>
+                                <button onClick={() => switchLang('tr')} className={`px-2 py-1 text-xs font-bold rounded transition-colors ${lang === 'tr' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'}`}>TR</button>
+                                <button onClick={() => switchLang('en')} className={`px-2 py-1 text-xs font-bold rounded transition-colors ${lang === 'en' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'}`}>EN</button>
                             </div>
                             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 text-slate-300 hover:text-primary">{isMenuOpen ? <Icons.X size={28} /> : <Icons.Menu size={28} />}</button>
                         </div>
@@ -620,7 +647,7 @@ const App = () => {
                                         {item.children.map(sub => (
                                             <HybLink 
                                                 key={sub.id} 
-                                                href={`?page=${sub.id}`}
+                                                href={`?page=${sub.id}&lang=${lang}`}
                                                 onNavigate={() => navigateTo(sub.id)} 
                                                 className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 block ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}
                                             >
@@ -630,7 +657,7 @@ const App = () => {
                                     </div>
                                 ) : (
                                     <HybLink 
-                                        href={item.id === "home" ? "/" : `?page=${PARENT_REDIRECTS[item.id] || item.id}`}
+                                        href={item.id === "home" ? `/?lang=${lang}` : `?page=${PARENT_REDIRECTS[item.id] || item.id}&lang=${lang}`}
                                         onNavigate={() => navigateTo(item.id)} 
                                         className={`w-full flex items-center gap-3 px-6 py-4 rounded-xl text-lg font-bold block ${activeTab === item.id ? 'bg-primary text-slate-900' : 'text-slate-300 hover:bg-slate-800'}`}
                                     >
@@ -660,7 +687,7 @@ const App = () => {
 
     return (
         <div className="min-h-screen bg-slate-900 text-slate-200 font-sans selection:bg-primary/30">
-            <NavBar activeTab={activeTab} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} activeTheme={activeTheme} setActiveTheme={setActiveTheme} lang={lang} setLang={setLang} />
+            <NavBar activeTab={activeTab} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} activeTheme={activeTheme} setActiveTheme={setActiveTheme} lang={lang} switchLang={switchLang} />
             <main className="pt-24 pb-20 px-4 md:px-8 max-w-6xl mx-auto min-h-screen">{renderContent()}</main>
         </div>
     );
