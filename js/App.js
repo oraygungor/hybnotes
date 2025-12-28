@@ -1,24 +1,27 @@
 const { useState, useEffect, useMemo, useRef } = React;
 
-// --- 1. DÜZELTME: IKONLAR (Size prop'u artık çalışıyor) ---
-// İkonların boyutunu ve diğer özelliklerini doğru yöneten yapı
-const IconWrapper = ({ children, size = 24, className = "", ...props }) => (
-    <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width={size} 
-        height={size} 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-        className={className}
-        {...props} // Props en sonda olmalı ki override edilebilsin
-    >
-        {children}
-    </svg>
-);
+// --- 1. DÜZELTME: DEFANSİF ICON WRAPPER ---
+// width ve height props'tan ayrıştırıldı (rest), böylece size prop'u garanti altına alındı.
+const IconWrapper = ({ children, size = 24, className = "", ...props }) => {
+    const { width, height, ...rest } = props; // width/height override'ını engelle
+    return (
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width={size} 
+            height={size} 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+            className={className}
+            {...rest} 
+        >
+            {children}
+        </svg>
+    );
+};
 
 const Icons = {
     Activity: (p) => <IconWrapper {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></IconWrapper>,
@@ -40,7 +43,6 @@ const Icons = {
     Info: (p) => <IconWrapper {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></IconWrapper>,
 };
 
-// --- LOGOLAR (Değişmedi, zaten doğruydu) ---
 const PulseBarLogo = ({ size = 24, className = "" }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
@@ -72,7 +74,6 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
-// --- 2. DÜZELTME: GEÇERLİ SAYFA LİSTESİ (URL Validation) ---
 const VALID_PAGES = ['home', 'research', 'hyrox', 'hyrox_calc', 'running', 'running_perf', 'nutrition', 'caffeine', 'tools', 'utmb_lottery'];
 
 const App = () => {
@@ -94,16 +95,16 @@ const App = () => {
         return THEMES.find(t => t.id === saved) || THEMES[0];
     });
 
-    // --- SEO: JSON-LD SCHEMA (Daha önce eklemiştin, burada durmalı) ---
+    // --- 4. DÜZELTME: DİNAMİK SEO LANG ---
     useEffect(() => {
         if (!readingArticle) return;
         const schemaData = {
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            "headline": readingArticle.title.tr,
+            "headline": readingArticle.title[lang], // [lang] kullanıldı
             "datePublished": readingArticle.date,
-            "description": readingArticle.summary.tr,
-            "articleBody": readingArticle.content.tr.replace(/<[^>]*>?/gm, ''),
+            "description": readingArticle.summary[lang], // [lang] kullanıldı
+            "articleBody": readingArticle.content[lang].replace(/<[^>]*>?/gm, ''), // [lang] kullanıldı
             "author": { "@type": "Person", "name": "HybNotes" },
             "url": `${window.location.origin}/?article=${readingArticle.id}` 
         };
@@ -112,9 +113,9 @@ const App = () => {
         script.text = JSON.stringify(schemaData);
         document.head.appendChild(script);
         return () => { try { document.head.removeChild(script); } catch(e) {} }
-    }, [readingArticle]);
+    }, [readingArticle, lang]); // lang dependency'e eklendi
 
-    // --- ROUTING (URL Parametreleri ve Validation) ---
+    // --- 2. DÜZELTME: ROUTING FALLBACK ---
     useEffect(() => {
         const handleUrlChange = () => {
             const params = new URLSearchParams(window.location.search);
@@ -126,13 +127,17 @@ const App = () => {
                 if (foundArticle) {
                     setReadingArticle(foundArticle);
                     setActiveTab('research');
+                } else {
+                    // Bulunamadıysa Research listesine dön (veya Home)
+                    setReadingArticle(null);
+                    setActiveTab('research');
                 }
             } else if (pageId) {
-                // Validation: Sadece izin verilen sayfalar açılabilir
+                // Validation: Sadece izin verilen sayfalar
                 if (VALID_PAGES.includes(pageId)) {
                     setActiveTab(pageId);
                 } else {
-                    setActiveTab('home'); // Geçersiz sayfa ise ana sayfaya at
+                    setActiveTab('home'); 
                 }
                 setReadingArticle(null);
             } else {
@@ -147,26 +152,32 @@ const App = () => {
         return () => window.removeEventListener('popstate', handleUrlChange);
     }, [posts]);
 
-    // --- NAVİGASYON ---
+    // --- 3. DÜZELTME: NAVIGATE VALIDATION ---
     const navigateTo = (destination, param = null) => {
         setIsMenuOpen(false);
         const url = new URL(window.location);
         
-        if (destination === 'article' && param) {
+        // Eğer gidilecek sayfa article/home değilse ve listede yoksa -> Home'a çevir
+        let safeDestination = destination;
+        if (destination !== 'article' && destination !== 'home' && !VALID_PAGES.includes(destination)) {
+            safeDestination = 'home';
+        }
+
+        if (safeDestination === 'article' && param) {
             url.searchParams.set('article', param.id);
             url.searchParams.delete('page');
             setReadingArticle(param);
             setActiveTab('research');
         } else {
-            if (destination === 'home') {
+            if (safeDestination === 'home') {
                 url.searchParams.delete('page');
                 url.searchParams.delete('article');
             } else {
-                url.searchParams.set('page', destination);
+                url.searchParams.set('page', safeDestination);
                 url.searchParams.delete('article');
             }
             setReadingArticle(null);
-            setActiveTab(destination);
+            setActiveTab(safeDestination);
         }
         window.history.pushState({}, '', url);
         window.scrollTo(0, 0);
@@ -210,20 +221,17 @@ const App = () => {
     }, [activeTheme, lang, user]);
 
     // --- COMPONENT: ARTICLE DETAIL ---
-    // 7. DÜZELTME: Kullanılmayan "goBack" prop'u kaldırıldı
     const ArticleDetail = ({ article, lang }) => {
         const [copied, setCopied] = useState(false);
         const contentRef = useRef(null);
 
-        // 4. DÜZELTME: Clipboard için hata yakalama (Try/Catch)
         const handleShare = async () => {
             try {
                 await navigator.clipboard.writeText(window.location.href);
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
             } catch (err) {
-                console.error('Kopyalama başarısız:', err);
-                // Fallback olarak kullanıcıya linki gösterebilir veya prompt açabilirsin, ama şimdilik hata basması yeterli.
+                console.error('Kopyalama hatası:', err);
             }
         };
 
@@ -314,7 +322,7 @@ const App = () => {
                 const matchesCategory = selectedCategory === ALL_CATEGORY || post.category[lang] === selectedCategory;
                 return matchesSearch && matchesCategory;
             });
-            // 2. DÜZELTME: Daha güvenli tarih sıralaması
+            // Tarih sıralaması (Date parse güvenliği eklenebilir ama veri ISO formatındaysa bu OK)
             return result.sort((a, b) => {
                 const dateA = new Date(a.date).getTime();
                 const dateB = new Date(b.date).getTime();
@@ -360,7 +368,6 @@ const App = () => {
 
     // --- COMPONENT: LATEST POSTS WIDGET ---
     const LatestPostsWidget = ({ posts, lang }) => {
-        // En yüksek ID'ye göre değil, tarihe göre sıralamak daha güvenli (Best Practice)
         const latest = [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 3);
         const t = { title: lang === 'tr' ? 'Son Eklenenler' : 'Latest Posts', new: lang === 'tr' ? 'Yeni' : 'New', viewAll: lang === 'tr' ? 'Tümünü Gör' : 'View All' };
         return (
@@ -412,7 +419,7 @@ const App = () => {
         const [showPalette, setShowPalette] = useState(false);
         const paletteRef = useRef(null);
 
-        // 7. DÜZELTME: Palette dışına tıklayınca kapanması için logic
+        // Palette dışına tıklayınca kapanma
         useEffect(() => {
             const handleClickOutside = (event) => {
                 if (paletteRef.current && !paletteRef.current.contains(event.target)) {
