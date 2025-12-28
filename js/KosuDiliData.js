@@ -221,34 +221,34 @@ window.KosuDiliData = [
     "tr": { "category": "Sağlık", "term": "IT Band Syndrome", "def": "Koşucu dizi. Bacağın yanındaki şeridin gerilmesiyle dizin dış tarafında oluşan keskin ağrı." },
     "en": { "category": "Health", "term": "IT Band Syndrome", "def": "Runner's Knee. Sharp pain on the outside of the knee caused by tightness in the iliotibial band." }
   },
-  { 
+  {
     "id": 38,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Overtraining", "def": "Sürantrene olmak. Yetersiz dinlenme sonucu vücudun toparlanamayıp performansın kronik olarak düşmesi." },
-    "en": { "category": "Health", "term": "Overtraining", "def": "Burnout. Chronic fatigue and performance decline when training load exceeds the body's ability to recover." }
+    "tr": { "category": "Sağlık", "term": "Overtraining", "def": "Aşırı yüklenme. Yük ve dinlenme dengesinin bozulmasıyla toparlanmanın yetişmemesi; performansın uzun süre düşmesi ve kronik yorgunluk hali." },
+    "en": { "category": "Health", "term": "Overtraining", "def": "Overtraining. A prolonged state of fatigue and performance decline when training load consistently exceeds the body's ability to recover." }
   },
-  { 
+  {
     "id": 39,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Runner’s High", "def": "Koşucu kafası. Uzun koşularda beyin kimyasallarının (Endokannabinoidler) değişimiyle gelen doğal mutluluk hali." },
-    "en": { "category": "Health", "term": "Runner’s High", "def": "A state of euphoria. A natural 'high' and reduced anxiety experienced during or after long runs." }
+    "tr": { "category": "Sağlık", "term": "Runner’s High", "def": "Koşucu kafası. Uzun/orta-uzun koşularda bazı kişilerde görülen doğal iyi his hali; endokannabinoid sistemiyle ilişkilendirilen öfori ve rahatlama." },
+    "en": { "category": "Health", "term": "Runner’s High", "def": "Runner’s high. A natural sense of euphoria and calm that some people feel during or after longer runs, linked to changes in brain chemistry (including endocannabinoids)." }
   },
-  { 
+  {
     "id": 40,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Carb Loading", "def": "Depoları fullemek. Maraton öncesi kaslardaki glikojen (yakıt) depolarını ağzına kadar doldurmak için karbonhidrat yüklemesi." },
-    "en": { "category": "Health", "term": "Carb Loading", "def": "Fueling up. Maximizing muscle glycogen stores by eating high carbs in the days leading up to a long race." }
+    "tr": { "category": "Sağlık", "term": "Carb Loading", "def": "Karbonhidrat yüklemesi. Özellikle yarı maraton/maraton öncesi kas glikojen depolarını artırmak için son günlerde karbonhidrat alımını planlı şekilde yükseltme." },
+    "en": { "category": "Health", "term": "Carb Loading", "def": "Carb loading. Increasing carbohydrate intake in the days before a long race to maximize muscle glycogen stores." }
   },
-  { 
+  {
     "id": 41,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Electrolytes", "def": "Vücudun elektriği. Terle kaybedilen tuz ve mineraller. Eksikliği kramp ve performans düşüşüne yol açar." },
-    "en": { "category": "Health", "term": "Electrolytes", "def": "Essential minerals (Sodium, etc.) lost in sweat. Replenishing them prevents cramps and dehydration." }
+    "tr": { "category": "Sağlık", "term": "Elektrolit", "def": "Terle kaybedilen mineraller (özellikle sodyum; ayrıca potasyum, magnezyum vb.). Uzun koşularda yerine koymak sıvı dengesini ve performansı destekler." },
+    "en": { "category": "Health", "term": "Electrolytes", "def": "Minerals lost in sweat (especially sodium, plus potassium, magnesium, etc.). Replacing them during longer efforts supports fluid balance and performance." }
   },
-  { 
+  {
     "id": 42,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Hybrid Athlete", "def": "Çok yönlü sporcu. Sadece koşmayan, aynı zamanda kas kütlesi ve kuvvet inşa eden modern sporcu tipi." },
-    "en": { "category": "Health", "term": "Hybrid Athlete", "def": "The all-rounder. An athlete who trains to be proficient in both endurance running and strength/lifting." }
+    "tr": { "category": "Sağlık", "term": "Hibrit Atlet", "def": "Dayanıklılık (koşu/cardio) ile kuvveti (ağırlık/strength) aynı dönemde birlikte geliştirmeye odaklanan sporcu." },
+    "en": { "category": "Health", "term": "Hybrid Athlete", "def": "An athlete who trains to improve both endurance (running/cardio) and strength (lifting) at the same time." }
   }
 ];
