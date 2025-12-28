@@ -74,7 +74,7 @@ const PulseBarLogo = ({ size = 24, className = "" }) => (
     </svg>
 );
 
-const HyroxLogo = ({ size = 20, className = "" }) => (
+const HyroxLogo = ({ size = 30, className = "" }) => (
     <svg width={size} height={size} viewBox="0 0 398 262" fill="currentColor" className={className}>
         <polygon points="72,37 249,37 243,53 66,53" />
         <polygon points="55,67 232,67 226,82 49,82" />
