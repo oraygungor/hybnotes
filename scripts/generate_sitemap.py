@@ -1,122 +1,209 @@
 #!/usr/bin/env python3
-from __future__ import annotations
+# scripts/generate_sitemap.py
 
 import argparse
 import datetime as dt
 from collections import deque
-from urllib.parse import urlparse, urljoin, urlunparse, urlencode, parse_qsl
+from urllib.parse import urlparse, urljoin, urlunparse, parse_qsl, urlencode
 
-import xml.etree.ElementTree as ET
+from xml.sax.saxutils import escape
 
+# Optional Playwright import (required in your GH Action)
 from playwright.sync_api import sync_playwright
 
 
-def normalize_url(raw: str, base: str) -> str | None:
-    if not raw:
-        return None
+LANGS_DEFAULT = ["tr", "en"]
+ALLOWED_QUERY_KEYS = {"page", "article", "lang"}
 
-    abs_url = urljoin(base, raw)
-    p = urlparse(abs_url)
 
-    # sadece aynı domain
-    base_netloc = urlparse(base).netloc
-    if p.netloc != base_netloc:
-        return None
+def _norm_base(base: str) -> str:
+    """Ensure base is a valid absolute URL, normalized to origin + '/'."""
+    p = urlparse(base)
+    if not p.scheme or not p.netloc:
+        raise ValueError(f"--base must be an absolute URL, got: {base}")
+    origin = f"{p.scheme}://{p.netloc}"
+    return origin + "/"
 
-    # fragment at
-    p = p._replace(fragment="")
 
-    # path normalize (root mutlaka /)
-    path = p.path or "/"
-    if path == "":
-        path = "/"
+def _normalize_url(url: str, origin: str) -> str:
+    """
+    Normalize URL:
+    - force same origin
+    - remove fragment
+    - keep only allowed query keys (page/article/lang)
+    - stable query ordering: lang, page, article
+    - normalize path: '/' if empty
+    """
+    u = urlparse(url)
 
-    # query paramları stable hale getir (opsiyonel ama duplicate azaltır)
-    q = parse_qsl(p.query, keep_blank_values=True)
-    q = sorted(q, key=lambda x: (x[0], x[1]))
+    # absolute-ize
+    if not u.scheme:
+        url = urljoin(origin, url)
+        u = urlparse(url)
+
+    # same-origin only
+    if f"{u.scheme}://{u.netloc}" != origin.rstrip("/"):
+        return ""
+
+    path = u.path or "/"
+    # drop fragment
+    fragment = ""
+
+    # filter + order query
+    q = parse_qsl(u.query, keep_blank_values=False)
+    q = [(k, v) for (k, v) in q if k in ALLOWED_QUERY_KEYS and v]
+    # stable order
+    order = {"lang": 0, "page": 1, "article": 2}
+    q.sort(key=lambda kv: (order.get(kv[0], 9), kv[0], kv[1]))
+
     query = urlencode(q, doseq=True)
 
-    normalized = urlunparse((p.scheme, p.netloc, path, "", query, ""))
-    # https://hybnotes.com -> https://hybnotes.com/
-    if normalized.endswith("://"+p.netloc):
-        normalized += "/"
-    return normalized
+    return urlunparse((u.scheme, u.netloc, path, "", query, fragment))
 
 
-def extract_links(page) -> list[str]:
-    # DOM'daki tüm anchor href’leri
-    hrefs = page.eval_on_selector_all(
-        "a[href]",
-        "els => els.map(e => e.getAttribute('href')).filter(Boolean)"
-    )
-    return hrefs or []
+def _set_lang(url: str, lang: str, origin: str) -> str:
+    """Return url with lang=<lang> set (and query keys normalized)."""
+    u = urlparse(url)
+    # absolute-ize & normalize first
+    norm = _normalize_url(url, origin)
+    if not norm:
+        return ""
+    u = urlparse(norm)
+    q = dict(parse_qsl(u.query, keep_blank_values=False))
+    q["lang"] = lang
+
+    # Keep page/article if present, drop everything else
+    q2 = []
+    for k in ["lang", "page", "article"]:
+        if k in q and q[k]:
+            q2.append((k, q[k]))
+
+    query = urlencode(q2)
+    return urlunparse((u.scheme, u.netloc, u.path or "/", "", query, ""))
 
 
-def crawl_site(base_url: str, max_urls: int = 2000) -> set[str]:
-    seen: set[str] = set()
-    q: deque[str] = deque()
+def crawl_site(base: str, max_urls: int, timeout_ms: int) -> set[str]:
+    """
+    Crawl all internal links (anchors) using Playwright (JS-rendered SPA friendly).
+    Returns a set of normalized URLs (may include any lang or none).
+    """
+    origin = _norm_base(base).rstrip("/")  # "https://hybnotes.com"
+    start = origin + "/"
 
-    start = normalize_url(base_url, base_url)
-    if not start:
-        return seen
+    visited: set[str] = set()
+    discovered: set[str] = set()
 
-    q.append(start)
-    seen.add(start)
+    q = deque([start])
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        ctx = browser.new_context()
-        page = ctx.new_page()
+        page = browser.new_page()
 
-        while q and len(seen) < max_urls:
-            url = q.popleft()
-            try:
-                page.goto(url, wait_until="networkidle", timeout=60_000)
-            except Exception:
-                # bazı sayfalar timeout verebilir; devam edelim
+        while q and len(visited) < max_urls:
+            current = q.popleft()
+            current_norm = _normalize_url(current, origin)
+            if not current_norm or current_norm in visited:
                 continue
 
-            for raw_href in extract_links(page):
-                nu = normalize_url(raw_href, base_url)
+            visited.add(current_norm)
+
+            try:
+                resp = page.goto(current_norm, wait_until="networkidle", timeout=timeout_ms)
+                # Even if response is None (rare), continue extracting links
+                status = resp.status if resp else 200
+                if status >= 400:
+                    continue
+            except Exception:
+                continue
+
+            # collect links from DOM
+            try:
+                hrefs = page.eval_on_selector_all(
+                    "a[href]",
+                    "els => els.map(a => a.getAttribute('href')).filter(Boolean)"
+                )
+            except Exception:
+                hrefs = []
+
+            for href in hrefs:
+                absu = urljoin(current_norm, href)
+                nu = _normalize_url(absu, origin)
                 if not nu:
                     continue
-
-                if nu not in seen:
-                    seen.add(nu)
+                discovered.add(nu)
+                if nu not in visited and len(visited) + len(q) < max_urls:
                     q.append(nu)
 
-        ctx.close()
         browser.close()
 
-    return seen
+    # ensure at least homepage included
+    discovered.add(_normalize_url(start, origin))
+    return discovered
 
 
-def write_sitemap(urls: set[str], out_path: str, base_url: str) -> None:
-    # Minimal sitemap: sadece <loc>, + comment ile generated timestamp
-    urlset = ET.Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+def expand_langs(urls: set[str], base: str, langs: list[str]) -> list[str]:
+    """For every discovered URL, generate both lang variants and return sorted unique list."""
+    origin = _norm_base(base).rstrip("/")
+    out: set[str] = set()
 
-    generated_utc = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    urlset.insert(0, ET.Comment(f" generated: {generated_utc} | source: crawl {base_url} "))
+    # Always include root for both langs
+    root = origin + "/"
+    for lg in langs:
+        out.add(_set_lang(root, lg, origin))
 
-    for u in sorted(urls):
-        url_el = ET.SubElement(urlset, "url")
-        ET.SubElement(url_el, "loc").text = u
+    for u in urls:
+        # If URL already has a lang, still produce both
+        for lg in langs:
+            ul = _set_lang(u, lg, origin)
+            if ul:
+                out.add(ul)
 
-    tree = ET.ElementTree(urlset)
-    ET.indent(tree, space="  ", level=0)
-    tree.write(out_path, encoding="utf-8", xml_declaration=True)
+    # Sort: root first, then others
+    def sort_key(x: str):
+        pu = urlparse(x)
+        # shorter first (often root/pages), then lexicographic
+        return (0 if pu.path == "/" and not pu.query else 1, len(x), x)
+
+    return sorted(out, key=sort_key)
+
+
+def write_sitemap(urls: list[str], out_path: str, base: str):
+    now = dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+    origin = _norm_base(base)
+
+    lines = []
+    lines.append("<?xml version='1.0' encoding='utf-8'?>")
+    lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    lines.append(f"  <!-- generated: {now} | source: crawl {origin} -->")
+    for u in urls:
+        lines.append("  <url>")
+        lines.append(f"    <loc>{escape(u)}</loc>")
+        lines.append("  </url>")
+    lines.append("</urlset>\n")
+
+    content = "\n".join(lines)
+
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write(content)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--base", default="https://hybnotes.com/", help="Site root URL (https://...)")
-    ap.add_argument("--out", default="sitemap.xml", help="Output path")
-    ap.add_argument("--max", type=int, default=2000, help="Max URL count")
+    ap.add_argument("--base", required=True, help='Base URL, e.g. "https://hybnotes.com/"')
+    ap.add_argument("--out", default="sitemap.xml")
+    ap.add_argument("--max", type=int, default=5000)
+    ap.add_argument("--timeout", type=int, default=30000, help="Navigation timeout (ms)")
+    ap.add_argument("--langs", default="tr,en", help='Comma list, default "tr,en"')
     args = ap.parse_args()
 
-    base = args.base.rstrip("/") + "/"
-    urls = crawl_site(base, max_urls=args.max)
-    write_sitemap(urls, args.out, base)
+    langs = [x.strip() for x in args.langs.split(",") if x.strip()]
+    if set(langs) != set(LANGS_DEFAULT):
+        # still allow custom, but warn by behavior (no print to keep CI clean)
+        pass
+
+    discovered = crawl_site(args.base, max_urls=args.max, timeout_ms=args.timeout)
+    final_urls = expand_langs(discovered, args.base, langs=langs)
+    write_sitemap(final_urls, args.out, args.base)
 
 
 if __name__ == "__main__":
