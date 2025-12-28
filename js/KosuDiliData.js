@@ -26,68 +26,68 @@ window.KosuDiliData = [
   { 
     "id": 5,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Easy Run (Kolay Koşu)", "def": "Yanındakiyle rahatça konuşarak koşabildiğin düşük tempo. Aerobik tabanı büyütür." },
-    "en": { "category": "Training Types", "term": "Easy Run", "def": "A low-intensity run where you can hold a conversation. Builds aerobic base and recovery." }
+    "tr": { "category": "Antrenman", "term": "Easy Run (Kolay Koşu)", "def": "Yanındakiyle rahatça konuşarak koşabildiğin düşük tempo. Aerobik tabanı büyütür." },
+    "en": { "category": "Training", "term": "Easy Run", "def": "A low-intensity run where you can hold a conversation. Builds aerobic base and recovery." }
   },
   { 
     "id": 6,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Long Run (Uzun Koşu)", "def": "Haftanın en uzun koşusudur. Vücuda 'ayakta kalma/direnç' yeteneği kazandırır." },
-    "en": { "category": "Training Types", "term": "Long Run", "def": "The longest run of the week. Builds aerobic endurance and mental resilience." }
+    "tr": { "category": "Antrenman", "term": "Long Run (Uzun Koşu)", "def": "Haftanın en uzun koşusudur. Vücuda 'ayakta kalma/direnç' yeteneği kazandırır." },
+    "en": { "category": "Training", "term": "Long Run", "def": "The longest run of the week. Builds aerobic endurance and mental resilience." }
   },
   { 
     "id": 7,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Recovery Run", "def": "Çok kolay tempoda yapılan toparlanma koşusu. Amaç kan dolaşımını hareketlendirerek toparlanmayı hızlandırmaktır." },
-    "en": { "category": "Training Types", "term": "Recovery Run", "def": "A very easy run designed to promote blood flow and recovery, not to build fitness." }
+    "tr": { "category": "Antrenman", "term": "Recovery Run", "def": "Çok kolay tempoda yapılan toparlanma koşusu. Amaç kan dolaşımını hareketlendirerek toparlanmayı hızlandırmaktır." },
+    "en": { "category": "Training", "term": "Recovery Run", "def": "A very easy run designed to promote blood flow and recovery, not to build fitness." }
   },
   { 
     "id": 8,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Tempo Run", "def": "Sürdürülebilir 'rahat-zor' bir bantta yapılan koşu. Laktat eşiğini geliştirir." },
-    "en": { "category": "Training Types", "term": "Tempo Run", "def": "A 'comfortably hard' sustained effort run. Improves the body's lactate clearance capability." }
+    "tr": { "category": "Antrenman", "term": "Tempo Run", "def": "Sürdürülebilir 'rahat-zor' bir bantta yapılan koşu. Laktat eşiğini geliştirir." },
+    "en": { "category": "Training", "term": "Tempo Run", "def": "A 'comfortably hard' sustained effort run. Improves the body's lactate clearance capability." }
   },
   { 
     "id": 9,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Threshold Run", "def": "Laktat eşiğine çok yakın 'kontrollü zor' tempoda yapılır. Yüksek şiddeti daha uzun süre sürdürebilmeyi hedefler." },
-    "en": { "category": "Training Types", "term": "Threshold Run", "def": "Run at a 'controlled hard' pace near your lactate threshold. Increases the ability to hold speed." }
+    "tr": { "category": "Antrenman", "term": "Threshold Run", "def": "Laktat eşiğine çok yakın 'kontrollü zor' tempoda yapılır. Yüksek şiddeti daha uzun süre sürdürebilmeyi hedefler." },
+    "en": { "category": "Training", "term": "Threshold Run", "def": "Run at a 'controlled hard' pace near your lactate threshold. Increases the ability to hold speed." }
   },
   { 
     "id": 10,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Intervals", "def": "Yüksek eforlu tekrarlar ve aralarda dinlenme bölümlerinden oluşur. Hız gelişimi için kritiktir." },
-    "en": { "category": "Training Types", "term": "Intervals", "def": "High-effort repetitions with rest periods in between. Critical for speed and power development." }
+    "tr": { "category": "Antrenman", "term": "Intervals", "def": "Yüksek eforlu tekrarlar ve aralarda dinlenme bölümlerinden oluşur. Hız gelişimi için kritiktir." },
+    "en": { "category": "Training", "term": "Intervals", "def": "High-effort repetitions with rest periods in between. Critical for speed and power development." }
   },
   { 
     "id": 11,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Fartlek", "def": "Sürekli koşu içinde değişken hızların uygulandığı esnek antrenman (İsveççe 'Hız Oyunu')." },
-    "en": { "category": "Training Types", "term": "Fartlek", "def": "Swedish for 'Speed Play'. A continuous run with varying mix of fast and slow segments." }
+    "tr": { "category": "Antrenman", "term": "Fartlek", "def": "Sürekli koşu içinde değişken hızların uygulandığı esnek antrenman (İsveççe 'Hız Oyunu')." },
+    "en": { "category": "Training", "term": "Fartlek", "def": "Swedish for 'Speed Play'. A continuous run with varying mix of fast and slow segments." }
   },
   { 
     "id": 12,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Progression Run", "def": "Yavaş başlayıp antrenman sonuna doğru kademeli olarak hızlanma." },
-    "en": { "category": "Training Types", "term": "Progression Run", "def": "Starting slow and gradually increasing speed throughout the run. A controlled negative split." }
+    "tr": { "category": "Antrenman", "term": "Progression Run", "def": "Yavaş başlayıp antrenman sonuna doğru kademeli olarak hızlanma." },
+    "en": { "category": "Training", "term": "Progression Run", "def": "Starting slow and gradually increasing speed throughout the run. A controlled negative split." }
   },
   { 
     "id": 13,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Hill Repeats", "def": "Yokuşu güçlü çıkıp, inişte yavaşça toparlanma egzersizi. Güç ve koşu formunu geliştirir." },
-    "en": { "category": "Training Types", "term": "Hill Repeats", "def": "Running hard up a hill and jogging down. Great for building power and running economy." }
+    "tr": { "category": "Antrenman", "term": "Hill Repeats", "def": "Yokuşu güçlü çıkıp, inişte yavaşça toparlanma egzersizi. Güç ve koşu formunu geliştirir." },
+    "en": { "category": "Training", "term": "Hill Repeats", "def": "Running hard up a hill and jogging down. Great for building power and running economy." }
   },
   { 
     "id": 14,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Drills", "def": "Teknik odaklı egzersizlerdir (High knees, skipping vb.). Koordinasyonu artırır." },
-    "en": { "category": "Training Types", "term": "Drills", "def": "Technical exercises (High knees, skipping, etc.) to improve neuromuscular coordination and form." }
+    "tr": { "category": "Antrenman", "term": "Drills", "def": "Teknik odaklı egzersizlerdir (High knees, skipping vb.). Koordinasyonu artırır." },
+    "en": { "category": "Training", "term": "Drills", "def": "Technical exercises (High knees, skipping, etc.) to improve neuromuscular coordination and form." }
   },
   { 
     "id": 15,
     "catId": "training",
-    "tr": { "category": "Antrenman Türleri", "term": "Cross-Training", "def": "Koşu yerine bisiklet, yüzme gibi farklı branşlar ekleyerek kondisyonu koruma yaklaşımı." },
-    "en": { "category": "Training Types", "term": "Cross-Training", "def": "Using other sports like cycling or swimming to maintain fitness while resting running muscles." }
+    "tr": { "category": "Antrenman", "term": "Cross-Training", "def": "Koşu yerine bisiklet, yüzme gibi farklı branşlar ekleyerek kondisyonu koruma yaklaşımı." },
+    "en": { "category": "Training", "term": "Cross-Training", "def": "Using other sports like cycling or swimming to maintain fitness while resting running muscles." }
   },
   { 
     "id": 16,
