@@ -165,7 +165,7 @@
                                     </div>
                                     {/* BACK */}
                                     {/* Opaklık %85'e (bg-primary/85) düşürüldü */}
-                                    <div className="card-back bg-primary/60 rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden backdrop-blur-sm">
+                                    <div className="card-back bg-primary/81 rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden backdrop-blur-sm">
                                          <div className="absolute top-0 right-0 p-4 opacity-10"><LocalIcons.Info size={64}/></div>
                                          <div className="relative z-10 overflow-y-auto pr-1 custom-scrollbar max-h-full">
                                             <div className="flex items-center gap-2 mb-3 opacity-70">
