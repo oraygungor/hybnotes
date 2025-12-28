@@ -47,14 +47,17 @@ const RunningPerformancePage = ({ lang }) => {
         vo2_title: "VO₂max",
         vo2_sub: "OKSİJEN KULLANMA TAVANI",
         vo2_desc: "Aerobik kapasitenin üst limiti. Potansiyeli belirler ancak tek başına kazananı belirlemez.",
-        vo2_tooltip: "Bir arabanın motor hacmi (cc) gibidir. 5000cc motoru olan bir araba, 1600cc olandan daha hızlı gitme potansiyeline sahiptir. Ancak lastikleri kötüyse (ekonomi) veya motor hararet yapıyorsa (sürdürülebilirlik) o gücü kullanamaz.",
+        vo2_tooltip: "Bir arabanın motor hacmi (cc) gibidir. 5000cc motoru olan bir araba, 1600cc olandan daha hızlı gitme potansiyeline sahiptir. Ancak lastikleri kötüyse (ekonomi) veya motor hararet yapıyorsa (eşik) o gücü kullanamaz.",
         
-        threshold_title: "Sürdürülebilirlik",
-        threshold_sub: "%VO₂max KULLANIMI",
-        threshold_desc: "Genelde LT/VT/MLSS/CS civarında sürdürülebilen %VO₂max. Mevcut kapasitenin yüzde kaçını 'patlamadan' sürdürebiliyorsun?",
+        threshold_title: "Eşik (Fractional Utilization)",
+        threshold_sub: "%VO₂max SÜRDÜRÜLEBİLEN",
+        threshold_desc: "LT/MLSS/CS civarında sürdürülebilen %VO₂max. Kapasitenin yüzde kaçını uzun süre taşıyabiliyorsun?",
         threshold_tooltip: (
             <>
                 <div className="mb-3">Arabanın devir saati gibidir. Motorun kırmızı çizgiye girmeden (asit birikmeden) çalışabileceği en yüksek devirdir.</div>
+                <div className="mb-2 text-[10px] text-slate-400">
+                  Not: Bunlar aynı şey değil; farklı testlerle benzer “sürdürülebilir yoğunluğu” yaklaşıklar.
+                </div>
                 <div className="text-[10px] font-sans border-t border-slate-700 pt-2 space-y-1.5 opacity-90">
                     <div><span className="text-rose-400 font-bold">LT (Lactate Threshold):</span> Laktatın kanda birikmeye başladığı ilk eşik.</div>
                     <div><span className="text-rose-400 font-bold">VT (Ventilatory Threshold):</span> Solunumun derinleştiği solunum eşiği.</div>
@@ -67,12 +70,12 @@ const RunningPerformancePage = ({ lang }) => {
         economy_title: "Ekonomi (Cr)",
         economy_sub: "VERİMLİLİK",
         economy_desc: "Belirli bir hızda koşarken ne kadar oksijen/enerji harcıyorsun?",
-        economy_tooltip: "Arabanın yakıt tüketimi veya aerodinamiği gibidir. Aynı hızda giden iki arabadan az yakan (ekonomik olan), daha az eforla daha uzağa gider. İyi teknik ve uygun ayakkabı bunu geliştirir.",
+        economy_tooltip: "Arabanın yakıt tüketimi gibidir: aynı hızda daha az yakıt yakan, aynı işi daha az maliyetle yapar. Koşuda bu; teknik, kuvvet, biomekanik ve ayakkabı gibi etkenlerle iyileşir.",
         
         resilience_title: "Durability",
         resilience_sub: "YORGUNLUK DİRENCİ",
         resilience_desc: "Yarış uzadıkça fizyolojik parametrelerin bozulmaya (drift) karşı direnci.",
-        resilience_tooltip: "Arabanın dayanıklılığı gibidir. Start çizgisinde herkes taze olabilir, ama 30. km'den sonra süspansiyon dağılıyor mu, motor su kaynatıyor mu? Performansın zamanla ne kadar az düştüğünü gösterir.",
+        resilience_tooltip: "Arabanın lastik–süspansiyon–soğutma kalitesi gibidir: yol uzadıkça performansın ne kadar 'dağılmadan' kaldığını belirler. Yorgunluk geldikçe eşik düşmeye, koşu maliyeti (Cr) artmaya meyillidir; durability bu bozulmayı sınırlama becerisidir.",
 
         // Formül Alanı
         eq_title: "PERFORMANS DENKLEMİ (ZAMANA BAĞLI)",
@@ -86,7 +89,7 @@ const RunningPerformancePage = ({ lang }) => {
         resilience_factor_text_2: "eklendiğinde gerçek hayat senaryosu ortaya çıkar. Maratonun sonlarına doğru yorgunlukla birlikte",
         resilience_factor_highlight_1: "Cr (Maliyet) artar",
         resilience_factor_text_3: "ve",
-        resilience_factor_highlight_2: "Sürdürülebilirlik düşer",
+        resilience_factor_highlight_2: "Eşik (F.U.) düşer",
         resilience_factor_text_4: ". Durability, bu düşüşü minimize etme yeteneğidir.",
 
         // Fark Notu
@@ -115,7 +118,7 @@ const RunningPerformancePage = ({ lang }) => {
         chart_axis: "X: Yarış Süresi (0-100%) • Y: Performans Etkisi",
         chart_vo2_title: "VO₂max",
         chart_vo2_label: "Başta Potansiyeli Belirler",
-        chart_sust_title: "SÜRDÜRÜLEBİLİRLİK",
+        chart_sust_title: "EŞİK (FRACTIONAL UTILIZATION)",
         chart_sust_label: "Sürekli Güç Üretimi",
         chart_econ_title: "EKONOMİ",
         chart_econ_label: "Her An Kritik (Verimlilik)",
@@ -141,14 +144,17 @@ const RunningPerformancePage = ({ lang }) => {
         vo2_title: "VO₂max",
         vo2_sub: "OXYGEN UPTAKE CEILING",
         vo2_desc: "The upper limit of aerobic capacity. Determines potential but not the winner alone.",
-        vo2_tooltip: "It's like the engine displacement (cc) of a car. A 5000cc engine has the potential to go faster than a 1600cc one. But if the tires are bad (economy) or the engine overheats (sustainability), it cannot use that power.",
+        vo2_tooltip: "It's like the engine displacement (cc) of a car. A 5000cc engine has the potential to go faster than a 1600cc one. But if the tires are bad (economy) or the engine overheats (threshold), it cannot use that power.",
         
-        threshold_title: "Sustainability",
-        threshold_sub: "%VO₂max UTILIZATION",
-        threshold_desc: "Gen. %VO₂max sustained at LT/VT/MLSS/CS. What percentage of your capacity can you sustain with metabolic stability?",
+        threshold_title: "Threshold (Fractional Utilization)",
+        threshold_sub: "%VO₂max SUSTAINABLE",
+        threshold_desc: "Gen. %VO₂max sustained at LT/VT/MLSS/CS. What percentage of your capacity can you carry for a long time?",
         threshold_tooltip: (
             <>
                 <div className="mb-3">It's like the RPM redline of a car. It's the highest intensity you can maintain without 'overheating' (metabolic instability).</div>
+                <div className="mb-2 text-[10px] text-slate-400">
+                  Note: These are not identical; they approximate similar 'sustainable intensity' via different tests.
+                </div>
                 <div className="text-[10px] font-sans border-t border-slate-700 pt-2 space-y-1.5 opacity-90">
                     <div><span className="text-rose-400 font-bold">LT (Lactate Threshold):</span> Point where lactate rises above baseline.</div>
                     <div><span className="text-rose-400 font-bold">VT (Ventilatory Threshold):</span> Breathing rate inflection point.</div>
@@ -161,12 +167,12 @@ const RunningPerformancePage = ({ lang }) => {
         economy_title: "Economy (Cr)",
         economy_sub: "EFFICIENCY",
         economy_desc: "How much oxygen/energy do you consume at a given speed?",
-        economy_tooltip: "It's like fuel efficiency or aerodynamics. Between two cars going at the same speed, the one burning less fuel (more economical) goes further with less effort. Good form and shoes improve this.",
+        economy_tooltip: "It's like fuel consumption: burning less fuel at the same speed means doing the same work with less cost. In running, this improves with form, strength, biomechanics, and shoes.",
         
         resilience_title: "Durability",
         resilience_sub: "FATIGUE RESISTANCE",
         resilience_desc: "The ability to resist deterioration (drift) in physiological parameters as the race progresses.",
-        resilience_tooltip: "It's like the durability of the car parts. Everyone is fresh at the start line, but does the suspension break down after 30km? It shows how little your performance drops over time.",
+        resilience_tooltip: "It's like the quality of tires-suspension-cooling: determines how well performance holds up without 'falling apart' over distance. As fatigue sets in, threshold tends to drop and cost (Cr) increase; durability is the skill to limit this decay.",
 
         // Formula Area
         eq_title: "PERFORMANCE EQUATION (TIME DEPENDENT)",
@@ -180,7 +186,7 @@ const RunningPerformancePage = ({ lang }) => {
         resilience_factor_text_2: "reveals the real-world scenario. Late in a marathon, due to fatigue,",
         resilience_factor_highlight_1: "Cr (Cost) increases",
         resilience_factor_text_3: "and",
-        resilience_factor_highlight_2: "Sustainability drops",
+        resilience_factor_highlight_2: "Threshold drops",
         resilience_factor_text_4: ". Durability is the ability to minimize this drift.",
 
         // Difference Note
@@ -195,7 +201,7 @@ const RunningPerformancePage = ({ lang }) => {
         importance_title: "Which is more important and when?",
         importance_desc: (
             <>
-                <span className="text-cyan-400 font-bold">VO₂max</span> is like the engine displacement: it sets the ceiling. Race pace is determined by how much of that ceiling you can sustain (<span className="text-rose-400 font-bold">threshold</span>) and how efficiently you do it (<span className="text-emerald-400 font-bold">economy</span>). But as the race goes on, fatigue sets in. <span className="text-amber-400 font-bold">Durability</span> is like the quality of tires/suspension: it determines how well your performance holds up without "falling apart" over distance. <br/><br/><span className="text-white font-semibold border-b border-slate-500 pb-0.5">The fastest result comes not from one trait, but the harmony of all four.</span>
+                <span className="text-cyan-400 font-bold">VO₂max</span> is like the engine displacement: it sets the ceiling. Race pace is determined by how much of that ceiling you can sustain (<span className="text-rose-400 font-bold">threshold</span>) and how efficiently you do it (<span className="text-emerald-400 font-bold">economy</span>). But as the race goes on, fatigue sets in. <span className="text-amber-400 font-bold">Durability</span> is like the quality of tires/suspension: it determines how well your performance holds up without "falling apart" over distance. <br/><br/><span class="text-white font-semibold border-b border-slate-500 pb-0.5">The fastest result comes not from one trait, but the harmony of all four.</span>
             </>
         ),
 
@@ -204,7 +210,7 @@ const RunningPerformancePage = ({ lang }) => {
         chart_axis: "X: Race Duration (0-100%) • Y: Performance Impact",
         chart_vo2_title: "VO₂max",
         chart_vo2_label: "Determines Potential Early",
-        chart_sust_title: "SUSTAINABILITY",
+        chart_sust_title: "THRESHOLD (FRACTIONAL UTILIZATION)",
         chart_sust_label: "Steady Power Output",
         chart_econ_title: "ECONOMY",
         chart_econ_label: "Critical Always (Efficiency)",
