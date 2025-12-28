@@ -162,7 +162,7 @@
                                     
                                     {/* BACK - RENKLİ ZEMİN TASARIMI (ESKİ HALİ) */}
                                     {/* Opaklık: %80 (bg-primary/80) */}
-                                    <div className="card-back bg-primary/80 backdrop-blur-sm rounded-2xl p-5 flex flex-col shadow-xl text-slate-900 relative overflow-hidden">
+                                    <div className="card-back bg-primary/80 backdrop-blur-sm rounded-2xl p-5 flex flex-col shadow-xl text-white relative overflow-hidden">
                                          {/* Arka plan silik ikon */}
                                          <div className="absolute top-0 right-0 p-4 opacity-10"><LocalIcons.Info size={64}/></div>
                                          
@@ -179,7 +179,7 @@
                                          {/* Mobil: text-base (Normal) | Masaüstü: md:text-sm (Bir tık küçük) */}
                                          <div className="relative z-10 flex-1 overflow-y-auto custom-scrollbar pr-1">
                                             <div className="min-h-full flex items-center">
-                                                <p className="text-base md:text-sm font-semibold leading-relaxed drop-shadow-sm">
+                                                <p className="text-base md:text-sm font-semibold leading-relaxed drop-shadow-sm text-white">
                                                     {content.def}
                                                 </p>
                                             </div>
