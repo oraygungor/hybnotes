@@ -48,6 +48,13 @@ window.HybNotesData = {
             } 
         },
         { 
+  "tag": "#Fizyoloji", 
+  "text": { 
+    "tr": "Eşik hızın (LT), aslında motor gücün (VO₂max) + yakıt cimriliğin (koşu ekonomisi) birleşince ortaya çıkan gerçek yarış hızıdır. FU ise bunun oranı: Eşiğin, motor kapasitenin yüzde kaçı? (LT / VO₂max).", 
+    "en": "Your threshold pace (LT) is basically the real-world result of your engine size (VO₂max) plus how fuel-efficient you are (running economy). FU is just the ratio: what percentage of your engine capacity can you hold at threshold? (LT / VO₂max)." 
+  } 
+},
+        { 
             "tag": "#Beslenme", 
             "text": { 
                 "tr": "Pancar suyu (nitrat), kan damarlarını genişleterek oksijen maliyetini düşürebilir ve özellikle yüksek irtifada performansı artırabilir.", 
