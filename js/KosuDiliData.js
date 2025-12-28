@@ -179,29 +179,29 @@ window.KosuDiliData = [
     "tr": { "category": "Yarış Stratejisi", "term": "Pacer (Tavşan)", "def": "Hedef süresi sırtında yazan rehber koşucu. Onu takip edersen hedeflediğin sürede yarışı bitirirsin." },
     "en": { "category": "Race Strategy", "term": "Pacer", "def": "A guide runner marking a specific finish time. Sticking with them helps you hit your time goal." }
   },
-  { 
+  {
     "id": 31,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "DNS / DNF", "def": "DNS: Başlamadı (Sakatlık vb. nedenlerle start almadı). DNF: Bitiremedi (Yarışı yarıda bıraktı)." },
-    "en": { "category": "Race Strategy", "term": "DNS / DNF", "def": "DNS: Did Not Start (Skipped the race). DNF: Did Not Finish (Dropped out during the race)." }
+    "tr": { "category": "Yarış Stratejisi", "term": "DNS / DNF", "def": "DNS: “Did Not Start” (start almadı). DNF: “Did Not Finish” (yarışı bitiremedi). Tek başına başarısızlık anlamına gelmez." },
+    "en": { "category": "Race Strategy", "term": "DNS / DNF", "def": "DNS: Did Not Start. DNF: Did Not Finish. These labels don’t necessarily mean failure—there can be valid reasons." }
   },
-  { 
+  {
     "id": 32,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Stride Length", "def": "Adım Uzunluğu. Bir adımda katettiğin mesafe. Hızlandıkça uzar, ama aşırı uzatmak verimi düşürebilir." },
-    "en": { "category": "Biomechanics", "term": "Stride Length", "def": "The distance covered in a single step. Increases with speed, but overextending can reduce efficiency." }
+    "tr": { "category": "Biyomekanik", "term": "Stride Length (Adım Uzunluğu)", "def": "Bir adımda katettiğin mesafe. Hız arttıkça genelde uzar; kadansla birlikte pace’i belirler. Aşırı uzatma verimi düşürebilir." },
+    "en": { "category": "Biomechanics", "term": "Stride Length", "def": "The distance covered in one step. It usually increases as speed increases and works together with cadence to determine pace. Overextending can reduce efficiency." }
   },
-  { 
+  {
     "id": 33,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Overstriding", "def": "Ayağı vücudun çok önüne basmak. Her adımda fren etkisi yaratır ve dizlere binen yükü artırır." },
-    "en": { "category": "Biomechanics", "term": "Overstriding", "def": "Landing with your foot too far ahead of your body. Creates braking forces and increases injury risk." }
+    "tr": { "category": "Biyomekanik", "term": "Overstriding", "def": "Ayağın gövdenin çok önüne düşmesi. “Fren” etkisi yaratıp verimi azaltabilir ve bazı sakatlık risklerini artırabilir." },
+    "en": { "category": "Biomechanics", "term": "Overstriding", "def": "Landing with your foot too far ahead of your body. It can create braking forces, reduce efficiency, and increase injury risk." }
   },
-  { 
+  {
     "id": 34,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Running Economy", "def": "Yakıt tasarrufu. Belirli bir hızda koşarken vücudunun ne kadar az enerji/oksijen harcadığının göstergesi." },
-    "en": { "category": "Biomechanics", "term": "Running Economy", "def": "Fuel efficiency. A measure of how much energy/oxygen you use to maintain a certain speed." }
+    "tr": { "category": "Biyomekanik", "term": "Koşu Ekonomisi", "def": "Aynı hızda koşarken ne kadar az enerji/oksijen harcadığını gösteren “verimlilik” ölçüsü. Ekonomi arttıkça aynı pace daha kolay gelir." },
+    "en": { "category": "Biomechanics", "term": "Running Economy", "def": "A measure of efficiency—how much energy/oxygen you use to hold a given speed. Better economy makes the same pace feel easier." }
   },
 {
     "id": 35,
