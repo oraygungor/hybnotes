@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HybNotes Live Studio (Final Stable)</title>
+    <title>HybNotes Live Studio (v2 - Image Support)</title>
     
-    <!-- React & Libraries -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- KaTeX -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
-    <!-- Quill Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 
     <style>
@@ -59,10 +55,25 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
         }
 
+        /* --- YENİ GÖRSEL STİLİ --- */
+        .custom-responsive-img {
+            display: block !important;
+            margin: 2rem auto !important; /* Ortala ve boşluk bırak */
+            border-radius: 8px !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+            transition: transform 0.2s;
+            max-width: 100% !important;
+        }
+        .custom-responsive-img:hover {
+            transform: scale(1.01);
+            border: 1px solid #22d3ee;
+        }
+
         /* QUILL */
         .ql-toolbar.ql-snow { background: #1e293b; border-color: #334155 !important; border-radius: 12px 12px 0 0; padding: 12px; }
         .ql-container.ql-snow { background: #0f172a; border-color: #334155 !important; border-radius: 0 0 12px 12px; color: #cbd5e1; font-family: 'Inter', sans-serif; font-size: 16px; height: 100%; }
         .ql-editor.ql-blank::before { color: #475569 !important; font-style: italic !important; font-family: 'Inter', sans-serif !important; }
+        
         .ql-snow .ql-stroke { stroke: #94a3b8 !important; }
         .ql-snow .ql-fill { fill: #94a3b8 !important; }
         .ql-snow .ql-picker { color: #94a3b8 !important; }
@@ -96,7 +107,6 @@
         ];
 
         const App = () => {
-            // --- MAIN DATA STATE ---
             const [data, setData] = useState({
                 tr: { title: "Örnek Başlık TR", summary: "Türkçe özet...", content: `<p>İçerik...</p><div class="math-box">$$ E = mc^2 $$</div>` },
                 en: { title: "Example Title EN", summary: "English summary...", content: `<p>Content...</p><div class="math-box">$$ E = mc^2 $$</div>` }
@@ -113,7 +123,6 @@
             const jsonFocusRef = useRef(false);
             const isUpdatingQuill = useRef(false);
             
-            // --- KRİTİK FİX 1: EditLang Ref (Closure Problemi Çözümü) ---
             const editLangRef = useRef(editLang);
             useEffect(() => { editLangRef.current = editLang; }, [editLang]);
 
@@ -130,14 +139,14 @@
             const quillRef = useRef(null);
             const previewRef = useRef(null);
 
-            // --- 1. QUILL KURULUM ---
+            // --- 1. QUILL KURULUM & ÖZEL BLOTLAR ---
             useEffect(() => {
-                // KRİTİK FİX: KaTeX Global Ataması
                 window.katex = katex;
 
                 if (!quillRef.current) {
                     const container = document.getElementById('editor-container');
                     
+                    // --- Custom Math Blot ---
                     const Block = Quill.import('blots/block');
                     class MathBox extends Block {}
                     MathBox.blotName = 'math-box';
@@ -145,10 +154,54 @@
                     MathBox.className = 'math-box';
                     Quill.register(MathBox);
 
+                    // --- Custom Responsive Image Blot (YENİ) ---
+                    const BlockEmbed = Quill.import('blots/block/embed');
+                    class ResponsiveImg extends BlockEmbed {
+                        static create(value) {
+                            let node = super.create();
+                            // value bir obje olabilir { url, width } veya sadece url string
+                            const url = typeof value === 'object' ? value.url : value;
+                            const width = (typeof value === 'object' && value.width) ? value.width : '100%';
+
+                            node.setAttribute('src', url);
+                            node.setAttribute('style', `width: ${width};`); // CSS class zaten ortalıyor
+                            return node;
+                        }
+
+                        static value(node) {
+                            return {
+                                url: node.getAttribute('src'),
+                                width: node.style.width
+                            };
+                        }
+                    }
+                    ResponsiveImg.blotName = 'responsive-img';
+                    ResponsiveImg.tagName = 'img';
+                    ResponsiveImg.className = 'custom-responsive-img'; // CSS class ile stil veriyoruz
+                    Quill.register(ResponsiveImg);
+
+
+                    // --- Handlers ---
                     const addMathBoxHandler = function() {
                         const range = this.quill.getSelection(true) || { index: this.quill.getLength() };
                         const html = `<div class="math-box">$$ x = ... $$</div><p><br></p>`;
                         this.quill.clipboard.dangerouslyPasteHTML(range.index, html);
+                    };
+
+                    const addResponsiveImgHandler = function() {
+                        const range = this.quill.getSelection(true) || { index: this.quill.getLength() };
+                        
+                        // 1. URL İste
+                        const url = prompt("Görsel Bağlantısını (URL) yapıştırın:");
+                        if (!url) return;
+
+                        // 2. Genişlik İste
+                        let width = prompt("Görsel Genişliği (Örn: 50%, 300px). Boş bırakılırsa %100 olur:", "100%");
+                        if (!width) width = "100%";
+
+                        // 3. Ekle
+                        this.quill.insertEmbed(range.index, 'responsive-img', { url, width });
+                        this.quill.setSelection(range.index + 1);
                     };
 
                     const quill = new Quill(container, {
@@ -158,17 +211,27 @@
                                 container: [
                                     [{ 'header': [2, 3, false] }],
                                     ['bold', 'italic', 'underline', 'strike'],
-                                    ['blockquote', 'code-block', 'mathbox'], 
+                                    ['blockquote', 'code-block', 'mathbox', 'responsive-img'], // 'responsive-img' buraya eklendi
                                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                                     [{ 'script': 'sub'}, { 'script': 'super' }],
                                     [{ 'color': [] }, { 'background': [] }],
                                     ['link', 'formula', 'clean']
                                 ],
-                                handlers: { 'mathbox': addMathBoxHandler }
+                                handlers: { 
+                                    'mathbox': addMathBoxHandler,
+                                    'responsive-img': addResponsiveImgHandler
+                                }
                             }
                         },
                         placeholder: 'İçerik yazmaya başla...'
                     });
+
+                    // Özel ikon ekle (SVG Camera Icon)
+                    const toolbar = quill.getModule('toolbar');
+                    if(toolbar) {
+                        const btn = document.querySelector('.ql-responsive-img');
+                        if(btn) btn.innerHTML = '<svg viewBox="0 0 18 18" width="18" height="18"><path class="ql-stroke" d="M15,12V6a3,3,0,0,0-3-3H6A3,3,0,0,0,3,6v6a3,3,0,0,0,3,3h6A3,3,0,0,0,15,12Z"></path><circle class="ql-fill" cx="9" cy="9" r="2"></circle><rect class="ql-fill" height="1" width="1" x="11.5" y="4.5"></rect></svg>';
+                    }
 
                     quillRef.current = quill;
 
@@ -181,7 +244,6 @@
                         const wordCount = trimmedText ? trimmedText.split(/\s+/).length : 0;
                         setReadTime(Math.max(1, Math.ceil(wordCount / 180)));
 
-                        // GÜNCELLEME: editLangRef.current kullanarak doğru dile yazıyoruz
                         setData(prev => ({
                             ...prev,
                             [editLangRef.current]: { ...prev[editLangRef.current], content: html }
@@ -209,7 +271,7 @@
                 }
             }, [editLang, data]);
 
-            // --- 3. JSON OLUŞTURMA (DÜZELTİLDİ: Replace kaldırıldı) ---
+            // --- 3. JSON OLUŞTURMA ---
             useEffect(() => {
                 if (!jsonFocusRef.current) {
                     const dataObj = {
@@ -255,7 +317,6 @@
                     
                     const postsStart = match.index + match[0].length;
                     
-                    // KRİTİK FİX 2: Virgül Kontrolü
                     const afterPostsStart = content.slice(postsStart);
                     const needsComma = !/^\s*\]/.test(afterPostsStart); 
 
@@ -304,7 +365,6 @@
                         }
                         if (item.references) setReferences(item.references);
                         
-                        // Replace kullanmadan direkt al
                         const newTrContent = item.content?.tr || "";
                         const newEnContent = item.content?.en || "";
                         
