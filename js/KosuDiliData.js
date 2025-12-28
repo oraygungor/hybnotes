@@ -1,33 +1,33 @@
 window.KosuDiliData = [
-  { 
+  {
     "id": 1,
     "catId": "metrics",
     "tr": { "category": "Temel Metrikler", "term": "Tempo (Pace)", "def": "Koşunun hız dili. 1 kilometreyi kaç dakikada tamamladığını gösterir (dk/km). Sayı küçüldükçe hız artar." },
-    "en": { "category": "Basic Metrics", "term": "Pace", "def": "The universal language of speed. Shows how many minutes it takes to run 1 km/mile. Lower numbers mean faster running." }
+    "en": { "category": "Basic Metrics", "term": "Pace", "def": "The universal language of speed. It shows how many minutes it takes to run 1 km (or 1 mile). Lower numbers mean faster running." }
   },
-  { 
+  {
     "id": 2,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "Kadans", "def": "Dakikadaki adım sayısı (SPM). Verimlilik ve sakatlık riskini azaltmak için genelde 170-180+ aralığı hedeflenir. Kişiseldir." },
-    "en": { "category": "Basic Metrics", "term": "Cadence", "def": "Steps per minute (SPM). A higher cadence (170-180+) is often linked to better efficiency and reduced injury risk. It is personal." }
+    "tr": { "category": "Temel Metrikler", "term": "Kadans (Cadence)", "def": "Dakikadaki adım sayısıdır (SPM). Tek bir “ideal” sayı yoktur; hız ve stile göre değişir. Birçok koşucuda daha yüksek kadans (çoğunlukla ~170–180+) verimlilikle ilişkilendirilir." },
+    "en": { "category": "Basic Metrics", "term": "Cadence", "def": "Steps per minute (SPM). There is no single “ideal” number—it varies by speed and form. A higher cadence (often ~170–180+) is commonly associated with better running efficiency." }
   },
-  { 
+  {
     "id": 3,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "VO₂Max", "def": "Vücudunun yoğun egzersiz sırasında kullanabildiği maksimum oksijen miktarını ifade eder." },
-    "en": { "category": "Basic Metrics", "term": "VO₂Max", "def": "The maximum amount of oxygen your body can utilize during intense exercise." }
+    "tr": { "category": "Temel Metrikler", "term": "VO₂Max", "def": "Yoğun egzersizde vücudunun kullanabildiği maksimum oksijen kapasitesi; aerobik kapasitenin temel göstergelerinden biridir." },
+    "en": { "category": "Basic Metrics", "term": "VO₂Max", "def": "The maximum amount of oxygen your body can utilize during intense exercise—one of the key indicators of aerobic capacity." }
   },
-  { 
+  {
     "id": 4,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "PB / PR", "def": "Kişisel En İyi derecen (Personal Best). Belirli bir mesafede (5K, Maraton vb.) bugüne kadar koştuğun en hızlı süredir." },
-    "en": { "category": "Basic Metrics", "term": "PB / PR", "def": "Personal Best / Record. Your fastest time ever recorded for a specific distance (e.g., 5K, Marathon)." }
+    "tr": { "category": "Temel Metrikler", "term": "PB / PR", "def": "Kişisel en iyi derecen (Personal Best/Record). Belirli bir mesafede (5K, 10K, Yarı Maraton, Maraton vb.) bugüne kadar koştuğun en hızlı süredir." },
+    "en": { "category": "Basic Metrics", "term": "PB / PR", "def": "Personal Best/Record. Your fastest time ever recorded for a specific distance (e.g., 5K, 10K, Half Marathon, Marathon)." }
   },
-  { 
+  {
     "id": 5,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Easy Run", "def": "Konuşma hızında, düşük eforlu koşu. Aerobik tabanı geliştirir, yağ yakımını destekler ve vücudu yormadan kondisyon sağlar." },
-    "en": { "category": "Training", "term": "Easy Run", "def": "A conversational, low-effort run. Builds aerobic base and burns fat without stressing the body." }
+    "tr": { "category": "Antrenman", "term": "Easy Run", "def": "Konuşma hızında, düşük eforlu koşu. Aerobik tabanı geliştirir ve toparlanmayı destekler; “zorlanmadan” düzenli hacim biriktirmeyi sağlar." },
+    "en": { "category": "Training", "term": "Easy Run", "def": "A conversational, low-effort run. Builds aerobic base and supports recovery, allowing you to accumulate volume without heavy stress." }
   },
   { 
     "id": 6,
