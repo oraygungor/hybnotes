@@ -7,18 +7,18 @@
         </svg>
     );
 
-    const LocalIcons = {
-        Activity: (p) => <SvgIcon {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></SvgIcon>,
-        Dumbbell: (p) => <SvgIcon {...p}><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1a2.121 2.121 0 0 0-3 3l1 1"/><path d="m21 21-1-1a2.121 2.121 0 0 0-3 3l1 1"/><path d="M15 6.5 17.5 4"/><path d="M4 6.5 6.5 4"/><path d="m3 3 1 1a2.121 2.121 0 0 0 3 3l1-1"/><path d="m3 3 1 1a2.121 2.121 0 0 0 3 3l1-1"/><path d="M14 17.5 16.5 20"/><path d="M4 17.5 6.5 20"/></SvgIcon>,
-        Heart: (p) => <SvgIcon {...p}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></SvgIcon>,
-        Flag: (p) => <SvgIcon {...p}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></SvgIcon>,
-        Footprints: (p) => <SvgIcon {...p}><path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 11 3.8 11 8c0 1.25-.5 2-1.25 2H4.18C4.07 10 4 10.05 4 10.1V16Z"/><path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 13 7.8 13 12c0 1.25.5 2 1.25 2h5.57c.11 0 .18.05.18.1V20Z"/></SvgIcon>,
-        Stethoscope: (p) => <SvgIcon {...p}><path d="M4.8 2.3A.3.3 0 0 1 5 2h14a.3.3 0 0 1 .2.3v3.3a.3.3 0 0 1-.3.3H18a.3.3 0 0 1-.3-.3V4.2a.3.3 0 0 0-.3-.3h-4a.3.3 0 0 0-.3.3v10a3 3 0 0 1-3 3 2.5 2.5 0 0 1-2.5-2.5V5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5v3.6a.3.3 0 0 1-.3.3H3.3a.3.3 0 0 1-.3-.3V2.3Z"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></SvgIcon>,
-        Zap: (p) => <SvgIcon {...p}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></SvgIcon>,
-        ChevronRight: (p) => <SvgIcon {...p}><polyline points="9 18 15 12 9 6"/></SvgIcon>,
-        Info: (p) => <SvgIcon {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></SvgIcon>,
-        Shuffle: (p) => <SvgIcon {...p}><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l14.2-12.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="M2 6h1.4c1.3 0 2.5.6 3.3 1.7l14.2 12.6c.8 1.1 2 1.7 3.3 1.7H22"/></SvgIcon>
-    };
+   const LocalIcons = {
+  Activity: (p) => <SvgIcon {...p}><path d="M4 19V5" /><path d="M4 19h16" /><path d="M7 15l3-4 3 3 4-6" /><path d="M17 8h3" /></SvgIcon>,
+  Dumbbell: (p) => <SvgIcon {...p}><path d="M7 8v8" /><path d="M5 9v6" /><path d="M19 8v8" /><path d="M21 9v6" /><path d="M7 12h12" /></SvgIcon>,
+  Heart: (p) => <SvgIcon {...p}><path d="M20.5 8.9c0 6-8.5 10.6-8.5 10.6S3.5 14.9 3.5 8.9A4.6 4.6 0 0 1 8 4.4c1.6 0 3 .7 4 2 1-1.3 2.4-2 4-2a4.6 4.6 0 0 1 4.5 4.5Z" /><path d="M7 12h2l1-2 2 5 1-3h4" /></SvgIcon>,
+  Flag: (p) => <SvgIcon {...p}><path d="M5 21V3" /><path d="M5 4c3-1.5 5 1.5 8 0s5 1.5 8 0v9c-3 1.5-5-1.5-8 0s-5-1.5-8 0" /></SvgIcon>,
+  Footprints: (p) => <SvgIcon {...p}><path d="M7.5 14.5c1.8 0 3.3-1.9 3.3-4.3S9.7 6 7.9 6 4.6 7.9 4.6 10.2s1.2 4.3 2.9 4.3Z" /><path d="M9 18.5c0 1.2-1.3 2.2-2.8 2.2S3.5 19.7 3.5 18.5 4.8 16.3 6.2 16.3 9 17.3 9 18.5Z" /><path d="M16.5 12.8c1.7 0 3.1-1.7 3.1-3.9s-1.2-4-2.9-4-3.1 1.7-3.1 3.9 1.2 4 2.9 4Z" /><path d="M20.5 17.5c0 1.2-1.3 2.2-2.8 2.2S15 18.7 15 17.5s1.3-2.2 2.7-2.2 2.8 1 2.8 2.2Z" /></SvgIcon>,
+  Stethoscope: (p) => <SvgIcon {...p}><path d="M6 3v6a6 6 0 0 0 12 0V3" /><path d="M9 3v5" /><path d="M15 3v5" /><path d="M12 15v2a5 5 0 0 0 5 5" /><circle cx="20" cy="19" r="2" /></SvgIcon>,
+  Zap: (p) => <SvgIcon {...p}><path d="M13 2 4 14h7l-1 8 10-12h-7l0-8Z" /></SvgIcon>,
+  ChevronRight: (p) => <SvgIcon {...p}><path d="M10 6l6 6-6 6" /></SvgIcon>,
+  Info: (p) => <SvgIcon {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><path d="M12 7h.01" /></SvgIcon>,
+  Shuffle: (p) => <SvgIcon {...p}><path d="M3 8h5c1 0 2 .4 2.7 1.1L21 19" /><path d="M3 16h5c1 0 2-.4 2.7-1.1L14 11" /><path d="M19 6h2v2" /><path d="M21 6l-4 4" /><path d="M19 18h2v-2" /><path d="M21 18l-4-4" /></SvgIcon>,
+};
 
     const KosuDili101Page = ({ lang }) => {
         // DOĞRUDAN window.KosuDiliData KULLANILIYOR
