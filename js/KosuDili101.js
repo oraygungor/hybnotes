@@ -163,23 +163,26 @@
                                             {t.seeDef} <LocalIcons.ChevronRight size={12} />
                                         </div>
                                     </div>
-                                    {/* BACK */}
-                                    {/* Opaklık %80'e (bg-primary/80) düşürüldü */}
-                                    <div className="card-back bg-primary/80 rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden backdrop-blur-sm">
-                                         <div className="absolute top-0 right-0 p-4 opacity-10"><LocalIcons.Info size={64}/></div>
+                                    
+                                    {/* BACK - YENİ TASARIM */}
+                                    {/* Beyaz zemin, tema renginde kalın çerçeve, koyu yazı */}
+                                    <div className="card-back bg-white border-4 border-primary rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden">
+                                         {/* Arka plan silik ikon - Tema renginde */}
+                                         <div className="absolute top-0 right-0 p-4 text-primary opacity-10"><LocalIcons.Info size={64}/></div>
+                                         
                                          <div className="relative z-10 overflow-y-auto pr-1 custom-scrollbar max-h-full">
-                                            {/* Header Section on Back */}
-                                            <div className="mb-3">
-                                                <div className="flex items-center gap-2 opacity-70 mb-1">
-                                                    <LocalIcons.Info size={14} />
-                                                    <span className="font-bold text-[10px] uppercase">{t.whatIs}</span>
+                                            {/* Başlık Bölümü */}
+                                            <div className="mb-4 border-b border-slate-100 pb-2">
+                                                <div className="flex items-center gap-2 text-primary mb-1">
+                                                    <LocalIcons.Info size={16} />
+                                                    <span className="font-bold text-xs uppercase tracking-wider">{t.whatIs}</span>
                                                 </div>
-                                                {/* Added Term Title */}
-                                                <h4 className="font-black text-lg leading-tight">{content.term}</h4>
+                                                {/* Kelime Adı */}
+                                                <h4 className="font-black text-xl leading-tight text-slate-900">{content.term}</h4>
                                             </div>
 
-                                            {/* Definition Font Size Reduced (text-base) */}
-                                            <p className="text-base font-medium leading-relaxed">{content.def}</p>
+                                            {/* Tanım - Okunaklı koyu gri */}
+                                            <p className="text-base font-medium leading-relaxed text-slate-600">{content.def}</p>
                                         </div>
                                     </div>
                                 </div>
