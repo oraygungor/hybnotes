@@ -203,23 +203,23 @@ window.KosuDiliData = [
     "tr": { "category": "Biyomekanik", "term": "Running Economy", "def": "Yakıt tasarrufu. Belirli bir hızda koşarken vücudunun ne kadar az enerji/oksijen harcadığının göstergesi." },
     "en": { "category": "Biomechanics", "term": "Running Economy", "def": "Fuel efficiency. A measure of how much energy/oxygen you use to maintain a certain speed." }
   },
-  { 
+{
     "id": 35,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Drop", "def": "Topuk-Burun farkı. Ayakkabının topuğunun, ön kısmından kaç mm daha yüksekte olduğunu gösterir. Basış mekaniğini etkiler." },
-    "en": { "category": "Biomechanics", "term": "Drop", "def": "Heel-to-toe drop. The height difference (mm) between the heel and forefoot of the shoe. Affects landing mechanics." }
+    "tr": { "category": "Biyomekanik", "term": "Drop", "def": "Topuk–burun farkı. Ayakkabının topuk yüksekliği ile burun (ön ayak) yüksekliği arasındaki mm farkıdır. Basış hissini ve yük dağılımını etkileyebilir." },
+    "en": { "category": "Biomechanics", "term": "Drop", "def": "Heel-to-toe drop. The difference in height (mm) between the heel and the forefoot of the shoe. It can influence how load is distributed when you run." }
   },
-  { 
+  {
     "id": 36,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Shin Splints", "def": "Kaval kemiği ağrısı. Genelde çok hızlı, çok erken yüklenme sonucu kaval kemiği zarında oluşan iltihaptır." },
-    "en": { "category": "Health", "term": "Shin Splints", "def": "Pain along the shin bone. Common in new runners, caused by increasing mileage or intensity too quickly." }
+    "tr": { "category": "Sağlık", "term": "Shin Splints", "def": "Kaval kemiği boyunca ağrı (özellikle iç-alt kısım). Genelde yükü (mesafe/tempo) çok hızlı artırınca ortaya çıkar; tek bir “iltihap” gibi düşünmek yerine aşırı kullanım kaynaklı bir sorun olarak bilmek daha doğrudur." },
+    "en": { "category": "Health", "term": "Shin Splints", "def": "Pain along the shin (often the inner lower tibia), commonly triggered by increasing mileage or intensity too quickly." }
   },
-  { 
+  {
     "id": 37,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "IT Band Syndrome", "def": "Koşucu dizi. Bacağın yanındaki şeridin gerilmesiyle dizin dış tarafında oluşan keskin ağrı." },
-    "en": { "category": "Health", "term": "IT Band Syndrome", "def": "Runner's Knee. Sharp pain on the outside of the knee caused by tightness in the iliotibial band." }
+    "tr": { "category": "Sağlık", "term": "IT Band Sendromu", "def": "İliotibial bant sendromu. Genelde dizin dış tarafında batan/keskin ağrı yapar; özellikle koşu sırasında tekrar eder ve yük arttıkça belirginleşebilir." },
+    "en": { "category": "Health", "term": "IT Band Syndrome", "def": "Iliotibial band syndrome. Often presents as sharp pain on the outside of the knee, commonly triggered during running and worsened with increased load." }
   },
   {
     "id": 38,
