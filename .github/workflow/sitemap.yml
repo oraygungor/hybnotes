@@ -1,0 +1,40 @@
+name: Update sitemap.xml
+
+on:
+  schedule:
+    - cron: "17 3 * * *"   # her gün 03:17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build-sitemap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Generate sitemap.xml
+        run: |
+          python scripts/generate_sitemap.py --base "https://hybnotes.com/" --out "sitemap.xml" --max 5000
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          git diff --cached --quiet || git commit -m "chore: update sitemap.xml"
+          git push
