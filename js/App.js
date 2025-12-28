@@ -72,50 +72,81 @@ const App = () => {
         return THEMES.find(t => t.id === saved) || THEMES[0];
     });
 
-    // --- ROUTING ---
+// --- YENİ ROUTING (Query Params) ---
+// --- ROUTING (GÜNCELLENDİ: URL Parametreleri ?article=101) ---
     useEffect(() => {
-        const handleHashChange = () => {
-            const hash = window.location.hash.replace('#', '');
-            
-            if (!hash) {
-                setActiveTab('home');
-                setReadingArticle(null);
-                window.scrollTo(0, 0);
-                return;
-            }
+        // URL'deki parametreleri okuyup sayfayı güncelleyen fonksiyon
+        const handleUrlChange = () => {
+            const params = new URLSearchParams(window.location.search);
+            const articleId = params.get('article'); // Örnek: ?article=101
+            const pageId = params.get('page');       // Örnek: ?page=hyrox
 
-            if (hash.startsWith('article/')) {
-                const articleId = parseInt(hash.split('/')[1]);
-                const foundArticle = posts.find(p => p.id === articleId);
-                
+            if (articleId) {
+                // Eğer linkte makale ID varsa, o makaleyi bul ve aç
+                const foundArticle = posts.find(p => p.id === parseInt(articleId));
                 if (foundArticle) {
                     setReadingArticle(foundArticle);
                     setActiveTab('research');
-                    window.scrollTo(0, 0);
-                } else {
-                    setActiveTab('research');
-                    setReadingArticle(null);
                 }
-            } 
-            else {
-                setActiveTab(hash);
+            } else if (pageId) {
+                // Eğer sayfa ID varsa (örn: running, tools) o sekmeyi aç
+                setActiveTab(pageId);
                 setReadingArticle(null);
-                window.scrollTo(0, 0);
+            } else {
+                // Hiçbir parametre yoksa Ana Sayfayı aç
+                setActiveTab('home');
+                setReadingArticle(null);
             }
+            // Sayfa değişiminde en üste kaydır
+            window.scrollTo(0, 0);
         };
 
-        window.addEventListener('hashchange', handleHashChange);
-        handleHashChange(); // İlk yüklemede çalıştır
-        return () => window.removeEventListener('hashchange', handleHashChange);
+        // 1. Sayfa ilk yüklendiğinde çalıştır
+        handleUrlChange();
+
+        // 2. Tarayıcı Geri/İleri butonlarına basıldığında çalıştır
+        window.addEventListener('popstate', handleUrlChange);
+        
+        // Temizlik (Cleanup)
+        return () => window.removeEventListener('popstate', handleUrlChange);
     }, [posts]);
 
+    // --- NAVİGASYON FONKSİYONU (GÜNCELLENDİ) ---
     const navigateTo = (destination, param = null) => {
-        setIsMenuOpen(false);
+        setIsMenuOpen(false); // Mobilde menüyü kapat
+        
+        const url = new URL(window.location);
+        
         if (destination === 'article' && param) {
-            window.location.hash = `article/${param.id}`;
+            // Makale açılıyorsa: ?article=101 yap, page'i sil
+            url.searchParams.set('article', param.id);
+            url.searchParams.delete('page');
+            
+            // React State'ini anında güncelle (Beklemeden geçiş)
+            setReadingArticle(param);
+            setActiveTab('research');
         } else {
-            window.location.hash = destination;
+            // Sayfa değişiyorsa (örn: Ana sayfa, Hyrox vb.)
+            if (destination === 'home') {
+                // Ana sayfa ise URL tertemiz olsun: site.com
+                url.searchParams.delete('page');
+                url.searchParams.delete('article');
+            } else {
+                // Diğer sayfalar: ?page=running
+                url.searchParams.set('page', destination);
+                url.searchParams.delete('article');
+            }
+            
+            // React State'ini güncelle
+            setReadingArticle(null);
+            setActiveTab(destination);
         }
+
+        // URL'i tarayıcı geçmişine işle (Sayfa yenilenmez, SPA yapısı korunur)
+        window.history.pushState({}, '', url);
+        
+        // Sayfanın en tepesine kaydır
+        window.scrollTo(0, 0);
     };
 
     // --- RANDOM FACT ---
