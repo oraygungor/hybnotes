@@ -21,7 +21,6 @@
     };
 
     const KosuDili101Page = ({ lang }) => {
-        // DOĞRUDAN window.KosuDiliData KULLANILIYOR
         const [allTerms] = useState(window.KosuDiliData || []); 
         const [displayedIndices, setDisplayedIndices] = useState([]);
         const [flippedCards, setFlippedCards] = useState({});
@@ -72,7 +71,7 @@
 
         const getIcon = (catId) => {
             switch (catId) {
-                case 'metrics': return <LocalIcons.Activity className="w-10 h-10 text-primary" />; // Ana tema rengi
+                case 'metrics': return <LocalIcons.Activity className="w-10 h-10 text-primary" />; 
                 case 'training': return <LocalIcons.Dumbbell className="w-10 h-10 text-orange-400" />;
                 case 'physiology': return <LocalIcons.Heart className="w-10 h-10 text-red-400" />;
                 case 'race': return <LocalIcons.Flag className="w-10 h-10 text-yellow-400" />;
@@ -114,7 +113,6 @@
 
                 {/* --- HERO SECTION --- */}
                 <header className="bg-slate-800 text-white pt-12 pb-12 px-6 rounded-[2rem] shadow-xl relative overflow-hidden transition-all duration-500 border border-slate-700">
-                    {/* Arka plan blob'ları artık primary renginde */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full blur-[100px] opacity-10 -mr-20 -mt-20"></div>
                     <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary rounded-full blur-[80px] opacity-10 -ml-10 -mb-10"></div>
                     <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -127,7 +125,6 @@
 
                 {/* --- GRID --- */}
                 <div className="flex justify-end mb-2">
-                    {/* Buton rengi temaya bağlandı */}
                     <button onClick={shuffleAll} className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-primary px-5 py-2 rounded-xl transition-all font-bold border border-slate-700 hover:border-primary/50 shadow-lg active:scale-95 text-sm">
                         <LocalIcons.Shuffle size={18} /> {t.shuffleBtn}
                     </button>
@@ -144,13 +141,11 @@
                             <div key={slotIndex} className="card-container h-80 w-full cursor-pointer group" onClick={() => handleCardInteraction(slotIndex)}>
                                 <div className={`card-inner w-full h-full relative ${isFlipped ? 'flipped' : ''}`}>
                                     {/* FRONT */}
-                                    {/* Hover durumunda border rengi temaya göre değişir */}
                                     <div className="card-front bg-slate-800 rounded-2xl border border-slate-700 p-6 flex flex-col items-center justify-between shadow-xl group-hover:border-primary/50 transition-colors">
                                         <div className="w-full flex justify-between items-start">
                                             <span className="bg-slate-950 text-slate-400 text-[10px] font-bold tracking-wider px-2 py-1 rounded truncate max-w-[120px]">
                                                 {lang === 'tr' ? content.category.toLocaleUpperCase('tr-TR') : content.category.toUpperCase()}
                                             </span>
-                                            {/* Sağ üstteki nokta rengi temaya bağlandı */}
                                             <div className="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-primary transition-colors"></div>
                                         </div>
                                         <div className="text-center space-y-4 w-full">
@@ -164,25 +159,25 @@
                                         </div>
                                     </div>
                                     
-                                    {/* BACK - YENİ TASARIM */}
-                                    {/* Beyaz zemin, tema renginde kalın çerçeve, koyu yazı */}
-                                    <div className="card-back bg-white border-4 border-primary rounded-2xl p-6 flex flex-col justify-center shadow-xl text-slate-900 relative overflow-hidden">
-                                         {/* Arka plan silik ikon - Tema renginde */}
-                                         <div className="absolute top-0 right-0 p-4 text-primary opacity-10"><LocalIcons.Info size={64}/></div>
+                                    {/* BACK - ŞEFFAF/GLASS TASARIM */}
+                                    {/* bg-primary/50 ile yarı saydam renk + backdrop-blur ile buzlu cam etkisi */}
+                                    <div className="card-back bg-primary/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col justify-center shadow-xl text-white relative overflow-hidden">
+                                         {/* Arka plan silik ikon */}
+                                         <div className="absolute top-0 right-0 p-4 text-white opacity-10"><LocalIcons.Info size={64}/></div>
                                          
                                          <div className="relative z-10 overflow-y-auto pr-1 custom-scrollbar max-h-full">
                                             {/* Başlık Bölümü */}
-                                            <div className="mb-4 border-b border-slate-100 pb-2">
-                                                <div className="flex items-center gap-2 text-primary mb-1">
+                                            <div className="mb-4 border-b border-white/20 pb-2">
+                                                <div className="flex items-center gap-2 text-white/80 mb-1">
                                                     <LocalIcons.Info size={16} />
                                                     <span className="font-bold text-xs uppercase tracking-wider">{t.whatIs}</span>
                                                 </div>
-                                                {/* Kelime Adı */}
-                                                <h4 className="font-black text-xl leading-tight text-slate-900">{content.term}</h4>
+                                                {/* Kelime Adı - Artık burada görünüyor */}
+                                                <h4 className="font-black text-xl leading-tight text-white drop-shadow-md">{content.term}</h4>
                                             </div>
 
-                                            {/* Tanım - Okunaklı koyu gri */}
-                                            <p className="text-base font-medium leading-relaxed text-slate-600">{content.def}</p>
+                                            {/* Tanım - Okunabilirlik için beyaz metin */}
+                                            <p className="text-base font-medium leading-relaxed text-white/95 drop-shadow-sm">{content.def}</p>
                                         </div>
                                     </div>
                                 </div>
