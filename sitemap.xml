@@ -1,9 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://hybnotes.com/</loc></url>
-  <url><loc>https://hybnotes.com/?page=research</loc></url>
-  <url><loc>https://hybnotes.com/?page=hyrox_calc</loc></url>
-  <url><loc>https://hybnotes.com/?page=running_perf</loc></url>
-  <url><loc>https://hybnotes.com/?page=caffeine</loc></url>
-  <url><loc>https://hybnotes.com/?page=utmb_lottery</loc></url>
+  <url>
+    <loc>https://hybnotes.com/</loc>
+    <lastmod>2025-12-28</lastmod>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?page=caffeine</loc>
+    <lastmod>2025-12-28</lastmod>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?page=hyrox_calc</loc>
+    <lastmod>2025-12-28</lastmod>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?page=research</loc>
+    <lastmod>2025-12-28</lastmod>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?page=running_perf</loc>
+    <lastmod>2025-12-28</lastmod>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?page=utmb_lottery</loc>
+    <lastmod>2025-12-28</lastmod>
+  </url>
 </urlset>
