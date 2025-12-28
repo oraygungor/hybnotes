@@ -21,6 +21,7 @@
     };
 
     const KosuDili101Page = ({ lang }) => {
+        // DOĞRUDAN window.KosuDiliData KULLANILIYOR
         const [allTerms] = useState(window.KosuDiliData || []); 
         const [displayedIndices, setDisplayedIndices] = useState([]);
         const [flippedCards, setFlippedCards] = useState({});
@@ -159,26 +160,30 @@
                                         </div>
                                     </div>
                                     
-                                    {/* BACK - ŞEFFAF/GLASS TASARIM */}
-                                    {/* bg-primary/50 ile yarı saydam renk + backdrop-blur ile buzlu cam etkisi */}
-                                    <div className="card-back bg-primary/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col justify-center shadow-xl text-white relative overflow-hidden">
+                                    {/* BACK - RENKLİ ZEMİN TASARIMI (ESKİ HALİ) */}
+                                    {/* Opaklık: %80 (bg-primary/80) */}
+                                    <div className="card-back bg-primary/80 backdrop-blur-sm rounded-2xl p-5 flex flex-col shadow-xl text-slate-900 relative overflow-hidden">
                                          {/* Arka plan silik ikon */}
-                                         <div className="absolute top-0 right-0 p-4 text-white opacity-10"><LocalIcons.Info size={64}/></div>
+                                         <div className="absolute top-0 right-0 p-4 opacity-10"><LocalIcons.Info size={64}/></div>
                                          
-                                         <div className="relative z-10 overflow-y-auto pr-1 custom-scrollbar max-h-full">
-                                            {/* Başlık Bölümü */}
-                                            <div className="mb-4 border-b border-white/20 pb-2">
-                                                <div className="flex items-center gap-2 text-white/80 mb-1">
-                                                    <LocalIcons.Info size={16} />
-                                                    <span className="font-bold text-xs uppercase tracking-wider">{t.whatIs}</span>
-                                                </div>
-                                                {/* Kelime Adı - Artık burada görünüyor */}
-                                                <h4 className="font-black text-xl leading-tight text-white drop-shadow-md">{content.term}</h4>
+                                         {/* Başlık - Yukarı Sabitlendi */}
+                                         <div className="relative z-10 flex-none border-b border-black/10 pb-2 mb-2">
+                                            <div className="flex items-center gap-2 opacity-80 mb-1">
+                                                <LocalIcons.Info size={14} />
+                                                <span className="font-bold text-[10px] uppercase tracking-wider">{t.whatIs}</span>
                                             </div>
+                                            <h4 className="font-black text-lg leading-tight drop-shadow-sm">{content.term}</h4>
+                                         </div>
 
-                                            {/* Tanım - Okunabilirlik için beyaz metin */}
-                                            <p className="text-base font-medium leading-relaxed text-white/95 drop-shadow-sm">{content.def}</p>
-                                        </div>
+                                         {/* Tanım - Dikey Ortalanmış & Responsif Font Boyutu */}
+                                         {/* Mobil: text-base (Normal) | Masaüstü: md:text-sm (Bir tık küçük) */}
+                                         <div className="relative z-10 flex-1 overflow-y-auto custom-scrollbar pr-1">
+                                            <div className="min-h-full flex items-center">
+                                                <p className="text-base md:text-sm font-semibold leading-relaxed drop-shadow-sm">
+                                                    {content.def}
+                                                </p>
+                                            </div>
+                                         </div>
                                     </div>
                                 </div>
                             </div>
