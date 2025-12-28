@@ -158,7 +158,7 @@ window.KosuDiliData = [
   { 
     "id": 27,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "The Wall", "def": "Duvara çarpmak. Genelde maratonun 30. km'sinden sonra glikojenin bitmesiyle gelen ani fiziksel ve zihinsel tükeniş." },
+    "tr": { "category": "Yarış Stratejisi", "term": "Duvar", "def": "Duvara çarpmak: Genelde maratonun 30. km'sinden sonra glikojenin bitmesiyle gelen ani fiziksel ve zihinsel tükeniş." },
     "en": { "category": "Race Strategy", "term": "The Wall", "def": "Sudden depletion. Hitting a physical and mental barrier, usually around km 30 of a marathon, due to lack of fuel." }
   },
   { 
