@@ -366,8 +366,8 @@ const App = () => {
                             <ul className="space-y-3">
                                 {article.references.map((ref, index) => (
                                     <li key={index} className="flex gap-3 text-sm text-slate-400 font-mono leading-relaxed">
-                                        <span className="text-slate-600 select-none">[{index + 1}]</span>
-                                        <span className="hover:text-slate-200 transition-colors">{ref}</span>
+                                        <span className="text-slate-600 select-none shrink-0">[{index + 1}]</span>
+                                        <span className="hover:text-slate-200 transition-colors break-words min-w-0">{ref}</span>
                                     </li>
                                 ))}
                             </ul>
