@@ -99,7 +99,7 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
-const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery'];
+const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery', 'kosu_dili'];
 const PARENT_REDIRECTS = {
     'hyrox': 'hyrox_calc',
     'running': 'running_perf',
@@ -560,6 +560,7 @@ const App = () => {
                 type: 'dropdown',
                 children: [
                     { id: 'running_perf', title: lang === 'tr' ? 'Performansın Temeli' : 'Performance Fundamentals', icon: Icons.Activity },
+                    { id: 'kosu_dili', title: lang === 'tr' ? 'Koşu Dili 101' : 'Running Lingo 101', icon: Icons.BookOpen },
                 ]
             },
             { 
@@ -681,6 +682,7 @@ const App = () => {
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'hyrox_calc': return window.HyroxCalculatorPage ? <window.HyroxCalculatorPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
+            case 'kosu_dili': return window.KosuDili101Page ? <window.KosuDili101Page lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             default: return <HomePage posts={posts} lang={lang} currentFact={currentFact} />;
         }
     };
