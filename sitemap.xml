@@ -1,23 +1,41 @@
 <?xml version='1.0' encoding='utf-8'?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- generated: 2025-12-28T10:01:03Z | source: crawl https://hybnotes.com/ -->
+  <!-- generated: 2025-12-28T10:07:52Z | source: crawl https://hybnotes.com/ -->
   <url>
-    <loc>https://hybnotes.com/</loc>
-  </url>
-  <url>
-    <loc>https://hybnotes.com/?article=1&amp;lang=tr</loc>
+    <loc>https://hybnotes.com/?lang=en</loc>
   </url>
   <url>
     <loc>https://hybnotes.com/?lang=tr</loc>
   </url>
   <url>
+    <loc>https://hybnotes.com/?lang=en&amp;article=1</loc>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?lang=tr&amp;article=1</loc>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?lang=en&amp;page=caffeine</loc>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?lang=en&amp;page=research</loc>
+  </url>
+  <url>
     <loc>https://hybnotes.com/?lang=tr&amp;page=caffeine</loc>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?lang=tr&amp;page=research</loc>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?lang=en&amp;page=hyrox_calc</loc>
   </url>
   <url>
     <loc>https://hybnotes.com/?lang=tr&amp;page=hyrox_calc</loc>
   </url>
   <url>
-    <loc>https://hybnotes.com/?lang=tr&amp;page=research</loc>
+    <loc>https://hybnotes.com/?lang=en&amp;page=running_perf</loc>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?lang=en&amp;page=utmb_lottery</loc>
   </url>
   <url>
     <loc>https://hybnotes.com/?lang=tr&amp;page=running_perf</loc>
