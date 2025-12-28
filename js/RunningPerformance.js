@@ -72,7 +72,7 @@ const RunningPerformancePage = ({ lang }) => {
         economy_desc: "Belirli bir hızda koşarken ne kadar oksijen/enerji harcıyorsun?",
         economy_tooltip: "Arabanın yakıt tüketimi gibidir: aynı hızda daha az yakıt yakan, aynı işi daha az maliyetle yapar. Koşuda bu; teknik, kuvvet, biomekanik ve ayakkabı gibi etkenlerle iyileşir.",
         
-        resilience_title: "Durability",
+        resilience_title: "Durability (Fizyolojik Direnç)",
         resilience_sub: "YORGUNLUK DİRENCİ",
         resilience_desc: "Yarış uzadıkça fizyolojik parametrelerin bozulmaya (drift) karşı direnci.",
         resilience_tooltip: "Arabanın lastik–süspansiyon–soğutma kalitesi gibidir: yol uzadıkça performansın ne kadar 'dağılmadan' kaldığını belirler. Yorgunluk geldikçe eşik düşmeye, koşu maliyeti (Cr) artmaya meyillidir; durability bu bozulmayı sınırlama becerisidir.",
@@ -107,7 +107,7 @@ const RunningPerformancePage = ({ lang }) => {
                 <span className="text-cyan-400 font-bold">VO₂max’i</span> arabanın motor hacmi gibi düşün: performansın tavanını belirler. 
                 Yarış hızı ise çoğu zaman bu tavanın ne kadarını sürdürebildiğin (<span className="text-rose-400 font-bold">eşik</span>) ve bunu ne kadar verimli yaptığın (<span className="text-emerald-400 font-bold">koşu ekonomisi</span>) ile şekillenir. 
                 Ama yarış uzadıkça işler değişir; yorgunluk, bu iki unsuru da bozmaya başlar. 
-                <span className="text-amber-400 font-bold"> Durability</span> (fizyolojik direnç) ise arabanın lastik–süspansiyon–aerodinami kalitesi gibidir: yol uzadıkça performansın ne kadar “dağılmadan” kaldığını belirler. 
+                <span className="text-amber-400 font-bold"> Durability</span> (fizyolojik direnç) ise arabanın lastik–süspansiyon–soğutma kalitesi gibidir: yol uzadıkça performansın ne kadar “dağılmadan” kaldığını belirler. 
                 <br/><br/>
                 <span className="text-white font-semibold border-b border-slate-500 pb-0.5">En hızlı sonuç da tek bir özellikten değil, bu dört parçanın uyumundan çıkar.</span>
             </>
@@ -201,7 +201,7 @@ const RunningPerformancePage = ({ lang }) => {
         importance_title: "Which is more important and when?",
         importance_desc: (
             <>
-                <span className="text-cyan-400 font-bold">VO₂max</span> is like the engine displacement: it sets the ceiling. Race pace is determined by how much of that ceiling you can sustain (<span className="text-rose-400 font-bold">threshold</span>) and how efficiently you do it (<span className="text-emerald-400 font-bold">economy</span>). But as the race goes on, fatigue sets in. <span className="text-amber-400 font-bold">Durability</span> is like the quality of tires/suspension: it determines how well your performance holds up without "falling apart" over distance. <br/><br/><span class="text-white font-semibold border-b border-slate-500 pb-0.5">The fastest result comes not from one trait, but the harmony of all four.</span>
+                <span className="text-cyan-400 font-bold">VO₂max</span> is like the engine displacement: it sets the ceiling. Race pace is determined by how much of that ceiling you can sustain (<span className="text-rose-400 font-bold">threshold</span>) and how efficiently you do it (<span className="text-emerald-400 font-bold">economy</span>). But as the race goes on, fatigue sets in. <span className="text-amber-400 font-bold">Durability</span> is like the quality of tires/suspension: it determines how well your performance holds up without "falling apart" over distance. <br/><br/><span className="text-white font-semibold border-b border-slate-500 pb-0.5">The fastest result comes not from one trait, but the harmony of all four.</span>
             </>
         ),
 
