@@ -1,8 +1,20 @@
 (function() {
     const { useState, useEffect } = React;
 
-    const SvgIcon = ({ children, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    const SvgIcon = ({ children, className = "", size = 24, ...rest }) => (
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width={size} 
+            height={size} 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            className={className}
+            {...rest}
+        >
             {children}
         </svg>
     );
@@ -21,10 +33,36 @@
     };
 
     const KosuDili101Page = ({ lang }) => {
-        // DOĞRUDAN window.KosuDiliData KULLANILIYOR
-        const [allTerms] = useState(window.KosuDiliData || []); 
+        const [allTerms, setAllTerms] = useState([]); 
         const [displayedIndices, setDisplayedIndices] = useState([]);
         const [flippedCards, setFlippedCards] = useState({});
+
+        // --- GÜNCELLEME 1: Veriyi Polling İle Güvenli Yükleme ---
+        useEffect(() => {
+            // Eğer veri zaten window'da varsa hemen al
+            if (window.KosuDiliData && window.KosuDiliData.length > 0) {
+                setAllTerms(window.KosuDiliData);
+                return;
+            }
+
+            // Yoksa, script yüklenene kadar bekle (Polling)
+            const interval = setInterval(() => {
+                if (window.KosuDiliData && window.KosuDiliData.length > 0) {
+                    setAllTerms(window.KosuDiliData);
+                    clearInterval(interval);
+                }
+            }, 100); // 100ms'de bir kontrol et
+
+            // 5 saniye sonra hala gelmediyse pes et (Timeout)
+            const timeout = setTimeout(() => {
+                clearInterval(interval);
+            }, 5000);
+
+            return () => {
+                clearInterval(interval);
+                clearTimeout(timeout);
+            };
+        }, []);
 
         useEffect(() => {
             if (allTerms.length > 0) {
@@ -33,10 +71,16 @@
         }, [allTerms]);
 
         const getRandomIndex = (excludeIndices) => {
-            if (allTerms.length === 0) return 0;
+            const n = allTerms.length;
+            if (n === 0) return 0;
+
+            if (!excludeIndices || excludeIndices.length >= n) {
+                return Math.floor(Math.random() * n);
+            }
+
             let newIndex;
             do {
-                newIndex = Math.floor(Math.random() * allTerms.length);
+                newIndex = Math.floor(Math.random() * n);
             } while (excludeIndices.includes(newIndex));
             return newIndex;
         };
@@ -60,13 +104,16 @@
                 setFlippedCards(prev => ({ ...prev, [slotIndex]: true }));
             } else {
                 setFlippedCards(prev => ({ ...prev, [slotIndex]: false }));
+                
                 setTimeout(() => {
                     setDisplayedIndices(prev => {
                         const newArr = [...prev];
-                        newArr[slotIndex] = getRandomIndex(prev);
+                        if (allTerms.length > 4) {
+                            newArr[slotIndex] = getRandomIndex(prev);
+                        }
                         return newArr;
                     });
-                }, 300);
+                }, 600);
             }
         };
 
@@ -82,6 +129,10 @@
             }
         };
 
+        // --- GÜNCELLEME 2: Dil Seçimi Fallback ---
+        // lang prop'u 'tr' veya 'en' değilse varsayılan 'tr' kullan.
+        const safeLang = (lang === 'tr' || lang === 'en') ? lang : 'tr';
+
         const t = {
             tr: {
                 subtitle: "Koşucuların gizli dilini keşfetmeye hazır mısın?",
@@ -95,9 +146,9 @@
                 seeDef: "See Definition",
                 whatIs: "WHAT IS IT?"
             }
-        }[lang];
+        }[safeLang];
 
-        if (!allTerms || allTerms.length === 0) return <div className="text-center p-10 text-slate-500">Veri Yüklenemedi</div>;
+        if (!allTerms || allTerms.length === 0) return <div className="text-center p-10 text-slate-500">Yükleniyor...</div>;
 
         return (
             <div className="space-y-8 animate-fade-in pb-12">
@@ -118,7 +169,7 @@
                     <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary rounded-full blur-[80px] opacity-10 -ml-10 -mb-10"></div>
                     <div className="max-w-4xl mx-auto text-center relative z-10">
                         <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
-                            {lang === 'tr' ? 'Koşu Dili' : 'Running Lingo'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-slate-200">101</span>
+                            {safeLang === 'tr' ? 'Koşu Dili' : 'Running Lingo'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-slate-200">101</span>
                         </h1>
                         <p className="text-lg text-slate-400 font-light">{t.subtitle}</p>
                     </div>
@@ -135,8 +186,14 @@
                     {displayedIndices.map((termIndex, slotIndex) => {
                         const item = allTerms[termIndex];
                         if (!item) return null;
-                        const content = item[lang];
+                        
+                        // Fallback logic: safeLang ile al, yoksa tr'yi al, o da yoksa ilk key'i al
+                        const content = item[safeLang] || item['tr'] || item['en']; 
+                        
                         const isFlipped = flippedCards[slotIndex];
+
+                        // Kategori ismini güvenli bir şekilde büyük harfe çevir
+                        const categoryName = content.category ? (safeLang === 'tr' ? content.category.toLocaleUpperCase('tr-TR') : content.category.toUpperCase()) : '';
 
                         return (
                             <div key={slotIndex} className="card-container h-80 w-full cursor-pointer group" onClick={() => handleCardInteraction(slotIndex)}>
@@ -145,7 +202,7 @@
                                     <div className="card-front bg-slate-800 rounded-2xl border border-slate-700 p-6 flex flex-col items-center justify-between shadow-xl group-hover:border-primary/50 transition-colors">
                                         <div className="w-full flex justify-between items-start">
                                             <span className="bg-slate-950 text-slate-400 text-[10px] font-bold tracking-wider px-2 py-1 rounded truncate max-w-[120px]">
-                                                {lang === 'tr' ? content.category.toLocaleUpperCase('tr-TR') : content.category.toUpperCase()}
+                                                {categoryName}
                                             </span>
                                             <div className="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-primary transition-colors"></div>
                                         </div>
@@ -160,13 +217,11 @@
                                         </div>
                                     </div>
                                     
-                                    {/* BACK - RENKLİ ZEMİN TASARIMI (ESKİ HALİ) */}
-                                    {/* Opaklık: %80 (bg-primary/80) */}
+                                    {/* BACK */}
                                     <div className="card-back bg-primary/80 backdrop-blur-sm rounded-2xl p-5 flex flex-col shadow-xl text-white relative overflow-hidden">
-                                         {/* Arka plan silik ikon */}
                                          <div className="absolute top-0 right-0 p-4 opacity-10"><LocalIcons.Info size={64}/></div>
                                          
-                                         {/* Başlık - Yukarı Sabitlendi */}
+                                         {/* Başlık */}
                                          <div className="relative z-10 flex-none border-b border-black/10 pb-2 mb-2">
                                             <div className="flex items-center gap-2 opacity-80 mb-1">
                                                 <LocalIcons.Info size={14} />
@@ -175,8 +230,7 @@
                                             <h4 className="font-black text-lg leading-tight drop-shadow-sm">{content.term}</h4>
                                          </div>
 
-                                         {/* Tanım - Dikey Ortalanmış & Responsif Font Boyutu */}
-                                         {/* Mobil: text-base (Normal) | Masaüstü: md:text-sm (Bir tık küçük) */}
+                                         {/* Tanım */}
                                          <div className="relative z-10 flex-1 overflow-y-auto custom-scrollbar pr-1">
                                             <div className="min-h-full flex items-center">
                                                 <p className="text-base md:text-sm font-semibold leading-relaxed drop-shadow-sm text-white">
