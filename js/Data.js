@@ -40,40 +40,55 @@ window.HybNotesData = {
 
     ],
     facts: [
-        { 
-            "tag": "#Fizyoloji", 
-            "text": { 
-                "tr": "Laktat asidoza neden olmaz; tam tersine, asidozu önlemeye çalışan bir tamponlama sürecinin yan ürünüdür. Asıl suçlu ATP hidrolizi sonucu açığa çıkan H+ iyonlarıdır.", 
-                "en": "Lactate does not cause acidosis; rather, it is a byproduct of a buffering process attempting to prevent it. The real culprit is H+ ions released from ATP hydrolysis." 
-            } 
-        },
-{ 
-  "tag": "#Fizyoloji", 
-  "text": { 
-    "tr": "Eşik hızın (LT), motor gücün (VO₂max) ve ne kadar verimli koştuğunun (ekonomi) birleşimidir. FU ise şunu söyler: Bu eşiğe, VO₂max’inin yüzde kaçıyla çıkıyorsun?", 
-    "en": "Your threshold pace (LT) comes from your engine size (VO₂max) and how efficiently you run (economy). FU simply answers: what percentage of your VO₂max are you using at that threshold?" 
-  } 
-},
-        { 
-            "tag": "#Beslenme", 
-            "text": { 
-                "tr": "Pancar suyu (nitrat), kan damarlarını genişleterek oksijen maliyetini düşürebilir ve özellikle yüksek irtifada performansı artırabilir.", 
-                "en": "Beetroot juice (nitrate) can vasodilate blood vessels, reducing oxygen cost and improving performance, especially at high altitudes." 
-            } 
-        },
-        { 
-            "tag": "#Mekanik", 
-            "text": { 
-                "tr": "Ayakkabı ağırlığındaki her 100 gramlık artış, maraton süresini ortalama 3-4 dakika yavaşlatır.", 
-                "en": "Every 100-gram increase in shoe weight slows down marathon time by an average of 3-4 minutes." 
-            } 
-        },
-        { 
-            "tag": "#Antrenman", 
-            "text": { 
-                "tr": "Polarize antrenman modeli (80/20 kuralı), hem elit hem de amatör sporcularda VO2max artışı için en verimli yöntem olarak kanıtlanmıştır.", 
-                "en": "The polarized training model (80/20 rule) has been proven as the most efficient method for VO2max improvement in both elite and amateur athletes." 
-            } 
-        }
-    ]
+  {
+    "tag": "#Fizyoloji",
+    "text": {
+      "tr": "Laktat tek başına “asit” değildir; yoğun egzersizde pH düşüşü esasen H+ birikimiyle ilişkilidir. Laktat genelde bu süreçle birlikte yükseldiği için çoğu zaman neden sanılır.",
+      "en": "Lactate itself isn’t “acid”; during hard exercise, the drop in pH is mainly linked to H+ accumulation. Lactate rises alongside this process, so it’s often mistaken as the cause."
+    }
+  },
+  {
+    "tag": "#Fizyoloji",
+    "text": {
+      "tr": "Eşik hızın (LT), VO₂max’in ve koşu ekonominin birlikte ürettiği “sürdürülebilir hızlı tempo”dur. FU ise basitçe şunu söyler: Eşiğe çıkarken VO₂max’inin yüzde kaçını kullanıyorsun?",
+      "en": "Your threshold pace (LT) is the fastest sustainable pace shaped by both VO₂max and running economy. FU simply asks: what percentage of your VO₂max are you using at that threshold?"
+    }
+  },
+  {
+    "tag": "#Beslenme",
+    "text": {
+      "tr": "Pancar suyu (nitrat), bazı kişilerde egzersizde oksijen maliyetini azaltıp performansı iyileştirebilir; fakat özellikle irtifa/hypoxia ortamında sonuçlar her zaman tutarlı değildir.",
+      "en": "Beetroot juice (nitrate) can lower the oxygen cost of exercise and improve performance in some people, but results—especially in altitude/hypoxia—are not always consistent."
+    }
+  },
+  {
+    "tag": "#Takviye",
+    "text": {
+      "tr": "Kafein, çoğu sporcuda dayanıklılık performansını artırabilir; yaygın etkili doz aralığı 3–6 mg/kg ve genelde antrenmandan ~60 dk önce alınır. Daha yüksek dozlar yan etki riskini artırır.",
+      "en": "Caffeine can improve endurance performance for many athletes; a common effective range is 3–6 mg/kg, often taken ~60 minutes pre-exercise. Higher doses raise the risk of side effects."
+    }
+  },
+  {
+    "tag": "#Mekanik",
+    "text": {
+      "tr": "Ayakkabıyı ağırlaştırmak koşu ekonomisini kötüleştirir: yaklaşık her +100 g/ayakkabı artışı, oksijen maliyetini kabaca ~%1 civarı artırabilir (kişiye ve hıza göre değişir).",
+      "en": "Heavier shoes worsen running economy: roughly every +100 g per shoe can increase oxygen cost by around ~1% (varies by person and pace)."
+    }
+  },
+  {
+    "tag": "#Antrenman",
+    "text": {
+      "tr": "Polarize antrenman (çoğu zaman “çok kolay + az ama kaliteli yoğun”) VO₂max/VO₂peak’i geliştirmede sıkça etkili bulunur; fakat performans için her zaman diğer modellerden üstün değildir (bağlama bağlıdır).",
+      "en": "Polarized training (“a lot easy + a little hard”) is often effective for improving VO₂max/VO₂peak, but it isn’t always superior for performance versus other models—it depends on context."
+    }
+  },
+  {
+    "tag": "#UltraTrail",
+    "text": {
+      "tr": "Ultra dayanıklılıkta yağ oksidasyonu önemli bir enerji kaynağıdır; yine de yarışta sürdürülebilir tempo için karbonhidrat alımı kritik olabilir. Uzun yarışlarda birçok rehber 60–90 g/saat karbonhidratı hedeflemeyi önerir.",
+      "en": "In ultra-endurance, fat oxidation is a major fuel source, but carbohydrates can still be critical for sustaining pace. Many guidelines suggest targeting ~60–90 g/hour of carbs in long events."
+    }
+  }
+]
+
 };
