@@ -2,14 +2,14 @@ window.KosuDiliData = [
   {
     "id": 1,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "Tempo (Pace)", "def": "Koşunun hız dili. 1 kilometreyi kaç dakikada tamamladığını gösterir (dk/km). Sayı küçüldükçe hız artar." },
-    "en": { "category": "Basic Metrics", "term": "Pace", "def": "The universal language of speed. It shows how many minutes it takes to run 1 km (or 1 mile). Lower numbers mean faster running." }
+    "tr": { "category": "Temel Metrikler", "term": "Tempo (Pace)", "def": "Koşunun hız dili. 1 kilometreyi kaç dakikada tamamladığını gösterir (dk/km): Genel olarak 4:00 pace hızlı, 7:00 pace yavaş kabul edilir." },
+    "en": { "category": "Basic Metrics", "term": "Pace", "def": "The language of speed in running. It shows how many minutes it takes to complete 1 kilometer (min/km): Generally, a 4:00 pace is considered fast, and a 7:00 pace is considered slow." }
   },
   {
     "id": 2,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "Kadans (Cadence)", "def": "Dakikadaki adım sayısıdır (SPM). Tek bir “ideal” sayı yoktur; hız ve stile göre değişir. Birçok koşucuda daha yüksek kadans (çoğunlukla ~170–180+) verimlilikle ilişkilendirilir." },
-    "en": { "category": "Basic Metrics", "term": "Cadence", "def": "Steps per minute (SPM). There is no single “ideal” number—it varies by speed and form. A higher cadence (often ~170–180+) is commonly associated with better running efficiency." }
+    "tr": { "category": "Temel Metrikler", "term": "Kadans", "def": "Dakikadaki adım sayısıdır (SPM). Tek bir “ideal” sayı yoktur; hız ve stile göre değişir. Sayısal olarak 160 ila 190 arasında değişir." },
+    "en": { "category": "Basic Metrics", "term": "Cadence", "def": "Steps per minute (SPM). There is no single “ideal” number; it varies by speed and style. Numerically, it ranges between 160 and 190." }
   },
   {
     "id": 3,
@@ -20,55 +20,55 @@ window.KosuDiliData = [
   {
     "id": 4,
     "catId": "metrics",
-    "tr": { "category": "Temel Metrikler", "term": "PB / PR", "def": "Kişisel en iyi derecen (Personal Best/Record). Belirli bir mesafede (5K, 10K, Yarı Maraton, Maraton vb.) bugüne kadar koştuğun en hızlı süredir." },
-    "en": { "category": "Basic Metrics", "term": "PB / PR", "def": "Personal Best/Record. Your fastest time ever recorded for a specific distance (e.g., 5K, 10K, Half Marathon, Marathon)." }
+    "tr": { "category": "Temel Metrikler", "term": "PB / PR", "def": "Kişisel en iyi derece (Personal Best/Record). Belirli bir mesafede (5K, 10K, Yarı Maraton, Maraton vb.) koşulan en hızlı süredir." },
+    "en": { "category": "Basic Metrics", "term": "PB / PR", "def": "Personal Best/Record. The fastest time ever recorded for a specific distance (e.g., 5K, 10K, Half Marathon, Marathon)." }
   },
   {
     "id": 5,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Easy Run", "def": "Konuşma hızında, düşük eforlu koşu. Aerobik tabanı geliştirir ve toparlanmayı destekler; “zorlanmadan” düzenli hacim biriktirmeyi sağlar." },
-    "en": { "category": "Training", "term": "Easy Run", "def": "A conversational, low-effort run. Builds aerobic base and supports recovery, allowing you to accumulate volume without heavy stress." }
+    "tr": { "category": "Antrenman", "term": "Easy Koşu", "def": "Konuşma hızında (Z1/Z2), düşük eforlu koşu. Aerobik tabanı geliştirir ve toparlanmayı destekler; “zorlanmadan” düzenli hacim biriktirmeyi sağlar." },
+    "en": { "category": "Training", "term": "Easy Run", "def": "A conversational, low-effort run (Z1/Z2). Builds aerobic base and supports recovery, allowing you to accumulate volume without heavy stress." }
   },
   { 
     "id": 6,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Long Run", "def": "Haftanın en uzun koşusu. Kaslara ve zihne 'ayakta kalmayı' öğretir, dayanıklılığı (enduransı) temelden inşa eder." },
+    "tr": { "category": "Antrenman", "term": "Uzun Koşu", "def": "Haftanın en uzun koşusu. Kaslara ve zihne 'ayakta kalmayı' öğretir, dayanıklılığı (enduransı) temelden inşa eder." },
     "en": { "category": "Training", "term": "Long Run", "def": "The longest run of the week. Teaches muscles and mind to endure, building the foundation of stamina." }
   },
   { 
     "id": 7,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Recovery Run", "def": "Aktif dinlenme koşusu. Amaç hız değil, kan dolaşımını artırıp kaslardaki yorgunluğu atmaktır. Çok yavaş tempoda yapılır." },
-    "en": { "category": "Training", "term": "Recovery Run", "def": "Active rest on the move. Done at a very slow pace to flush out fatigue and promote blood flow, not to build fitness." }
+    "tr": { "category": "Antrenman", "term": "Recovery Run", "def": "Aktif dinlenme koşusu, easy koşudur. Amaç hız değil, kan dolaşımını artırıp kaslardaki yorgunluğu atmaktır. Çok yavaş tempoda yapılır." },
+    "en": { "category": "Training", "term": "Recovery Run", "def": "Active rest on the move, an easy run. Done at a very slow pace to flush out fatigue and promote blood flow, not to build fitness." }
   },
   { 
     "id": 8,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Tempo Run", "def": "'Rahat ama zor' bir tempoda sürdürülen koşu. Vücudun laktatı temizleme hızını artırarak yarış temposuna dayanıklılık kazandırır." },
-    "en": { "category": "Training", "term": "Tempo Run", "def": "A 'comfortably hard' sustained effort. Improves the body's ability to clear lactate and hold race pace longer." }
+    "tr": { "category": "Antrenman", "term": "Tempo Koşusu", "def": "'Rahat ama zor' bir tempoda sürdürülen koşu (Z3/Z4). Vücudun laktatı temizleme hızını artırarak yarış temposuna dayanıklılık kazandırır." },
+    "en": { "category": "Training", "term": "Tempo Run", "def": "A 'comfortably hard' sustained effort (Z3/Z4). Improves the body's ability to clear lactate and hold race pace longer." }
   },
   { 
     "id": 9,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Laktik Eşiği Koşusu", "def": "Laktat eşiği sınırında, 'kontrollü acı' temposu. Yüksek hızı daha uzun süre koruyabilmek için eşiği yukarı taşır." },
-    "en": { "category": "Training", "term": "Threshold Run", "def": "Running right at your lactate limit. Raises your threshold to sustain higher speeds for longer periods." }
+    "tr": { "category": "Antrenman", "term": "Eşik Koşusu", "def": "Laktat eşiği sınırında, 'kontrollü acı' temposu (Z4+). Yüksek hızı daha uzun süre koruyabilmek için eşiği yukarı taşır." },
+    "en": { "category": "Training", "term": "Threshold Run", "def": "Running right at your lactate limit (Z4+). Raises your threshold to sustain higher speeds for longer periods." }
   },
   { 
     "id": 10,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Interval", "def": "Yüksek hızda koşu ve dinlenme (jog) bölümlerinin tekrarı. Hız, güç ve patlayıcılığı artırmanın en etkili yoludur." },
-    "en": { "category": "Training", "term": "Interval", "def": "Alternating between high-speed bursts and rest periods. The most effective way to build speed and power." }
+    "tr": { "category": "Antrenman", "term": "Interval", "def": "Yüksek nabızda koşu (Z5) ve dinlenme (jog) bölümlerinin tekrarı. Hız, güç ve patlayıcılığı artırmanın en etkili yoludur." },
+    "en": { "category": "Training", "term": "Interval", "def": "Alternating between high-heart-rate bursts (Z5) and rest periods. The most effective way to build speed and power." }
   },
-  { 
+  {
     "id": 11,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Fartlek", "def": "İsveççe 'Hız Oyunu'. Yapısı esnek, kuralsız, hızlı ve yavaş bölümlerin iç içe geçtiği eğlenceli bir antrenmandır." },
-    "en": { "category": "Training", "term": "Fartlek", "def": "Swedish for 'Speed Play'. A flexible, unstructured run mixing fast and slow segments naturally." }
+    "tr": { "category": "Antrenman", "term": "Fartlek", "def": "İsveççe 'Hız Oyunu'. Yapısı esnek, kuralsız, hızlı ve yavaş bölümlerin iç içe geçtiği eğlenceli bir antrenmandır. Bazen hızlı uzun bazen yavaş kısa" },
+    "en": { "category": "Training", "term": "Fartlek", "def": "Swedish for 'Speed Play'. It is a fun workout with a flexible, unstructured structure where fast and slow segments are intertwined. Sometimes fast and long, sometimes slow and short." }
   },
   { 
     "id": 12,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Hızlanarak Koşu", "def": "Yavaş başlayıp her kilometrede biraz daha hızlandığın antrenman. Yarışın sonunu güçlü bitirmeyi öğretir." },
+    "tr": { "category": "Antrenman", "term": "Hızlanan Koşu", "def": "Yavaş başlayıp her kilometrede biraz daha hızlandığın antrenman. Yarışın sonunu güçlü bitirmeyi öğretir." },
     "en": { "category": "Training", "term": "Progression Run", "def": "Starting slow and getting faster with every mile/km. Teaches you to finish races strong." }
   },
   { 
@@ -80,20 +80,20 @@ window.KosuDiliData = [
   { 
     "id": 14,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Drilller", "def": "Koşu tekniğini geliştiren hareketler (Diz çekme, topuk çekme vb.). Beyin-kas bağlantısını ve koordinasyonu güçlendirir." },
-    "en": { "category": "Training", "term": "Drills", "def": "Technical exercises (High knees, etc.) to improve running mechanics, coordination, and brain-muscle connection." }
+    "tr": { "category": "Antrenman", "term": "Drill'ler", "def": "Koşu tekniğini geliştiren hareketler (Diz çekme, topuk çekme vb.). Beyin-kas bağlantısını ve koşu ekonomisini güçlendirir." },
+    "en": { "category": "Training", "term": "Drills", "def": "Technical exercises (High knees, etc.) to improve running mechanics/economy, coordination, and brain-muscle connection." }
   },
-  { 
+  {
     "id": 15,
     "catId": "training",
-    "tr": { "category": "Antrenman", "term": "Cross-Antrenman", "def": "Koşu dışı kardiyo (bisiklet, yüzme). Eklemlere yük bindirmeden kondisyonu korumanın en iyi yoludur." },
-    "en": { "category": "Training", "term": "Cross-Training", "def": "Non-running cardio (cycling, swimming). The best way to maintain fitness without impact on joints." }
+    "tr": { "category": "Antrenman", "term": "Çapraz-Antrenman", "def": "Koşu dışı yapılan antrenmanlar (bisiklet, yüzme, crossfit vs). Off sezonda ve koşu olmayan günlerde güçlenmek için alternatif sporlardır." },
+    "en": { "category": "Training", "term": "Cross-Training", "def": "Workouts done outside of running (cycling, swimming, CrossFit, etc.). They are alternative sports for strengthening during the off-season and on non-running days." }
   },
-  { 
+  {
     "id": 16,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "RPE", "def": "Algılanan Efor Derecesi (1-10). Saate bakmadan, 'Hissim ne diyor?' sorusuna verilen cevaptır. 1 çok rahat, 10 tükeniştir." },
-    "en": { "category": "Physiology", "term": "RPE", "def": "Rate of Perceived Exertion (1-10). Judging effort by feel rather than a watch. 1 is very easy, 10 is exhaustion." }
+    "tr": { "category": "Fizyoloji", "term": "Off Sezon", "def": "Yarış sezonunun ardından gelen planlı dinlenme ve toparlanma dönemidir. Vücudun ve zihnin yenilenmesi için antrenman hacmi ve şiddeti belirgin şekilde azaltılır." },
+    "en": { "category": "Physiology", "term": "Off-Season", "def": "The planned period of rest and recovery following the racing season. Training volume and intensity are significantly reduced to allow the body and mind to rejuvenate." }
   },
   { 
     "id": 17,
