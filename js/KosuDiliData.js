@@ -98,38 +98,38 @@ window.KosuDiliData = [
   { 
     "id": 17,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "HR Aralıkları", "def": "Nabız Bölgeleri. Antrenman şiddetini kalbin atış hızına göre 5 farklı zorluk derecesine ayıran sistemdir." },
-    "en": { "category": "Physiology", "term": "HR Zones", "def": "Training zones based on heart rate, usually divided into 5 intensity levels to guide effort." }
+    "tr": { "category": "Fizyoloji", "term": "HR Aralıkları", "def": "Nabız Bölgeleri (Z1-Z5). Antrenman şiddetini kalbin atış hızına göre 5 farklı zorluk derecesine ayıran sistemdir." },
+    "en": { "category": "Physiology", "term": "HR Zones", "def": "Training zones based on heart rate (Z1-Z5), usually divided into 5 intensity levels to guide effort." }
   },
   { 
     "id": 18,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Zone 2", "def": "Konuşulabilir aerobik bölge. Yorulmadan, yağ yakarak çok uzun süre koşulabilen temel gelişim bölgesidir." },
-    "en": { "category": "Physiology", "term": "Zone 2", "def": "The conversational zone. The foundational intensity where you burn fat and can run for hours without fatigue." }
+    "tr": { "category": "Fizyoloji", "term": "Zone 2", "def": "Konuşulabilir aerobik bölge, easy koşular bu bölgede yapılır. Yorulmadan, yağ yakarak çok uzun süre koşulabilen temel gelişim bölgesidir." },
+    "en": { "category": "Physiology", "term": "Zone 2", "def": "The conversational zone. Easy runs. The foundational intensity where you burn fat and can run for hours without fatigue." }
   },
   { 
     "id": 19,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Base", "def": "Hız çalışmadan önce, düşük yoğunluklu koşularla yapılan koşu ekonomisi ve form inşa dönemi." },
-    "en": { "category": "Physiology", "term": "Base", "def": "The foundation. A period of low-intensity running to build endurance before adding speed work." }
+    "tr": { "category": "Fizyoloji", "term": "Base", "def": "Hız çalışmadan önce, düşük yoğunluklu koşularla yapılan koşu ekonomisi ve form inşa dönemi. Z1-Z2 koşusudur temeldee." },
+    "en": { "category": "Physiology", "term": "Base", "def": "The foundation. A period of low-intensity running to build endurance before adding speed work. (Z1-Z2)" }
   },
   { 
     "id": 20,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Laktak Eşiği", "def": "Egzersiz şiddeti arttıkça, kandaki laktatın sabit kalamadığı ve belirgin şekilde yükselmeye başladığı yoğunluk. Bu noktanın üstünde sürdürülebilirlik hızla azalır." },
-    "en": { "category": "Physiology", "term": "Lactate Threshold", "def": "As exercise intensity increases, this is the point where blood lactate can no longer remain steady and begins to rise noticeably. Above this threshold, sustainability drops rapidly." }
+    "tr": { "category": "Fizyoloji", "term": "Laktak Eşiği", "def": "Egzersiz şiddeti arttıkça, kandaki laktatın sabit kalamadığı ve belirgin şekilde yükselmeye başladığı yoğunluk (LT2). Bu noktanın üstünde sürdürülebilirlik hızla azalır." },
+    "en": { "category": "Physiology", "term": "Lactate Threshold", "def": "As exercise intensity increases, this is the point where blood lactate can no longer remain steady and begins to rise noticeably (LT2). Above this threshold, sustainability drops rapidly." }
   },
   {
     "id": 21,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Aerobik", "def": "Oksijen kullanarak enerji üretimi. Genellikle düşük-orta şiddette, uzun süre sürdürülebilen eforları ifade eder." },
-    "en": { "category": "Physiology", "term": "Aerobic", "def": "Energy production that relies on oxygen. Typically refers to low-to-moderate intensity efforts that can be sustained for long durations." }
+    "tr": { "category": "Fizyoloji", "term": "Aerobik", "def": "Oksijen kullanarak enerji üretimi. Genellikle düşük-orta şiddette (Z1-Z3), uzun süre sürdürülebilen eforları ifade eder." },
+    "en": { "category": "Physiology", "term": "Aerobic", "def": "Energy production that relies on oxygen (Z1-Z3). Typically refers to low-to-moderate intensity efforts that can be sustained for long durations." }
   },
   {
     "id": 22,
     "catId": "physiology",
-    "tr": { "category": "Fizyoloji", "term": "Anaerobik", "def": "Oksijenin enerji üretimini karşılamaya yetmediği yüksek şiddetli eforlar. Kısa süreli, yoğun çalışmalarda (sprint/çok sert interval) anaerobik enerji sistemleri daha baskın olur." },
-    "en": { "category": "Physiology", "term": "Anaerobic", "def": "High-intensity efforts where oxygen cannot meet the energy demand. During short, hard work (sprints/very hard intervals), anaerobic energy systems become dominant." }
+    "tr": { "category": "Fizyoloji", "term": "Anaerobik", "def": "Oksijenin enerji üretimini karşılamaya yetmediği yüksek şiddetli eforlar (Z4-Z5). Kısa süreli, yoğun çalışmalarda (sprint/çok sert interval) anaerobik enerji sistemleri daha baskın olur." },
+    "en": { "category": "Physiology", "term": "Anaerobic", "def": "High-intensity efforts where oxygen cannot meet the energy demand (Z4-Z5). During short, hard work (sprints/very hard intervals), anaerobic energy systems become dominant." }
   },
   {
     "id": 23,
@@ -140,31 +140,31 @@ window.KosuDiliData = [
   { 
     "id": 24,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Negative Split", "def": "Yarışı, başladığından daha hızlı bitirme stratejisi. Sabır ve güç gerektirir, en iyi dereceler genelde böyle gelir." },
+    "tr": { "category": "Yarış Stratejisi", "term": "Negative Split", "def": "Yarışı, başladığından daha hızlı bitirme stratejisi. Sabır ve güç gerektirir, en iyi dereceler (PBler) genelde bununla gelir." },
     "en": { "category": "Race Strategy", "term": "Negative Split", "def": "Finishing faster than you started. A disciplined strategy that often leads to personal bests." }
   },
   { 
     "id": 25,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Positive Split", "def": "Hızlı başlayıp yavaşlayarak bitirme. Genelde heyecanla yarışın başında enerjiyi tüketmenin sonucudur." },
+    "tr": { "category": "Yarış Stratejisi", "term": "Positif Split", "def": "Hızlı başlayıp yavaşlayarak bitirme. Genelde heyecanla yarışın başında enerjiyi tüketmenin sonucudur." },
     "en": { "category": "Race Strategy", "term": "Positive Split", "def": "Starting fast and fading late. Usually the result of burning too much energy in the excitement of the start." }
   },
   { 
     "id": 26,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Even Split", "def": "Robot gibi koşmak. Yarışın başından sonuna kadar tempoyu sabit tutma stratejisi." },
+    "tr": { "category": "Yarış Stratejisi", "term": "Eşit Split", "def": "Robot gibi koşmak. Yarışın başından sonuna kadar tempoyu sabit tutma stratejisi." },
     "en": { "category": "Race Strategy", "term": "Even Split", "def": "Running like a metronome. Maintaining a consistent pace from start to finish." }
   },
   { 
     "id": 27,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Duvar", "def": "Duvara çarpmak: Genelde maratonun 30. km'sinden sonra glikojenin bitmesiyle gelen ani fiziksel ve zihinsel tükeniş." },
-    "en": { "category": "Race Strategy", "term": "The Wall", "def": "Sudden depletion. Hitting a physical and mental barrier, usually around km 30 of a marathon, due to lack of fuel." }
+    "tr": { "category": "Yarış Stratejisi", "term": "Duvara Çarpmak", "def": "Genelde maratonun 30. km'sinden sonra glikojenin bitmesiyle gelen ani fiziksel ve zihinsel tükeniş." },
+    "en": { "category": "Race Strategy", "term": "Hitting The Wall", "def": "Sudden depletion. Hitting a physical and mental barrier, usually around km 30 of a marathon, due to lack of fuel." }
   },
   { 
     "id": 28,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "CP (Checkpoint)", "def": "Kontrol Noktası, İstasyon. Yarış parkurunda sürenin kaydedildiği ve bazen yiyecek/içecek ikmalinin yapıldığı ara istasyonlar." },
+    "tr": { "category": "Yarış Stratejisi", "term": "CP (İstasyon)", "def": "Kontrol Noktası, İstasyon. Yarış parkurunda sürenin kaydedildiği ve bazen yiyecek/içecek ikmalinin yapıldığı ara istasyonlar." },
     "en": { "category": "Race Strategy", "term": "CP (Checkpoint)", "def": "Timing mats or aid stations along the course where your split time is recorded." }
   },
   { 
@@ -173,11 +173,11 @@ window.KosuDiliData = [
     "tr": { "category": "Yarış Stratejisi", "term": "Cut-off", "def": "Zaman sınırı. Yarışta belirli bir noktaya veya bitişe, organizasyonun belirlediği saatten önce ulaşma zorunluluğu." },
     "en": { "category": "Race Strategy", "term": "Cut-off", "def": "The strict time limit to reach a checkpoint or finish line to be allowed to continue or receive a medal." }
   },
-  { 
+  {
     "id": 30,
     "catId": "race",
-    "tr": { "category": "Yarış Stratejisi", "term": "Pacer (Tavşan)", "def": "Hedef süresi sırtında yazan rehber koşucu. Onu takip edersen hedeflediğin sürede yarışı bitirirsin." },
-    "en": { "category": "Race Strategy", "term": "Pacer", "def": "A guide runner marking a specific finish time. Sticking with them helps you hit your time goal." }
+    "tr": { "category": "Yarış Stratejisi", "term": "Pacer", "def": "Koşu gruplarında veya yarışlarda belli bir hızda gitmeyi tahattüt eden koşuculardır. Takip edersen genellikle belirtilen tempolarda koşabilirsin." },
+    "en": { "category": "Race Strategy", "term": "Pacer", "def": "Runners who commit to going at a certain speed in running groups or races. If you follow them, you can generally run at the specified paces." }
   },
   {
     "id": 31,
