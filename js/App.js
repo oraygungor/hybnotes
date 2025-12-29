@@ -396,7 +396,12 @@ const App = () => {
                                             <span className="text-sm">{lang === 'tr' ? 'Sesli Dinle' : 'Listen Audio'}</span>
                                         </div>
                                         {/* Standart HTML5 Audio Player - Tailwind ile biraz stilize edildi */}
-                                        <audio controls className="w-full h-8 block rounded-lg focus:outline-none accent-primary" src={article.audio[lang]}>
+                                        <audio   controls 
+                                                 preload="none"
+                                            className="w-full h-8 block rounded-lg focus:outline-none accent-primary" 
+                                                src={article.audio[lang]}
+                                                key={article.audio[lang]}
+                                        >
                                             Your browser does not support the audio element.
                                         </audio>
                                     </div>
