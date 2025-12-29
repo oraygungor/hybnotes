@@ -188,13 +188,13 @@ window.KosuDiliData = [
   {
     "id": 32,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Stride Length (Adım Uzunluğu)", "def": "Bir adımda katettiğin mesafe. Hız arttıkça genelde uzar; kadansla birlikte pace’i belirler. Aşırı uzatma verimi düşürebilir." },
+    "tr": { "category": "Biyomekanik", "term": "Adım Uzunluğu", "def": "Bir adımda katettiğin mesafe. Hız arttıkça genelde uzar; kadansla birlikte pace’i belirler. Aşırı uzatma verimi düşürebilir." },
     "en": { "category": "Biomechanics", "term": "Stride Length", "def": "The distance covered in one step. It usually increases as speed increases and works together with cadence to determine pace. Overextending can reduce efficiency." }
   },
   {
     "id": 33,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Overstriding", "def": "Ayağın gövdenin çok önüne düşmesi. “Fren” etkisi yaratıp verimi azaltabilir ve bazı sakatlık risklerini artırabilir." },
+    "tr": { "category": "Biyomekanik", "term": "Aşırı Uzun Adım", "def": "Ayağın gövdenin çok önüne düşmesi. “Fren” etkisi yaratıp verimi azaltabilir ve bazı sakatlık risklerini artırabilir." },
     "en": { "category": "Biomechanics", "term": "Overstriding", "def": "Landing with your foot too far ahead of your body. It can create braking forces, reduce efficiency, and increase injury risk." }
   },
   {
@@ -206,14 +206,14 @@ window.KosuDiliData = [
 {
     "id": 35,
     "catId": "biomechanics",
-    "tr": { "category": "Biyomekanik", "term": "Drop", "def": "Topuk–burun farkı. Ayakkabının topuk yüksekliği ile burun (ön ayak) yüksekliği arasındaki mm farkıdır. Basış hissini ve yük dağılımını etkileyebilir." },
-    "en": { "category": "Biomechanics", "term": "Drop", "def": "Heel-to-toe drop. The difference in height (mm) between the heel and the forefoot of the shoe. It can influence how load is distributed when you run." }
+    "tr": { "category": "Biyomekanik", "term": "Drop", "def": "Ayakkabıda topuk–burun farkı. Ayakkabının topuk yüksekliği ile burun (ön ayak) yüksekliği arasındaki mm farkıdır. Basış hissini ve yük dağılımını etkiler." },
+    "en": { "category": "Biomechanics", "term": "Drop", "def": "Heel-to-toe drop. The difference in height (mm) between the heel and the forefoot of the shoe. It influences how load is distributed when you run." }
   },
   {
     "id": 36,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Shin Splints", "def": "Kaval kemiği boyunca ağrı (özellikle iç-alt kısım). Genelde yükü (mesafe/tempo) çok hızlı artırınca ortaya çıkar; tek bir “iltihap” gibi düşünmek yerine aşırı kullanım kaynaklı bir sorun olarak bilmek daha doğrudur." },
-    "en": { "category": "Health", "term": "Shin Splints", "def": "Pain along the shin (often the inner lower tibia), commonly triggered by increasing mileage or intensity too quickly." }
+    "tr": { "category": "Sağlık", "term": "Shin Splints", "def": "Kaval kemiği boyunca ağrı (özellikle iç-alt kısım). Genelde yükü (mesafe/tempo) çok hızlı artırınca ortaya çıkar; acemi koşusu sakatlığıdır. Genellikle geçicidir fakat kronikleşebilir." },
+    "en": { "category": "Health", "term": "Shin Splints", "def": "Pain along the shin bone (especially the inner-lower part). It usually appears when the load (distance/pace) is increased too quickly; it is a novice running injury. It is usually temporary but can become chronic." }
   },
   {
     "id": 37,
@@ -224,26 +224,26 @@ window.KosuDiliData = [
   {
     "id": 38,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Overtraining", "def": "Aşırı yüklenme. Yük ve dinlenme dengesinin bozulmasıyla toparlanmanın yetişmemesi; performansın uzun süre düşmesi ve kronik yorgunluk hali." },
-    "en": { "category": "Health", "term": "Overtraining", "def": "Overtraining. A prolonged state of fatigue and performance decline when training load consistently exceeds the body's ability to recover." }
+    "tr": { "category": "Sağlık", "term": "Aşırı yüklenme", "def": "Yük ve dinlenme dengesinin bozulmasıyla toparlanmanın yetişmemesi; performansın uzun süre düşmesi ve kronik yorgunluk hali." },
+    "en": { "category": "Health", "term": "Overtraining", "def": "A prolonged state of fatigue and performance decline when training load consistently exceeds the body's ability to recover." }
   },
   {
     "id": 39,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Runner’s High", "def": "Koşucu kafası. Uzun/orta-uzun koşularda bazı kişilerde görülen doğal iyi his hali; endokannabinoid sistemiyle ilişkilendirilen öfori ve rahatlama." },
-    "en": { "category": "Health", "term": "Runner’s High", "def": "Runner’s high. A natural sense of euphoria and calm that some people feel during or after longer runs, linked to changes in brain chemistry (including endocannabinoids)." }
+    "tr": { "category": "Sağlık", "term": "Koşucu Kafası", "def": "Uzun/orta-uzun koşularda bazı kişilerde görülen doğal iyi his hali; endokannabinoid sistemiyle ilişkilendirilen öfori ve rahatlama." },
+    "en": { "category": "Health", "term": "Runner’s High", "def": "A natural sense of euphoria and calm that some people feel during or after longer runs, linked to changes in brain chemistry (including endocannabinoids)." }
   },
   {
     "id": 40,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Carb Loading", "def": "Karbonhidrat yüklemesi. Özellikle yarı maraton/maraton öncesi kas glikojen depolarını artırmak için son günlerde karbonhidrat alımını planlı şekilde yükseltme." },
-    "en": { "category": "Health", "term": "Carb Loading", "def": "Carb loading. Increasing carbohydrate intake in the days before a long race to maximize muscle glycogen stores." }
+    "tr": { "category": "Sağlık", "term": "Karb Yüklemesi", "def": "Özellikle yarı maraton/maraton öncesi kas glikojen depolarını artırmak için son günlerde karbonhidrat alımını planlı şekilde yükseltme." },
+    "en": { "category": "Health", "term": "Carb Loading", "def": "Increasing carbohydrate intake in the days before a long race to maximize muscle glycogen stores." }
   },
   {
     "id": 41,
     "catId": "health",
-    "tr": { "category": "Sağlık", "term": "Elektrolit", "def": "Terle kaybedilen mineraller (özellikle sodyum; ayrıca potasyum, magnezyum vb.). Uzun koşularda yerine koymak sıvı dengesini ve performansı destekler." },
-    "en": { "category": "Health", "term": "Electrolytes", "def": "Minerals lost in sweat (especially sodium, plus potassium, magnesium, etc.). Replacing them during longer efforts supports fluid balance and performance." }
+    "tr": { "category": "Sağlık", "term": "Elektrolit", "def": "Terle kaybedilen mineraller (özellikle sodyum). Uzun koşularda yerine koymak sıvı dengesini ve performansı destekler." },
+    "en": { "category": "Health", "term": "Electrolytes", "def": "Minerals lost in sweat (especially sodium). Replacing them during longer efforts supports fluid balance and performance." }
   },
   {
     "id": 42,
