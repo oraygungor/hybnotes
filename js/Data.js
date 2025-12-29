@@ -34,7 +34,7 @@ window.HybNotesData = {
     ]
   },
         
- [
+ 
   {
     "id": 2,
     "date": "2025-12-29",
@@ -73,7 +73,7 @@ window.HybNotesData = {
       "[12] Llanos-Lagos, C., et al. (2024). Effect of strength training programs in middle- and long-distance runners’ economy at different running speeds:   A systematic review with meta-analysis. Sports Medicine, 54(4), 895–932. https://doi.org/10.1007/s40279-023-01978-y   PMCID: https://pmc.ncbi.nlm.nih.gov/articles/PMC11052887/"
     ]
   }
-]
+
 
 
     
