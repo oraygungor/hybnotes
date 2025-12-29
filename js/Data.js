@@ -50,6 +50,12 @@ window.HybNotesData = {
       "tr": "ULTRA-RESILIENCE: Tükenmeden Bitiş Çizgisine Ulaşmanın Bilimsel Stratejisi",
       "en": "ULTRA-RESILIENCE: The Scientific Strategy to Reach the Finish Line Without Burning Out"
     },
+
+      "audio": {
+        "tr": "https://pub-e87338f36d86468a85027577c8e23dde.r2.dev/2t.wav",
+        "en": "https://pub-e87338f36d86468a85027577c8e23dde.r2.dev/2e.wav"
+    },
+      
     "summary": {
       "tr": "Ultra maraton başarısı sadece ne kadar hızlı olduğunuza değil; mekanik zırh, metabolik esneklik ve mide antrenmanı ile inşa edilen, stresi yönetip zamanla tükenmeye direnen \"fizyolojik kırılmazlığa\" (durability) bağlıdır.",
       "en": "Ultra-marathon success depends not just on your start-line capacity, but on \"physiological durability\", the ability to resist performance deterioration through mechanical armor, metabolic flexibility, and gut training."
