@@ -52,8 +52,8 @@ window.HybNotesData = {
     },
 
       "audio": {
-        "tr": "https://pub-e87338f36d86468a85027577c8e23dde.r2.dev/2t.wav",
-        "en": "https://pub-e87338f36d86468a85027577c8e23dde.r2.dev/2e.wav"
+        "tr": "http://files.hybnotes.com/2e.wav",
+        "en": "http://files.hybnotes.com/2t.wav"
     },
       
     "summary": {
