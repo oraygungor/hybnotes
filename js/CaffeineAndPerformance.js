@@ -36,7 +36,8 @@ const CaffeineIcons = {
     Globe: (p) => <IconWrapper {...p}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></IconWrapper>,
     HelpCircle: (p) => <IconWrapper {...p}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></IconWrapper>,
     X: (p) => <IconWrapper {...p}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconWrapper>,
-    Languages: (p) => <IconWrapper {...p}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></IconWrapper>
+    Languages: (p) => <IconWrapper {...p}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></IconWrapper>,
+    Grid: (p) => <IconWrapper {...p}><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></IconWrapper>
 };
 
 // --- HELPER COMPONENT: Reference (Text Mode) ---
@@ -53,14 +54,13 @@ const Ref = ({ ids }) => {
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // 1) Body Scroll Lock (iOS Safari Compatible & Safer)
+    // Body Scroll Lock (iOS Safari Compatible & Safer)
     useEffect(() => {
         if (!isOpen) return;
-        if (typeof document === 'undefined') return; // SSR Check
+        if (typeof document === 'undefined') return;
 
         const scrollY = window.scrollY || 0;
         
-        // Mevcut stilleri yedekle
         const prevStyle = {
             position: document.body.style.position,
             top: document.body.style.top,
@@ -68,14 +68,12 @@ const TermTooltip = ({ term, definition }) => {
             overflow: document.body.style.overflow
         };
 
-        // Scroll'u tamamen kilitle (iOS rubber-band fix)
         document.body.style.position = 'fixed';
         document.body.style.top = `-${scrollY}px`;
         document.body.style.width = '100%';
         document.body.style.overflow = 'hidden';
 
         return () => {
-            // Eski haline getir
             document.body.style.position = prevStyle.position;
             document.body.style.top = prevStyle.top;
             document.body.style.width = prevStyle.width;
@@ -84,16 +82,12 @@ const TermTooltip = ({ term, definition }) => {
         };
     }, [isOpen]);
 
-    // Portal Güvenlik Kontrolü
     const canPortal = 
         !!ReactDOM && 
         typeof ReactDOM.createPortal === 'function' && 
         typeof document !== 'undefined' && 
         !!document.body;
 
-    // --- YENİ MODAL YAPISI (Flex Wrapper) ---
-    // fixed top-1/2 yerine fixed inset-0 flex items-center justify-center kullanıyoruz.
-    // Bu, kutunun asla ekran dışına taşmamasını garanti eder.
     const tooltipContent = (
         <div 
             className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
@@ -102,14 +96,14 @@ const TermTooltip = ({ term, definition }) => {
             <div 
                 role="dialog"
                 aria-modal="true"
-                onClick={(e) => e.stopPropagation()} // Modal içine tıklayınca kapanmasın
+                onClick={(e) => e.stopPropagation()}
                 className="
                     w-full max-w-sm
                     max-h-[85vh] overflow-y-auto overflow-x-hidden
                     p-5 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
                     caff-scrollbar
                 "
-                style={{ maxWidth: "calc(100vw - 2rem)" }} // Ekstra mobil güvenliği
+                style={{ maxWidth: "calc(100vw - 2rem)" }}
             >
                 <div className="flex justify-between items-start mb-3">
                     <h4 className="text-primary font-bold text-base break-words pr-2 min-w-0">{term}</h4>
@@ -154,6 +148,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
     const activeLang = propLang || 'tr';
     
     const [activeTab, setActiveTab] = useState('summary');
+    const [isGridOpen, setIsGridOpen] = useState(false); // Grid Menu State
     const [weight, setWeight] = useState(70);
     const [showReferences, setShowReferences] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -348,6 +343,16 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
 
     const t = content[activeLang];
 
+    // Grid Menü için İkon ve Etiket Eşleştirmesi
+    const TAB_CONFIG = {
+        summary: { icon: CaffeineIcons.Scale, label: t.tabs.summary },
+        newScience: { icon: CaffeineIcons.Zap, label: t.tabs.newScience },
+        calculator: { icon: CaffeineIcons.Battery, label: t.tabs.calculator },
+        sports: { icon: CaffeineIcons.Timer, label: t.tabs.sports }
+    };
+
+    const activeTabConfig = TAB_CONFIG[activeTab];
+
     const performanceData = [
         { 
         term: 'TTE', 
@@ -457,26 +462,94 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
             </div>
         </header>
 
-        {/* NAVIGATION TABS */}
+        {/* NAVIGATION: DESKTOP TABS & MOBILE GRID TRIGGER */}
         <div className="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-lg">
             <div className="container mx-auto px-4 max-w-6xl">
-            <div className="flex overflow-x-auto gap-2 md:gap-6 py-3 scrollbar-hide">
-                {Object.keys(t.tabs).map((key) => (
-                <button
-                    key={key}
-                    onClick={() => setActiveTab(key)}
-                    className={`whitespace-nowrap px-3 py-2 md:px-4 md:py-2 text-sm md:text-base rounded-lg font-medium transition-all ${
-                    activeTab === key 
-                        ? 'bg-slate-800 text-primary ring-1 ring-primary/50 shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)]' 
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                    }`}
-                >
-                    {t.tabs[key]}
-                </button>
-                ))}
-            </div>
+                
+                {/* DESKTOP VIEW: Klasik Yatay Scroll (Hidden on Mobile) */}
+                <div className="hidden md:flex overflow-x-auto gap-2 md:gap-6 py-3 scrollbar-hide">
+                    {Object.keys(t.tabs).map((key) => (
+                    <button
+                        key={key}
+                        onClick={() => setActiveTab(key)}
+                        className={`whitespace-nowrap px-3 py-2 md:px-4 md:py-2 text-sm md:text-base rounded-lg font-medium transition-all ${
+                        activeTab === key 
+                            ? 'bg-slate-800 text-primary ring-1 ring-primary/50 shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)]' 
+                            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                        }`}
+                    >
+                        {t.tabs[key]}
+                    </button>
+                    ))}
+                </div>
+
+                {/* MOBILE VIEW: Grid Menu Trigger (Visible on Mobile) */}
+                <div className="md:hidden py-3 flex justify-between items-center">
+                    <div className="flex items-center gap-3 pl-1">
+                        <span className="text-primary bg-primary/10 p-1.5 rounded-lg border border-primary/20">
+                            <activeTabConfig.icon size={18} />
+                        </span>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-none mb-0.5">Aktif Bölüm</span>
+                            <span className="text-white font-bold text-sm leading-none">
+                                {activeTabConfig.label}
+                            </span>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => setIsGridOpen(true)}
+                        className="bg-slate-800 border border-slate-700 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider hover:border-primary hover:text-white transition-all shadow-md active:scale-95 flex items-center gap-2"
+                    >
+                        <CaffeineIcons.Grid size={16} />
+                        <span>Menü</span>
+                    </button>
+                </div>
+
             </div>
         </div>
+
+        {/* MOBILE GRID MENU OVERLAY (Portal-like, Full Screen) */}
+        {isGridOpen && (
+            <div className="fixed inset-0 z-[10000] bg-slate-900/98 backdrop-blur-xl flex items-center justify-center p-6 animate-in fade-in duration-300">
+                <div className="w-full max-w-sm space-y-8">
+                    <div className="text-center space-y-2">
+                        <h3 className="text-2xl font-black text-white tracking-tight">Menü</h3>
+                        <p className="text-slate-400 text-sm font-medium">Görüntülemek istediğiniz bölümü seçin</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        {Object.keys(TAB_CONFIG).map((key) => {
+                            const tab = TAB_CONFIG[key];
+                            const isActive = activeTab === key;
+                            return (
+                                <button
+                                    key={key}
+                                    onClick={() => { setActiveTab(key); setIsGridOpen(false); window.scrollTo({top: 0, behavior: 'smooth'}); }}
+                                    className={`
+                                        p-5 rounded-2xl border flex flex-col items-center justify-center gap-3 transition-all duration-200 aspect-square group
+                                        ${isActive 
+                                            ? 'bg-primary text-slate-900 border-primary shadow-[0_0_25px_rgba(var(--primary-rgb),0.4)] scale-105 ring-2 ring-primary/50' 
+                                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-slate-500 hover:bg-slate-750 active:scale-95'}
+                                    `}
+                                >
+                                    <div className={`p-3 rounded-full ${isActive ? 'bg-black/10' : 'bg-slate-900/50 group-hover:bg-slate-900'} transition-colors`}>
+                                        <tab.icon size={32} />
+                                    </div>
+                                    <span className="text-sm font-bold text-center leading-tight">{tab.label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <button 
+                        onClick={() => setIsGridOpen(false)}
+                        className="w-full py-4 text-slate-500 font-bold hover:text-white transition-colors text-sm uppercase tracking-widest"
+                    >
+                        Kapat
+                    </button>
+                </div>
+            </div>
+        )}
 
         <main className="container mx-auto px-4 py-8 md:py-12 max-w-6xl space-y-12 md:space-y-24">
 
