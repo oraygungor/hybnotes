@@ -27,23 +27,23 @@ const TermTooltip = ({ term, definition }) => {
         <div className="relative inline-block">
         <button 
             onClick={() => setIsOpen(!isOpen)}
-            className="group flex items-center gap-1.5 border-b border-dashed border-slate-500 hover:border-[#a3e635] transition-colors focus:outline-none"
+            className="group flex items-center gap-1.5 border-b border-dashed border-slate-500 hover:border-primary transition-colors focus:outline-none"
             aria-label={`${term} hakkında bilgi`}
         >
-            <span className="font-semibold text-slate-200 group-hover:text-[#a3e635]">{term}</span>
-            <CaffeineIcons.HelpCircle size={14} className="text-slate-500 group-hover:text-[#a3e635]" />
+            <span className="font-semibold text-slate-200 group-hover:text-primary">{term}</span>
+            <CaffeineIcons.HelpCircle size={14} className="text-slate-500 group-hover:text-primary" />
         </button>
         
         {isOpen && (
             <>
             <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={() => setIsOpen(false)} />
             <div className="
-                z-50 p-4 bg-slate-800 rounded-xl border border-[#a3e635]/30 shadow-2xl animate-zoom-in duration-200
+                z-50 p-4 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in duration-200
                 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-xs
                 md:absolute md:top-auto md:bottom-full md:left-0 md:translate-x-0 md:translate-y-0 md:mb-3 md:w-72
             ">
                 <div className="flex justify-between items-start mb-2">
-                <h4 className="text-[#a3e635] font-bold text-sm">{term}</h4>
+                <h4 className="text-primary font-bold text-sm">{term}</h4>
                 <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white md:hidden p-1">
                     <CaffeineIcons.X size={16} />
                 </button>
@@ -60,9 +60,9 @@ const TermTooltip = ({ term, definition }) => {
 };
 
 // --- MAIN PAGE COMPONENT ---
-const CaffeinePerformancePage = ({ lang: propLang }) => {
+const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
     // App.js passes language via props, we use it directly.
-    // If not provided, fallback to 'tr'.
+    // We also get activeTheme but we use 'primary' class which is linked to CSS variable set by App.js
     const activeLang = propLang || 'tr';
     
     const [activeTab, setActiveTab] = useState('summary');
@@ -88,7 +88,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
 
     const content = {
         tr: {
-        heroTitle: <>Kafein: <br/>Performansın <span className="text-[#a3e635]">Biyolojik Hilesi</span></>,
+        heroTitle: <>Kafein: <br/>Performansın <span className="text-primary">Biyolojik Hilesi</span></>,
         heroDesc: "Yıllardır \"yorgunluk alıcı\" olarak bildiğimiz kafein, performans çıktısını ve efor algısını (RPE) iyileştirir [8]. Ayrıca bazı elit sporcularda VO2max ölçümünde küçük artışlar (~%1) ve kas gücünde (özellikle bacaklarda) artış sağlayabildiği raporlanmıştır [8][3][6].",
         provenEffectsTitle: "Kanıtlanmış Etkiler",
         provenEffects: [
@@ -97,7 +97,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
             { label: "Reaksiyon", val: "Yüksek" }
         ],
         tabs: { summary: 'Genel Bakış', newScience: 'Yeni Bulgular & Veriler', calculator: 'Dozaj Hesapla', sports: 'Sporuna Özel' },
-        summaryTitle: <>Bildiğimiz Doğrular ve <span className="text-[#a3e635]">Yeni Keşifler</span></>,
+        summaryTitle: <>Bildiğimiz Doğrular ve <span className="text-primary">Yeni Keşifler</span></>,
         summaryDesc: "Literatür yıllardır dayanıklılık üzerindeki etkiyi kabul ediyordu. Ancak 2021-2025 arası yapılan çalışmalar (ISSN, Wang, Wu) resmi güncelledi.",
         graphItems: [
             { desc: "Dayanıklılık kapasitesinde artış." },
@@ -155,7 +155,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
         }
         },
         en: {
-        heroTitle: <>Caffeine: <br/>The <span className="text-[#a3e635]">Biological Cheat Code</span></>,
+        heroTitle: <>Caffeine: <br/>The <span className="text-primary">Biological Cheat Code</span></>,
         heroDesc: "Known for years as a 'fatigue fighter', caffeine improves performance output and perceived effort (RPE) [8]. Reports also suggest small increases in VO2max (~1%) and muscle power (especially in legs) in some elite athletes [8][3][6].",
         provenEffectsTitle: "Proven Effects",
         provenEffects: [
@@ -164,7 +164,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
             { label: "Reaction Time", val: "High" }
         ],
         tabs: { summary: 'Overview', newScience: 'New Findings & Data', calculator: 'Dosage Calc', sports: 'Sport Specific' },
-        summaryTitle: <>Known Truths & <span className="text-[#a3e635]">New Discoveries</span></>,
+        summaryTitle: <>Known Truths & <span className="text-primary">New Discoveries</span></>,
         summaryDesc: "Literature has accepted the effect on endurance for years. However, studies between 2021-2025 (ISSN, Wang, Wu) have updated the framework.",
         graphItems: [
             { desc: "Increase in endurance capacity." },
@@ -278,7 +278,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
     const dosage = calculateDosage(weight);
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-[#a3e635]/30 pb-12 overflow-x-hidden">
+        <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-primary/30 pb-12 overflow-x-hidden">
         
         {/* CUSTOM STYLES FOR ANIMATIONS */}
         <style>{`
@@ -299,7 +299,8 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
 
         {/* HERO SECTION */}
         <header className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#a3e635] via-blue-500 to-purple-600"></div>
+            {/* The gradient bar now uses standard colors but starts with PRIMARY */}
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-blue-500 to-purple-600"></div>
             
             <div className="container mx-auto px-4 py-12 md:py-20 max-w-6xl relative z-10">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
@@ -313,19 +314,19 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                 </div>
                 {/* Quick Stat Visual */}
                 <div className="md:w-1/3 w-full bg-slate-800/50 backdrop-blur-sm p-6 rounded-2xl border border-slate-700 shadow-2xl relative animate-zoom-in">
-                <div className="absolute -top-4 -right-4 bg-[#a3e635] text-slate-900 font-bold p-3 md:p-4 rounded-xl shadow-lg rotate-12 transform hover:scale-110 transition-transform">
+                <div className="absolute -top-4 -right-4 bg-primary text-slate-900 font-bold p-3 md:p-4 rounded-xl shadow-lg rotate-12 transform hover:scale-110 transition-transform">
                     +16.9%
                     <div className="text-xs font-normal opacity-80">{activeLang === 'tr' ? 'Dayanıklılık' : 'Endurance'}</div>
                 </div>
                 <h3 className="text-slate-300 font-semibold mb-4 flex items-center gap-2">
-                    <CaffeineIcons.Activity size={18} className="text-[#a3e635]"/>
+                    <CaffeineIcons.Activity size={18} className="text-primary"/>
                     {t.provenEffectsTitle}
                 </h3>
                 <ul className="space-y-3">
                     {t.provenEffects.map((effect, idx) => (
                     <li key={idx} className="flex items-center justify-between text-sm group">
                         <span className="text-slate-400 group-hover:text-slate-200 transition-colors">{effect.label}</span>
-                        <span className="text-[#a3e635] font-mono font-medium bg-[#a3e635]/10 px-2 py-0.5 rounded">{effect.val}</span>
+                        <span className="text-primary font-mono font-medium bg-primary/10 px-2 py-0.5 rounded">{effect.val}</span>
                     </li>
                     ))}
                 </ul>
@@ -344,7 +345,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                     onClick={() => setActiveTab(key)}
                     className={`whitespace-nowrap px-3 py-2 md:px-4 md:py-2 text-sm md:text-base rounded-lg font-medium transition-all ${
                     activeTab === key 
-                        ? 'bg-slate-800 text-[#a3e635] ring-1 ring-[#a3e635]/50 shadow-[0_0_10px_rgba(163,230,53,0.2)]' 
+                        ? 'bg-slate-800 text-primary ring-1 ring-primary/50 shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)]' 
                         : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                     }`}
                 >
@@ -375,25 +376,25 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                 <ul className="space-y-4">
                     {t.classicKnowledge.items.map((item, i) => (
                     <li key={i} className="flex gap-3 text-slate-300 text-sm md:text-base">
-                        <span className="text-[#a3e635] font-bold">✓</span>
+                        <span className="text-primary font-bold">✓</span>
                         {item}
                     </li>
                     ))}
                 </ul>
                 </div>
 
-                <div className="bg-gradient-to-br from-slate-800 to-slate-800/30 p-6 md:p-8 rounded-2xl border border-[#a3e635]/20 shadow-lg shadow-[#a3e635]/5 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-2 md:p-3 bg-[#a3e635]/10 rounded-bl-2xl border-b border-l border-[#a3e635]/20 text-[#a3e635] text-[10px] md:text-xs font-bold uppercase tracking-wider">
+                <div className="bg-gradient-to-br from-slate-800 to-slate-800/30 p-6 md:p-8 rounded-2xl border border-primary/20 shadow-lg shadow-primary/5 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-2 md:p-3 bg-primary/10 rounded-bl-2xl border-b border-l border-primary/20 text-primary text-[10px] md:text-xs font-bold uppercase tracking-wider">
                     2021-2025
                 </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-[#a3e635]/20 rounded-xl flex items-center justify-center mb-6 text-[#a3e635] group-hover:scale-110 transition-transform duration-500">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/20 rounded-xl flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-500">
                     <CaffeineIcons.Zap size={20} className="md:w-6 md:h-6" />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold mb-4 text-white">{t.newFindings.title}</h3>
                 <ul className="space-y-4">
                     {t.newFindings.items.map((item, i) => (
                     <li key={i} className="flex gap-3 text-slate-300 text-sm md:text-base">
-                        <div className="mt-1.5 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#a3e635] shrink-0"></div>
+                        <div className="mt-1.5 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary shrink-0"></div>
                         <span>
                         <strong className="text-white block md:inline md:mr-1">{item.title}</strong> {item.desc}
                         </span>
@@ -408,7 +409,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
             <section id="newScience" className={`space-y-8 ${activeTab !== 'newScience' ? 'hidden' : 'animate-in'}`}>
             <div className="bg-slate-800 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-xl">
                 <h3 className="text-xl md:text-2xl font-bold mb-8 flex items-center gap-3">
-                <CaffeineIcons.TrendingUp className="text-[#a3e635]" />
+                <CaffeineIcons.TrendingUp className="text-primary" />
                 {t.graphsTitle}
                 </h3>
                 
@@ -419,7 +420,8 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                         <div className="flex items-center gap-2">
                             <TermTooltip term={item.label} definition={t.definitions[item.defKey]} />
                         </div>
-                        <span className="text-[#a3e635] font-mono text-base md:text-lg">
+                        {/* Graphs keep their specific colors (green for TTE, etc.) but we could use primary here if needed */}
+                        <span className="text-primary font-mono text-base md:text-lg">
                         {item.value === 0.71 ? '~0.71%' : `+${item.value}%`}
                         </span>
                     </div>
@@ -455,7 +457,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
             <div className="max-w-2xl mx-auto">
                 <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl">
                 <div className="text-center mb-8">
-                    <CaffeineIcons.Battery className="w-12 h-12 text-[#a3e635] mx-auto mb-4 animate-bounce duration-[2000ms]" />
+                    <CaffeineIcons.Battery className="w-12 h-12 text-primary mx-auto mb-4 animate-bounce duration-[2000ms]" />
                     <h3 className="text-xl md:text-2xl font-bold text-white">{t.calcTitle}</h3>
                     <p className="text-slate-400 mt-2 text-sm md:text-base">{t.calcDesc}</p>
                 </div>
@@ -471,7 +473,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                         value={weight}
                         onChange={handleWeightChange}
                         placeholder="---"
-                        className="w-28 md:w-36 bg-slate-900 border-2 border-[#a3e635]/30 focus:border-[#a3e635] rounded-2xl py-3 text-center text-2xl md:text-4xl font-bold text-white outline-none transition-all shadow-inner"
+                        className="w-28 md:w-36 bg-slate-900 border-2 border-primary/30 focus:border-primary rounded-2xl py-3 text-center text-2xl md:text-4xl font-bold text-white outline-none transition-all shadow-inner"
                     />
                     <button onClick={() => setWeight(w => (typeof w === 'number' ? w + 1 : 70))} className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center text-xl font-bold active:scale-95 transition-transform">+</button>
                     </div>
@@ -480,12 +482,12 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                 <div className="grid grid-cols-2 gap-4 mb-8">
                     <div className="bg-slate-700/30 p-4 rounded-2xl border border-slate-600 text-center hover:bg-slate-700/50 transition-colors">
                     <div className="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest mb-1">{t.minDose} (3mg/kg)</div>
-                    <div className="text-2xl md:text-3xl font-bold text-[#a3e635]">{dosage.min} mg</div>
+                    <div className="text-2xl md:text-3xl font-bold text-primary">{dosage.min} mg</div>
                     <div className="text-[10px] md:text-xs text-slate-500 mt-1">~{dosage.espressoMinCups}-{dosage.espressoMaxCups} {t.espresso}</div>
                     </div>
                     <div className="bg-slate-700/30 p-4 rounded-2xl border border-slate-600 text-center hover:bg-slate-700/50 transition-colors">
                     <div className="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest mb-1">{t.maxDose} (6mg/kg)</div>
-                    <div className="text-2xl md:text-3xl font-bold text-[#a3e635]">{dosage.max} mg</div>
+                    <div className="text-2xl md:text-3xl font-bold text-primary">{dosage.max} mg</div>
                     <div className="text-[10px] md:text-xs text-slate-500 mt-1">{t.maxPerf}</div>
                     </div>
                 </div>
@@ -588,7 +590,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
         <footer className="container mx-auto px-4 py-8 border-t border-slate-800 text-center text-slate-500 text-sm">
             <button 
             onClick={() => setShowReferences(!showReferences)}
-            className="text-slate-400 hover:text-[#a3e635] transition-colors mb-4 underline"
+            className="text-slate-400 hover:text-primary transition-colors mb-4 underline"
             >
             {showReferences ? t.footerRefsHide : t.footerRefsShow}
             </button>
