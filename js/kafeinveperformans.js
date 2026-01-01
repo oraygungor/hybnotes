@@ -579,4 +579,4 @@ const CaffeinePage = ({ lang: parentLang }) => {
   );
 };
 
-window.CaffeinePage = CaffeinePage;
+window.CaffeinePerformancePage = CaffeinePage;
