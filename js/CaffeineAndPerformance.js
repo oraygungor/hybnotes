@@ -1,4 +1,4 @@
-const { useState, useEffect, useMemo } = React;
+const { useState, useEffect } = React;
 // ReactDOM kontrolü: Tarayıcıda yüklü mü diye bakar, yoksa null atar (Hata #130 önleyici)
 const ReactDOM = window.ReactDOM || null;
 
@@ -49,21 +49,39 @@ const Ref = ({ ids }) => {
     );
 };
 
-// --- TOOLTIP COMPONENT (PORTAL + MOBILE SCROLL FIX) ---
+// --- TOOLTIP COMPONENT (PORTAL + iOS SCROLL FIX) ---
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // 1) Body Scroll Lock: Modal açıldığında arkadaki sayfanın kaymasını engelle
+    // 1) Robust Body Scroll Lock (iOS Safari Compatible)
     useEffect(() => {
         if (!isOpen) return;
-        // Mevcut scroll durumunu kaydet
-        const originalStyle = window.getComputedStyle(document.body).overflow;
-        // Scroll'u kilitle
-        document.body.style.overflow = 'hidden';
+        if (typeof document === 'undefined') return;
+
+        const scrollY = window.scrollY || 0;
         
-        // Modal kapandığında (cleanup) eski haline getir
+        // Mevcut stilleri yedekle
+        const prevStyle = {
+            position: document.body.style.position,
+            top: document.body.style.top,
+            width: document.body.style.width,
+            overflow: document.body.style.overflow
+        };
+
+        // Scroll'u tamamen kilitle (iOS rubber-band fix)
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+        document.body.style.overflow = 'hidden';
+
         return () => {
-            document.body.style.overflow = originalStyle;
+            // Eski haline getir
+            document.body.style.position = prevStyle.position;
+            document.body.style.top = prevStyle.top;
+            document.body.style.width = prevStyle.width;
+            document.body.style.overflow = prevStyle.overflow;
+            // Kullanıcıyı kaldığı yere geri kaydır
+            window.scrollTo(0, scrollY);
         };
     }, [isOpen]);
 
@@ -82,7 +100,7 @@ const TermTooltip = ({ term, definition }) => {
                 onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} 
             />
             
-            {/* Modal: Ekranın tam ortasında, scroll edilebilir */}
+            {/* Modal: Ekranın tam ortasında, scroll edilebilir, mobilde güvenli */}
             <div 
                 role="dialog"
                 aria-modal="true"
@@ -94,7 +112,6 @@ const TermTooltip = ({ term, definition }) => {
                 "
             >
                 <div className="flex justify-between items-start mb-3">
-                    {/* Uzun kelimeleri kırarak taşmayı önle (break-words) */}
                     <h4 className="text-primary font-bold text-base break-words pr-2">{term}</h4>
                     <button 
                         onClick={() => setIsOpen(false)} 
@@ -104,7 +121,6 @@ const TermTooltip = ({ term, definition }) => {
                         <CaffeineIcons.X size={20} />
                     </button>
                 </div>
-                {/* Uzun açıklamaları kır */}
                 <p className="text-sm text-slate-300 leading-relaxed text-left break-words">
                     {definition}
                 </p>
@@ -133,7 +149,8 @@ const TermTooltip = ({ term, definition }) => {
 };
 
 // --- MAIN PAGE COMPONENT ---
-const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
+const CaffeinePerformancePage = ({ lang: propLang }) => {
+    // activeTheme prop'u kullanılmadığı için kaldırıldı, useMemo import'u silindi.
     const activeLang = propLang || 'tr';
     
     const [activeTab, setActiveTab] = useState('summary');
@@ -220,7 +237,7 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         espresso: "fincan espresso (değişken)",
         maxPerf: "Maksimum Performans",
         techFocus: { title: "Teknik & Odaklanma", desc: <>2-3 mg/kg genelde daha iyi tolere edilir; titreme/anksiyete riski daha düşüktür (kişiden kişiye değişir). <Ref ids={[8]}/></> },
-        riskZone: { title: "Risk Zone", desc: <>For most, doses above 9 mg/kg offer limited extra benefit and increase risk of side effects. <Ref ids={[4,8]}/></> },
+        riskZone: { title: "Riskli Bölge", desc: <>Çoğu kişide 9 mg/kg civarı ve üzeri dozlarda ek fayda sınırlı olabilir; yan etki riski artar. <Ref ids={[4,8]}/></> },
         sportsCards: {
             hyrox: { 
                 title: "Hyrox & Koşu", 
