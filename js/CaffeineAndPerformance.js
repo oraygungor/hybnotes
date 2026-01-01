@@ -19,6 +19,18 @@ const CaffeineIcons = {
     Languages: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
 };
 
+// --- HELPER COMPONENT: Reference Superscript ---
+// Otomatik sıralama ve superscript formatı yapan bileşen
+const Ref = ({ ids }) => {
+    // Referansları küçükten büyüğe sırala
+    const sorted = [...ids].sort((a, b) => a - b);
+    return (
+        <sup className="text-[10px] text-primary font-bold ml-0.5 cursor-help select-none hover:underline" title={`Kaynak: [${sorted.join(', ')}]`}>
+            [{sorted.join(', ')}]
+        </sup>
+    );
+};
+
 // --- TOOLTIP COMPONENT ---
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -61,8 +73,6 @@ const TermTooltip = ({ term, definition }) => {
 
 // --- MAIN PAGE COMPONENT ---
 const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
-    // App.js passes language via props, we use it directly.
-    // We also get activeTheme but we use 'primary' class which is linked to CSS variable set by App.js
     const activeLang = propLang || 'tr';
     
     const [activeTab, setActiveTab] = useState('summary');
@@ -86,10 +96,26 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         }
     };
 
+    // Tanımları burada önceden belirleyelim ki içerikte kullanabilelim
+    const definitions = {
+        tr: {
+            TTE: "Time to Exhaustion (Tükenme Süresi). Sporcunun belirli bir tempoda (sabit hız/güç) tükenene kadar ne kadar süre dayanabildiğini ölçen test. Dayanıklılık kapasitesinin en net göstergelerinden biridir.",
+            TT: "Time-Trial (Zamana Karşı). Belirli bir mesafeyi (örneğin 5km koşu veya 20km bisiklet) en kısa sürede bitirmeye dayalı performans testi. Gerçek yarış koşullarını en iyi simüle eden testtir.",
+            VO2max: "Maksimal Oksijen Tüketimi. Vücudun egzersiz sırasında kullanabildiği maksimum oksijen miktarıdır. Aerobik (dayanıklılık) kapasitenin altın standardı olarak kabul edilir.",
+            Heat: "Sıcaklık Performansı. 30°C ve üzeri sıcaklıklarda yapılan egzersizlerdeki performans değişimi. Kafein burada da etkilidir."
+        },
+        en: {
+            TTE: "Time to Exhaustion. A test measuring how long an athlete can sustain a specific intensity until failure. A key indicator of endurance capacity.",
+            TT: "Time-Trial. A performance test based on completing a set distance (e.g., 5km run or 20km cycle) in the shortest possible time. It best simulates real race conditions.",
+            VO2max: "Maximal Oxygen Uptake. The maximum amount of oxygen the body can utilize during exercise. It is considered the gold standard of aerobic (endurance) capacity.",
+            Heat: "Performance in Heat. Performance changes during exercise in temperatures above 30°C. Caffeine is effective here as well."
+        }
+    };
+
     const content = {
         tr: {
         heroTitle: <>Kafein: <br/>Performansın <span className="text-primary">Biyolojik Hilesi</span></>,
-        heroDesc: "Yıllardır \"yorgunluk alıcı\" olarak bildiğimiz kafein, performans çıktısını ve efor algısını (RPE) iyileştirir [8]. Ayrıca bazı elit sporcularda VO2max ölçümünde küçük artışlar (~%1) ve kas gücünde (özellikle bacaklarda) artış sağlayabildiği raporlanmıştır [8][3][6].",
+        heroDesc: <>Yıllardır "yorgunluk alıcı" olarak bildiğimiz kafein, performans çıktısını ve efor algısını (RPE) iyileştirir <Ref ids={[8]}/>. Ayrıca bazı elit sporcularda VO2max ölçümünde küçük artışlar (~%1) ve kas gücünde (özellikle bacaklarda) artış sağlayabildiği raporlanmıştır <Ref ids={[8,3,6]}/>.</>,
         provenEffectsTitle: "Kanıtlanmış Etkiler",
         provenEffects: [
             { label: "Aerobik Güç", val: "Çok Yüksek" },
@@ -108,37 +134,52 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         classicKnowledge: {
             title: "Klasik Bilgi (Temeller)",
             items: [
-            "Dayanıklılık performansını artırır. [8][1]",
-            "Yorgunluk algısını (RPE) düşürür. [8]",
-            "Bazı koşullarda substrat kullanımını (yağ/karbonhidrat) etkileyebilir. [8]",
-            "Standart doz 3-6 mg/kg'dır. [8]"
+            <>Dayanıklılık performansını artırır. <Ref ids={[8,1]}/></>,
+            <>Yorgunluk algısını (RPE) düşürür. <Ref ids={[8]}/></>,
+            <>Bazı koşullarda substrat kullanımını (yağ/karbonhidrat) etkileyebilir. <Ref ids={[8]}/></>,
+            <>Standart doz 3-6 mg/kg'dır. <Ref ids={[8]}/></>
             ]
         },
         newFindings: {
             title: "2021+ Güncellenmiş Çerçeve",
             items: [
-            { title: "Fizyolojik Kapasite:", desc: "Bazı elit dayanıklılık sporcularında VO2max ölçümünde küçük artışlar (~%1) raporlanmıştır. [3]" },
-            { title: "Kuvvet Seçiciliği:", desc: "Alt vücut kaslarında (Leg Press vb.) etki üst vücuda göre daha belirgin olabilir. [6][9]" },
-            { title: "Cinsiyet Eşitliği:", desc: "Bazı kontrollü çalışmalarda benzer yanıt görülmüştür; ancak literatürde bulgular tam homojen değildir (mixed evidence). [9][6]" },
-            { title: "Sıcakta Güvenlik:", desc: "Sıcak koşullarda ortalama performans artışı görülürken, çekirdek sıcaklık artışı genelde düşüktür; yine de bireysel tolerans önemlidir. [2][8]" }
+            { title: "Fizyolojik Kapasite:", desc: <>Bazı elit dayanıklılık sporcularında VO2max ölçümünde küçük artışlar (~%1) raporlanmıştır. <Ref ids={[3]}/></> },
+            { title: "Kuvvet Seçiciliği:", desc: <>Alt vücut kaslarında (Leg Press vb.) etki üst vücuda göre daha belirgin olabilir. <Ref ids={[6,9]}/></> },
+            { title: "Cinsiyet Eşitliği:", desc: <>Bazı kontrollü çalışmalarda benzer yanıt görülmüştür; ancak literatürde bulgular tam homojen değildir (mixed evidence). <Ref ids={[6,9]}/></> },
+            { title: "Sıcakta Güvenlik:", desc: <>Sıcak koşullarda ortalama performans artışı görülürken, çekirdek sıcaklık artışı genelde düşüktür; yine de bireysel tolerans önemlidir. <Ref ids={[2,8]}/></> }
             ]
         },
         graphsTitle: "Performans Kazanım Grafikleri",
         graphNoteTitle: "Veri Yorumu:",
         graphNoteDesc: "Zamana Karşı (TT) testlerinde %0.71'lik bir iyileşme (süre azalması) küçük görünebilir ancak elit sporda bu fark kürsü ile 4.lük arasındaki farktır. Tükenme süresindeki (TTE) %16.97'lik artış ise antrenman hacmini artırmak için muazzam bir fırsattır.",
         calcTitle: "Kişisel Dozaj Planlayıcı",
-        calcDesc: "Kilonuzu girin, ISSN standartlarına göre aralığınızı görün. [8]",
+        calcDesc: <>Kilonuzu girin, ISSN standartlarına göre aralığınızı görün. <Ref ids={[8]}/></>,
         weightLabel: "VÜCUT AĞIRLIĞI (KG)",
         minDose: "Alt Sınır",
         maxDose: "Üst Sınır",
         espresso: "fincan espresso (değişken)",
         maxPerf: "Maksimum Performans",
-        techFocus: { title: "Teknik & Odaklanma", desc: "2-3 mg/kg genelde daha iyi tolere edilir; titreme/anksiyete riski daha düşüktür (kişiden kişiye değişir). [8]" },
-        riskZone: { title: "Riskli Bölge", desc: "Çoğu kişide 9 mg/kg civarı ve üzeri dozlarda ek fayda sınırlı olabilir; yan etki riski artar. [8][4]" },
+        techFocus: { title: "Teknik & Odaklanma", desc: <>2-3 mg/kg genelde daha iyi tolere edilir; titreme/anksiyete riski daha düşüktür (kişiden kişiye değişir). <Ref ids={[8]}/></> },
+        riskZone: { title: "Riskli Bölge", desc: <>Çoğu kişide 9 mg/kg civarı ve üzeri dozlarda ek fayda sınırlı olabilir; yan etki riski artar. <Ref ids={[4,8]}/></> },
         sportsCards: {
-            hyrox: { title: "Hyrox & Koşu", desc: "Hem koşu hem de istasyon dayanıklılığı gerektiren hibrit yapı için ideal.", why: "TT ve TTE sürelerini iyileştirir [1], bacak kuvvet devamlılığını artırır [6].", strat: "Başlangıçtan 45-60 dk önce 3-6 mg/kg [8]. Uzun etkinliklerde (60-90 dk+) performans düşüşünü yönetmek için bazı sporcular yarış içinde ek kafein tercih eder (toleransa bağlı) [8]." },
-            crossfit: { title: "CrossFit / HIIT", desc: "Yüksek yoğunluklu, kompleks hareketler ve anlık karar verme süreçleri.", why: "Reaksiyon süresini hızlandırır, WOD çıktısını artırır [4].", warn: "6 mg/kg sık kullanılan 'yüksek ama yönetilebilir' bir doz; daha yüksek dozlar çoğu kişide yan etki riskini artırabilir [4][8]." },
-            power: { title: "Kuvvet & Powerlifting", desc: "Maksimal güç üretimi ve set arası toparlanma.", why: "1RM değerini ve \"Bar Hızını\" (Velocity) artırır [6].", note: "Alt vücut (Squat/Deadlift) hareketlerinde etki, Bench Press'e göre daha belirgindir [6][9]." }
+            hyrox: { 
+                title: "Hyrox & Koşu", 
+                desc: "Hem koşu hem de istasyon dayanıklılığı gerektiren hibrit yapı için ideal.", 
+                why: <><TermTooltip term="TT" definition={definitions.tr.TT}/> ve <TermTooltip term="TTE" definition={definitions.tr.TTE}/> sürelerini iyileştirir <Ref ids={[1]}/>, bacak kuvvet devamlılığını artırır <Ref ids={[6]}/>.</>, 
+                strat: <>Başlangıçtan 45-60 dk önce 3-6 mg/kg <Ref ids={[8]}/>. Uzun etkinliklerde (60-90 dk+) performans düşüşünü yönetmek için bazı sporcular yarış içinde ek kafein tercih eder (toleransa bağlı) <Ref ids={[8]}/>.</> 
+            },
+            crossfit: { 
+                title: "CrossFit / HIIT", 
+                desc: "Yüksek yoğunluklu, kompleks hareketler ve anlık karar verme süreçleri.", 
+                why: <>Reaksiyon süresini hızlandırır, WOD çıktısını artırır <Ref ids={[4]}/>.</>, 
+                warn: <>6 mg/kg sık kullanılan 'yüksek ama yönetilebilir' bir doz; daha yüksek dozlar çoğu kişide yan etki riskini artırabilir <Ref ids={[4,8]}/>.</> 
+            },
+            power: { 
+                title: "Kuvvet & Powerlifting", 
+                desc: "Maksimal güç üretimi ve set arası toparlanma.", 
+                why: <>1RM değerini ve "Bar Hızını" (Velocity) artırır <Ref ids={[6]}/>.</>, 
+                note: <>Alt vücut (Squat/Deadlift) hareketlerinde etki, Bench Press'e göre daha belirgindir <Ref ids={[6,9]}/>.</> 
+            }
         },
         footerRefsShow: "Bilimsel Referansları Göster",
         footerRefsHide: "Referansları Gizle",
@@ -147,16 +188,11 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         stratLabel: "Strateji:",
         warnLabel: "Doz Uyarısı:",
         impLabel: "Önemli:",
-        definitions: {
-            TTE: "Time to Exhaustion (Tükenme Süresi). Sporcunun belirli bir tempoda (sabit hız/güç) tükenene kadar ne kadar süre dayanabildiğini ölçen test. Dayanıklılık kapasitesinin en net göstergelerinden biridir.",
-            TT: "Time-Trial (Zamana Karşı). Belirli bir mesafeyi (örneğin 5km koşu veya 20km bisiklet) en kısa sürede bitirmeye dayalı performans testi. Gerçek yarış koşullarını en iyi simüle eden testtir.",
-            VO2max: "Maksimal Oksijen Tüketimi. Vücudun egzersiz sırasında kullanabildiği maksimum oksijen miktarıdır. Aerobik (dayanıklılık) kapasitenin altın standardı olarak kabul edilir.",
-            Heat: "Sıcaklık Performansı. 30°C ve üzeri sıcaklıklarda yapılan egzersizlerdeki performans değişimi. Kafein burada da etkilidir."
-        }
+        definitions: definitions.tr
         },
         en: {
         heroTitle: <>Caffeine: <br/>The <span className="text-primary">Biological Cheat Code</span></>,
-        heroDesc: "Known for years as a 'fatigue fighter', caffeine improves performance output and perceived effort (RPE) [8]. Reports also suggest small increases in VO2max (~1%) and muscle power (especially in legs) in some elite athletes [8][3][6].",
+        heroDesc: <>Known for years as a 'fatigue fighter', caffeine improves performance output and perceived effort (RPE) <Ref ids={[8]}/>. Reports also suggest small increases in VO2max (~1%) and muscle power (especially in legs) in some elite athletes <Ref ids={[8,3,6]}/>.</>,
         provenEffectsTitle: "Proven Effects",
         provenEffects: [
             { label: "Aerobic Power", val: "Very High" },
@@ -175,37 +211,52 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         classicKnowledge: {
             title: "Classic Knowledge (Basics)",
             items: [
-            "Increases endurance performance. [8][1]",
-            "Lowers Rating of Perceived Exertion (RPE). [8]",
-            "May affect substrate use (fat/carb) in some conditions. [8]",
-            "Standard dose is 3-6 mg/kg. [8]"
+            <>Increases endurance performance. <Ref ids={[8,1]}/></>,
+            <>Lowers Rating of Perceived Exertion (RPE). <Ref ids={[8]}/></>,
+            <>May affect substrate use (fat/carb) in some conditions. <Ref ids={[8]}/></>,
+            <>Standard dose is 3-6 mg/kg. <Ref ids={[8]}/></>
             ]
         },
         newFindings: {
             title: "2021+ Updated Framework",
             items: [
-            { title: "Physiological Capacity:", desc: "Small increases in VO2max (~1%) have been reported in some elite endurance settings. [3]" },
-            { title: "Strength Selectivity:", desc: "Effect on lower body muscles (Leg Press etc.) may be more pronounced than upper body. [6][9]" },
-            { title: "Gender Equality:", desc: "Some controlled trials show similar responses, though literature findings are not fully homogeneous (mixed evidence). [9][6]" },
-            { title: "Safety in Heat:", desc: "Average performance increases in heat, while core temp rise is generally small; individual tolerance remains important. [2][8]" }
+            { title: "Physiological Capacity:", desc: <>Small increases in VO2max (~1%) have been reported in some elite endurance settings. <Ref ids={[3]}/></> },
+            { title: "Strength Selectivity:", desc: <>Effect on lower body muscles (Leg Press etc.) may be more pronounced than upper body. <Ref ids={[6,9]}/></> },
+            { title: "Gender Equality:", desc: <>Some controlled trials show similar responses, though literature findings are not fully homogeneous (mixed evidence). <Ref ids={[6,9]}/></> },
+            { title: "Safety in Heat:", desc: <>Average performance increases in heat, while core temp rise is generally small; individual tolerance remains important. <Ref ids={[2,8]}/></> }
             ]
         },
         graphsTitle: "Performance Gain Charts",
         graphNoteTitle: "Data Interpretation:",
         graphNoteDesc: "A 0.71% improvement in Time-Trial (TT) tests may seem small, but in elite sports, this is the difference between the podium and 4th place. A 16.97% increase in Time to Exhaustion (TTE) is a massive opportunity to increase training volume.",
         calcTitle: "Personal Dosage Planner",
-        calcDesc: "Enter your weight, see your range according to ISSN standards. [8]",
+        calcDesc: <>Enter your weight, see your range according to ISSN standards. <Ref ids={[8]}/></>,
         weightLabel: "BODY WEIGHT (KG)",
         minDose: "Lower Limit",
         maxDose: "Upper Limit",
         espresso: "cups of espresso (variable)",
         maxPerf: "Maximum Performance",
-        techFocus: { title: "Technique & Focus", desc: "2-3 mg/kg is generally better tolerated; risk of tremors/anxiety is lower (varies by individual). [8]" },
-        riskZone: { title: "Risk Zone", desc: "For most, doses above 9 mg/kg offer limited extra benefit and increase risk of side effects. [8][4]" },
+        techFocus: { title: "Technique & Focus", desc: <>2-3 mg/kg is generally better tolerated; risk of tremors/anxiety is lower (varies by individual). <Ref ids={[8]}/></> },
+        riskZone: { title: "Risk Zone", desc: <>For most, doses above 9 mg/kg offer limited extra benefit and increase risk of side effects. <Ref ids={[4,8]}/></> },
         sportsCards: {
-            hyrox: { title: "Hyrox & Running", desc: "Ideal for hybrid structures requiring both running and station endurance.", why: "Improves TT and TTE times [1], increases leg strength endurance [6].", strat: "3-6 mg/kg 45-60 mins before start [8]. In long events (60-90 min+), some athletes opt for intra-race caffeine to manage fatigue (tolerance dependent) [8]." },
-            crossfit: { title: "CrossFit / HIIT", desc: "High intensity, complex movements and instant decision making processes.", why: "Speeds up reaction time, increases WOD output [4].", warn: "6 mg/kg is a common 'high but manageable' dose; higher amounts may increase side effect risk for many [4][8]." },
-            power: { title: "Strength & Powerlifting", desc: "Maximal power production and recovery between sets.", why: "Increases 1RM value and 'Bar Velocity' [6].", note: "Effect is more pronounced in lower body (Squat/Deadlift) movements compared to Bench Press [6][9]." }
+            hyrox: { 
+                title: "Hyrox & Running", 
+                desc: "Ideal for hybrid structures requiring both running and station endurance.", 
+                why: <>Improves <TermTooltip term="TT" definition={definitions.en.TT}/> and <TermTooltip term="TTE" definition={definitions.en.TTE}/> times <Ref ids={[1]}/>, increases leg strength endurance <Ref ids={[6]}/>.</>, 
+                strat: <>3-6 mg/kg 45-60 mins before start <Ref ids={[8]}/>. In long events (60-90 min+), some athletes opt for intra-race caffeine to manage fatigue (tolerance dependent) <Ref ids={[8]}/>.</> 
+            },
+            crossfit: { 
+                title: "CrossFit / HIIT", 
+                desc: "High intensity, complex movements and instant decision making processes.", 
+                why: <>Speeds up reaction time, increases WOD output <Ref ids={[4]}/>.</>, 
+                warn: <>6 mg/kg is a common 'high but manageable' dose; higher amounts may increase side effect risk for many <Ref ids={[4,8]}/>.</> 
+            },
+            power: { 
+                title: "Strength & Powerlifting", 
+                desc: "Maximal power production and recovery between sets.", 
+                why: <>Increases 1RM value and 'Bar Velocity' <Ref ids={[6]}/>.</>, 
+                note: <>Effect is more pronounced in lower body (Squat/Deadlift) movements compared to Bench Press <Ref ids={[6,9]}/>.</> 
+            }
         },
         footerRefsShow: "Show Scientific References",
         footerRefsHide: "Hide References",
@@ -214,12 +265,7 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         stratLabel: "Strategy:",
         warnLabel: "Dose Warning:",
         impLabel: "Important:",
-        definitions: {
-            TTE: "Time to Exhaustion. A test measuring how long an athlete can sustain a specific intensity until failure. A key indicator of endurance capacity.",
-            TT: "Time-Trial. A performance test based on completing a set distance (e.g., 5km run or 20km cycle) in the shortest possible time. It best simulates real race conditions.",
-            VO2max: "Maximal Oxygen Uptake. The maximum amount of oxygen the body can utilize during exercise. It is considered the gold standard of aerobic (endurance) capacity.",
-            Heat: "Performance in Heat. Performance changes during exercise in temperatures above 30°C. Caffeine is effective here as well."
-        }
+        definitions: definitions.en
         }
     };
 
@@ -299,7 +345,6 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
 
         {/* HERO SECTION */}
         <header className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700">
-            {/* The gradient bar now uses standard colors but starts with PRIMARY */}
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-blue-500 to-purple-600"></div>
             
             <div className="container mx-auto px-4 py-12 md:py-20 max-w-6xl relative z-10">
