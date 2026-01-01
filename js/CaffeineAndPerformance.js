@@ -1,28 +1,46 @@
 const { useState, useEffect, useMemo } = React;
-const ReactDOM = window.ReactDOM; // Portal işlemi için gerekli
+// ReactDOM kontrolü: Tarayıcıda yüklü mü diye bakar, yoksa null atar (Hata #130 önleyici)
+const ReactDOM = window.ReactDOM || null;
 
-// --- ICONS ---
+// --- ICONS (Size prop desteği eklendi) ---
+const IconWrapper = ({ children, size = 24, className = "", ...props }) => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width={size} 
+        height={size} 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        className={className} 
+        {...props}
+    >
+        {children}
+    </svg>
+);
+
 const CaffeineIcons = {
-    Activity: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
-    Battery: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg>,
-    Zap: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-    Timer: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>,
-    Flame: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.5-3.3.3-1.2 1-2.4 2-3.2"/></svg>,
-    Brain: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.97-3.284"/><path d="M17.97 14.716A4 4 0 0 1 16 18"/></svg>,
-    AlertCircle: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>,
-    TrendingUp: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
-    Info: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
-    ChevronRight: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m9 18 6-6-6-6"/></svg>,
-    Scale: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m16 16 3-8 3 8c-.87.65-1.926 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.926 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>,
-    Globe: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>,
-    HelpCircle: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>,
-    X: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
-    Languages: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+    Activity: (p) => <IconWrapper {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></IconWrapper>,
+    Battery: (p) => <IconWrapper {...p}><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></IconWrapper>,
+    Zap: (p) => <IconWrapper {...p}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></IconWrapper>,
+    Timer: (p) => <IconWrapper {...p}><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></IconWrapper>,
+    Flame: (p) => <IconWrapper {...p}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.5-3.3.3-1.2 1-2.4 2-3.2"/></IconWrapper>,
+    Brain: (p) => <IconWrapper {...p}><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.97-3.284"/><path d="M17.97 14.716A4 4 0 0 1 16 18"/></IconWrapper>,
+    AlertCircle: (p) => <IconWrapper {...p}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></IconWrapper>,
+    TrendingUp: (p) => <IconWrapper {...p}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></IconWrapper>,
+    Info: (p) => <IconWrapper {...p}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></IconWrapper>,
+    ChevronRight: (p) => <IconWrapper {...p}><path d="m9 18 6-6-6-6"/></IconWrapper>,
+    Scale: (p) => <IconWrapper {...p}><path d="m16 16 3-8 3 8c-.87.65-1.926 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.926 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></IconWrapper>,
+    Globe: (p) => <IconWrapper {...p}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></IconWrapper>,
+    HelpCircle: (p) => <IconWrapper {...p}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></IconWrapper>,
+    X: (p) => <IconWrapper {...p}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconWrapper>,
+    Languages: (p) => <IconWrapper {...p}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></IconWrapper>
 };
 
 // --- HELPER COMPONENT: Reference Superscript ---
 const Ref = ({ ids }) => {
-    // Referansları küçükten büyüğe sırala
     const sorted = [...ids].sort((a, b) => a - b);
     return (
         <span className="text-[10px] text-primary font-bold ml-0.5 relative -top-[4px] select-none">
@@ -31,29 +49,41 @@ const Ref = ({ ids }) => {
     );
 };
 
-// --- TOOLTIP COMPONENT (PORTAL VERSION) ---
-// Bu bileşen, içeriği 'body' etiketine taşır, böylece overflow/gizlenme sorunu yaşanmaz.
+// --- TOOLTIP COMPONENT (PORTAL + MOBILE FIX) ---
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
 
+    // Portal Güvenlik Kontrolü: 
+    // ReactDOM ve document.body hazır mı diye bakar.
+    const canPortal = 
+        !!ReactDOM && 
+        typeof ReactDOM.createPortal === 'function' && 
+        typeof document !== 'undefined' && 
+        !!document.body;
+
     const tooltipContent = (
         <>
-            {/* Arka plan karartması (Backdrop) */}
+            {/* Backdrop: Arka planı karartır ve tıklayınca kapatır */}
             <div 
                 className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm animate-in fade-in" 
-                onClick={() => setIsOpen(false)} 
+                onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} 
             />
             
-            {/* Modal Kutusu - Ekranın tam ortasında açılır */}
-            <div className="
-                fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                w-[90vw] max-w-xs p-5 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
-            ">
+            {/* Modal: Ekranın tam ortasında, her şeyin üzerinde */}
+            <div 
+                role="dialog"
+                aria-modal="true"
+                className="
+                    fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                    w-[85vw] max-w-xs p-5 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
+                "
+            >
                 <div className="flex justify-between items-start mb-3">
                     <h4 className="text-primary font-bold text-base">{term}</h4>
                     <button 
                         onClick={() => setIsOpen(false)} 
                         className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700 transition-colors"
+                        aria-label="Kapat"
                     >
                         <CaffeineIcons.X size={20} />
                     </button>
@@ -62,7 +92,7 @@ const TermTooltip = ({ term, definition }) => {
                     {definition}
                 </p>
                 <div className="mt-4 text-center">
-                   <button onClick={() => setIsOpen(false)} className="text-xs text-slate-500 underline">Kapat</button>
+                   <button onClick={() => setIsOpen(false)} className="text-xs text-slate-500 underline py-2 px-4">Kapat</button>
                 </div>
             </div>
         </>
@@ -71,16 +101,20 @@ const TermTooltip = ({ term, definition }) => {
     return (
         <span className="relative inline-block">
             <button 
-                onClick={() => setIsOpen(true)}
-                className="group inline-flex items-center gap-1 border-b border-dashed border-slate-500 hover:border-primary transition-colors focus:outline-none align-baseline"
+                onClick={(e) => { e.stopPropagation(); setIsOpen(true); }}
+                type="button"
+                className="group inline-flex items-center gap-1 border-b border-dashed border-slate-500 hover:border-primary transition-colors focus:outline-none align-baseline cursor-pointer"
                 aria-label={`${term} hakkında bilgi`}
             >
                 <span className="font-semibold text-slate-200 group-hover:text-primary">{term}</span>
                 <CaffeineIcons.HelpCircle size={12} className="text-slate-500 group-hover:text-primary mb-0.5" />
             </button>
             
-            {/* Eğer açıksa ve ReactDOM mevcutsa portal ile body'ye render et */}
-            {isOpen && ReactDOM && ReactDOM.createPortal(tooltipContent, document.body)}
+            {/* Portal Mantığı: 
+               Eğer ortam müsaitse (canPortal), kutuyu 'document.body' içine ışınla.
+               Değilse (çok nadir), olduğu yere koy (fallback).
+            */}
+            {isOpen && (canPortal ? ReactDOM.createPortal(tooltipContent, document.body) : tooltipContent)}
         </span>
     );
 };
@@ -101,16 +135,15 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
     const handleWeightChange = (e) => {
         const val = e.target.value;
         if (val === '') {
-        setWeight('');
-        return;
+            setWeight('');
+            return;
         }
         const numVal = Number(val);
         if (Number.isFinite(numVal) && numVal >= 0) {
-        setWeight(numVal);
+            setWeight(numVal);
         }
     };
 
-    // --- Definitions ---
     const definitions = {
         tr: {
             TTE: "Time to Exhaustion (Tükenme Süresi). Sporcunun belirli bir tempoda (sabit hız/güç) tükenene kadar ne kadar süre dayanabildiğini ölçen test. Dayanıklılık kapasitesinin en net göstergelerinden biridir.",
@@ -126,7 +159,6 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         }
     };
 
-    // --- Content ---
     const content = {
         tr: {
         heroTitle: <>Kafein: <br/>Performansın <span className="text-primary">Biyolojik Hilesi</span></>,
@@ -517,7 +549,7 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
             <div className="max-w-2xl mx-auto">
                 <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl">
                 <div className="text-center mb-8">
-                    <CaffeineIcons.Battery className="w-12 h-12 text-primary mx-auto mb-4 animate-bounce duration-[2000ms]" />
+                    <CaffeineIcons.Battery size={48} className="text-primary mx-auto mb-4 animate-bounce duration-[2000ms]" />
                     <h3 className="text-xl md:text-2xl font-bold text-white">{t.calcTitle}</h3>
                     <p className="text-slate-400 mt-2 text-sm md:text-base">{t.calcDesc}</p>
                 </div>
