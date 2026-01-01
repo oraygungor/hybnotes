@@ -20,56 +20,63 @@ const CaffeineIcons = {
 };
 
 // --- HELPER COMPONENT: Reference Superscript ---
-// Otomatik sıralama ve görsel format bileşeni
 const Ref = ({ ids }) => {
     // Referansları küçükten büyüğe sırala
     const sorted = [...ids].sort((a, b) => a - b);
     return (
-        // Hover etkileşimleri kaldırıldı, sadece metin ve renk
-        // Hizalama "relative -top" ile yapıldı, satır akışını daha az bozar
         <span className="text-[10px] text-primary font-bold ml-0.5 relative -top-[4px] select-none">
             [{sorted.join(', ')}]
         </span>
     );
 };
 
-// --- TOOLTIP COMPONENT ---
+// --- TOOLTIP COMPONENT (PORTAL VERSION) ---
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    return (
-        <div className="relative inline-block">
-        <button 
-            onClick={() => setIsOpen(!isOpen)}
-            className="group flex items-center gap-1.5 border-b border-dashed border-slate-500 hover:border-primary transition-colors focus:outline-none"
-            aria-label={`${term} hakkında bilgi`}
-        >
-            <span className="font-semibold text-slate-200 group-hover:text-primary">{term}</span>
-            <CaffeineIcons.HelpCircle size={14} className="text-slate-500 group-hover:text-primary" />
-        </button>
-        
-        {isOpen && (
-            <>
-            <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={() => setIsOpen(false)} />
+    // İçeriği React Portal ile Body'ye taşıyoruz.
+    // Bu, z-index ve overflow sorunlarını %100 çözer.
+    const tooltipContent = (
+        <>
+            {/* Backdrop */}
+            <div 
+                className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm animate-in fade-in" 
+                onClick={() => setIsOpen(false)} 
+            />
+            {/* Modal Box */}
             <div className="
-                z-50 p-4 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in duration-200
-                fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-xs
-                md:absolute md:top-auto md:bottom-full md:left-0 md:translate-x-0 md:translate-y-0 md:mb-3 md:w-72
+                fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                w-[90vw] max-w-xs p-5 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
             ">
-                <div className="flex justify-between items-start mb-2">
-                <h4 className="text-primary font-bold text-sm">{term}</h4>
-                <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white md:hidden p-1">
-                    <CaffeineIcons.X size={16} />
-                </button>
+                <div className="flex justify-between items-start mb-3">
+                    <h4 className="text-primary font-bold text-base">{term}</h4>
+                    <button 
+                        onClick={() => setIsOpen(false)} 
+                        className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700 transition-colors"
+                    >
+                        <CaffeineIcons.X size={20} />
+                    </button>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed text-left">
-                {definition}
+                <p className="text-sm text-slate-300 leading-relaxed text-left">
+                    {definition}
                 </p>
-                <div className="hidden md:block absolute top-full left-4 -mt-px border-8 border-transparent border-t-slate-800" />
             </div>
-            </>
-        )}
-        </div>
+        </>
+    );
+
+    return (
+        <span className="relative inline-block">
+            <button 
+                onClick={() => setIsOpen(true)}
+                className="group inline-flex items-center gap-1 border-b border-dashed border-slate-500 hover:border-primary transition-colors focus:outline-none align-baseline"
+                aria-label={`${term} hakkında bilgi`}
+            >
+                <span className="font-semibold text-slate-200 group-hover:text-primary">{term}</span>
+                <CaffeineIcons.HelpCircle size={12} className="text-slate-500 group-hover:text-primary mb-0.5" />
+            </button>
+            
+            {isOpen && ReactDOM.createPortal(tooltipContent, document.body)}
+        </span>
     );
 };
 
@@ -98,7 +105,6 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         }
     };
 
-    // Tanımları burada önceden belirleyelim ki içerikte kullanabilelim
     const definitions = {
         tr: {
             TTE: "Time to Exhaustion (Tükenme Süresi). Sporcunun belirli bir tempoda (sabit hız/güç) tükenene kadar ne kadar süre dayanabildiğini ölçen test. Dayanıklılık kapasitesinin en net göstergelerinden biridir.",
