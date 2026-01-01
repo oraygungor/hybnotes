@@ -594,7 +594,4 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
     </div>
   );
 };
-
-// Bu satır App.js ile bağlantıyı sağlar.
-// İçerdeki isim CaffeinePerformanceComp olsa da dışarıya CaffeinePerformancePage olarak açıyoruz.
 window.CaffeinePerformancePage = CaffeinePerformancePage;
