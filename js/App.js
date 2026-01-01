@@ -753,22 +753,31 @@ const App = () => {
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
 case 'caffeine_perf': 
-            // 1. Bileşeni güvenli bir şekilde alıyoruz
-            const SafeCaffeinePage = window.CaffeinePerformancePage;
-            
-            // 2. Eğer bileşen henüz yüklenmediyse veya bulunamadıysa hata vermek yerine mesaj gösteriyoruz
-            if (!SafeCaffeinePage) {
-                return (
-                    <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-400">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-                        <p>Modül yükleniyor...</p>
-                        <p className="text-xs text-slate-600 mt-2">(Eğer bu ekran gitmiyorsa kafeinveperformans.js dosya yolunu kontrol edin)</p>
-                    </div>
-                );
-            }
-            
-            // 3. Bileşen yüklendiyse ekrana çiziyoruz
-            return <SafeCaffeinePage lang={lang} />;
+    // Bileşeni güvenli bir değişkene alıyoruz
+    const Comp = window.CaffeinePerformancePage;
+
+    // Eğer bileşen henüz yüklenmediyse veya bulunamadıysa:
+    if (!Comp) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-4">
+                <div className="text-red-500 font-bold text-xl mb-2">⚠️ Yükleme Hatası</div>
+                <p className="text-slate-300">
+                    'kafeinveperformans.js' dosyası yüklenemedi veya okunamadı.
+                </p>
+                <div className="text-xs text-slate-500 mt-4 bg-slate-800 p-4 rounded text-left">
+                    <strong>Kontrol Edilecekler:</strong>
+                    <ul className="list-disc pl-4 mt-1">
+                        <li>index.html dosyasında script src="js/kafeinveperformans.js" doğru mu?</li>
+                        <li>Dosya ismi gerçekten kafeinveperformans.js mi? (Harf hatası?)</li>
+                        <li>Dosya gerçekten 'js' klasörünün içinde mi?</li>
+                    </ul>
+                </div>
+            </div>
+        );
+    }
+
+    // Sorun yoksa bileşeni çiz
+    return <Comp lang={lang} />;
 
                 
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
