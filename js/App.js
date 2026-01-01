@@ -640,7 +640,7 @@ const App = () => {
                 type: 'dropdown',
                 children: [
                     { id: 'caffeine', title: lang === 'tr' ? 'Kafein Stratejisi' : 'Caffeine Strategy', icon: Icons.Zap },
-                    { id: 'caffeine_perf', title: lang === 'tr' ? 'Kafein ve Performans' : 'Caffeine & Perf.', icon: Icons.Activity },
+                    { id: 'caffeine_perf', title: lang === 'tr' ? 'Kafein & Perf.' : 'Caffeine & Perf.', icon: Icons.Activity },
                 ]
             },
             { 
