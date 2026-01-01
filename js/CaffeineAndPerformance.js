@@ -1,7 +1,8 @@
 const { useState, useEffect } = React;
+// ReactDOM kontrolü: Tarayıcıda yüklü mü diye bakar, yoksa null atar (Hata #130 önleyici)
 const ReactDOM = window.ReactDOM || null;
 
-// --- ICONS ---
+// --- ICONS (Size prop desteği eklendi) ---
 const IconWrapper = ({ children, size = 24, className = "", ...props }) => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
@@ -38,27 +39,28 @@ const CaffeineIcons = {
     Languages: (p) => <IconWrapper {...p}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></IconWrapper>
 };
 
-// --- HELPER COMPONENT: Reference (Sadeleştirildi) ---
+// --- HELPER COMPONENT: Reference (Text Mode) ---
 const Ref = ({ ids }) => {
     const sorted = [...ids].sort((a, b) => a - b);
     return (
-        // "Uçuşan" stil kaldırıldı. Artık metinle aynı hizada, sade bir görünüm.
         <span className="text-xs text-primary/90 font-semibold ml-1 select-none">
             [{sorted.join(', ')}]
         </span>
     );
 };
 
-// --- TOOLTIP COMPONENT (PORTAL + SCROLL FIX) ---
+// --- TOOLTIP COMPONENT (PORTAL + FLEX CENTER + MOBILE SCROLL FIX) ---
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // Body Scroll Lock (iOS Safari Uyumlu)
+    // 1) Body Scroll Lock (iOS Safari Compatible & Safer)
     useEffect(() => {
         if (!isOpen) return;
-        if (typeof document === 'undefined') return;
+        if (typeof document === 'undefined') return; // SSR Check
 
         const scrollY = window.scrollY || 0;
+        
+        // Mevcut stilleri yedekle
         const prevStyle = {
             position: document.body.style.position,
             top: document.body.style.top,
@@ -66,12 +68,14 @@ const TermTooltip = ({ term, definition }) => {
             overflow: document.body.style.overflow
         };
 
+        // Scroll'u tamamen kilitle (iOS rubber-band fix)
         document.body.style.position = 'fixed';
         document.body.style.top = `-${scrollY}px`;
         document.body.style.width = '100%';
         document.body.style.overflow = 'hidden';
 
         return () => {
+            // Eski haline getir
             document.body.style.position = prevStyle.position;
             document.body.style.top = prevStyle.top;
             document.body.style.width = prevStyle.width;
@@ -80,34 +84,40 @@ const TermTooltip = ({ term, definition }) => {
         };
     }, [isOpen]);
 
+    // Portal Güvenlik Kontrolü
     const canPortal = 
         !!ReactDOM && 
         typeof ReactDOM.createPortal === 'function' && 
         typeof document !== 'undefined' && 
         !!document.body;
 
+    // --- YENİ MODAL YAPISI (Flex Wrapper) ---
+    // fixed top-1/2 yerine fixed inset-0 flex items-center justify-center kullanıyoruz.
+    // Bu, kutunun asla ekran dışına taşmamasını garanti eder.
     const tooltipContent = (
-        <>
-            <div 
-                className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm animate-in fade-in" 
-                onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} 
-            />
+        <div 
+            className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
+            onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+        >
             <div 
                 role="dialog"
                 aria-modal="true"
+                onClick={(e) => e.stopPropagation()} // Modal içine tıklayınca kapanmasın
                 className="
-                    fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                    w-[92vw] max-w-sm max-h-[85vh] overflow-y-auto
+                    w-full max-w-sm
+                    max-h-[85vh] overflow-y-auto overflow-x-hidden
                     p-5 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
                     caff-scrollbar
                 "
+                style={{ maxWidth: "calc(100vw - 2rem)" }} // Ekstra mobil güvenliği
             >
                 <div className="flex justify-between items-start mb-3">
-                    <h4 className="text-primary font-bold text-base break-words pr-2">{term}</h4>
+                    <h4 className="text-primary font-bold text-base break-words pr-2 min-w-0">{term}</h4>
                     <button 
                         onClick={() => setIsOpen(false)} 
                         className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700 transition-colors shrink-0"
                         aria-label="Kapat"
+                        type="button"
                     >
                         <CaffeineIcons.X size={20} />
                     </button>
@@ -116,10 +126,10 @@ const TermTooltip = ({ term, definition }) => {
                     {definition}
                 </p>
                 <div className="mt-4 text-center">
-                   <button onClick={() => setIsOpen(false)} className="text-xs text-slate-500 underline py-2 px-4">Kapat</button>
+                   <button onClick={() => setIsOpen(false)} className="text-xs text-slate-500 underline py-2 px-4" type="button">Kapat</button>
                 </div>
             </div>
-        </>
+        </div>
     );
 
     return (
@@ -488,11 +498,6 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                 <ul className="space-y-4">
                     {t.classicKnowledge.items.map((item, i) => (
                     <li key={i} className="flex gap-3 text-slate-300 text-sm md:text-base">
-                        {/* GÖRSEL DÜZELTME:
-                           Tik işareti ve metin artık birbirinden kopmaz.
-                           shrink-0: Tik işaretinin sıkışmasını önler.
-                           <span>: Metni ve referansı tek bir blokta tutar.
-                        */}
                         <span className="text-primary font-bold mt-0.5 shrink-0">✓</span>
                         <span className="text-slate-300 block">{item}</span>
                     </li>
@@ -537,7 +542,6 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                         <div className="flex items-center gap-2">
                             <TermTooltip term={item.label} definition={t.definitions[item.defKey]} />
                         </div>
-                        {/* Graphs keep their specific colors (green for TTE, etc.) but we could use primary here if needed */}
                         <span className="text-primary font-mono text-base md:text-lg">
                         {item.value === 0.71 ? '~0.71%' : `+${item.value}%`}
                         </span>
