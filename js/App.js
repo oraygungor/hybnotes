@@ -751,7 +751,25 @@ const App = () => {
             case 'research': return readingArticle ? <ArticleDetail article={readingArticle} lang={lang} /> : <ResearchPage posts={posts} lang={lang} />;
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
-            case 'caffeine_perf': const CaffeinePerfPage = window.CaffeinePerformancePage;  return CaffeinePerfPage ? <CaffeinePerfPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
+case 'caffeine_perf': 
+            // 1. Bileşeni güvenli bir şekilde alıyoruz
+            const SafeCaffeinePage = window.CaffeinePerformancePage;
+            
+            // 2. Eğer bileşen henüz yüklenmediyse veya bulunamadıysa hata vermek yerine mesaj gösteriyoruz
+            if (!SafeCaffeinePage) {
+                return (
+                    <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-400">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+                        <p>Modül yükleniyor...</p>
+                        <p className="text-xs text-slate-600 mt-2">(Eğer bu ekran gitmiyorsa kafeinveperformans.js dosya yolunu kontrol edin)</p>
+                    </div>
+                );
+            }
+            
+            // 3. Bileşen yüklendiyse ekrana çiziyoruz
+            return <SafeCaffeinePage lang={lang} />;
+
+                
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'hyrox_calc': return window.HyroxCalculatorPage ? <window.HyroxCalculatorPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'kosu_dili': return window.KosuDili101Page ? <window.KosuDili101Page lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
