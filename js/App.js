@@ -215,14 +215,15 @@ const App = () => {
             return () => { try { document.head.removeChild(script); } catch(e) {} };
         } else {
             // Normal Sayfalar
-            const pageMap = {
-                home: baseTitle,
-                research: `HybLib - Research | ${baseTitle}`,
-                hyrox_calc: `HYROX Calculator | ${baseTitle}`,
-                running_perf: `Running Performance | ${baseTitle}`,
-                caffeine: `Caffeine Strategy | ${baseTitle}`,
-                utmb_lottery: `UTMB Lottery | ${baseTitle}`,
-            };
+           const pageMap = {
+    home: baseTitle,
+    research: `HybLib - Research | ${baseTitle}`,
+    hyrox_calc: `HYROX Calculator | ${baseTitle}`,
+    running_perf: `Running Performance | ${baseTitle}`,
+    caffeine: `Caffeine Strategy | ${baseTitle}`,
+    caffeine_perf: `Caffeine & Performance | ${baseTitle}`, 
+    utmb_lottery: `UTMB Lottery | ${baseTitle}`,
+};
 
             document.title = pageMap[activeTab] || baseTitle;
             upsertMeta(
