@@ -61,7 +61,7 @@ const TermTooltip = ({ term, definition }) => {
 // --- İSİM DEĞİŞİKLİĞİ BURADA YAPILDI ---
 // Eski isim: CaffeinePage
 // Yeni İsim: CaffeinePerformanceComp (Böylece diğer dosya ile çakışmaz)
-const CaffeinePerformanceComp = ({ lang: parentLang }) => {
+const CaffeinePerformancePage = ({ lang: parentLang }) => {
   const [activeTab, setActiveTab] = useState('summary');
   const [weight, setWeight] = useState(70);
   const [showReferences, setShowReferences] = useState(false);
@@ -584,4 +584,4 @@ const CaffeinePerformanceComp = ({ lang: parentLang }) => {
 
 // Bu satır App.js ile bağlantıyı sağlar.
 // İçerdeki isim CaffeinePerformanceComp olsa da dışarıya CaffeinePerformancePage olarak açıyoruz.
-window.CaffeinePerformancePage = CaffeinePerformanceComp;
+window.CaffeinePerformancePage = CaffeinePerformancePage;
