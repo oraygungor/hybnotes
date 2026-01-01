@@ -752,13 +752,15 @@ const App = () => {
             case 'research': return readingArticle ? <ArticleDetail article={readingArticle} lang={lang} /> : <ResearchPage posts={posts} lang={lang} />;
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
-// App.js içindeki renderContent fonksiyonunda ilgili satırı şöyle değiştirin:
 
-case 'caffeine_perf': 
-    const CaffeinePerfComponent = window.CaffeinePerformancePage;
-    return CaffeinePerfComponent 
-        ? <CaffeinePerfComponent lang={lang} /> 
-        : <div className="text-center p-10 text-slate-500">Modül yükleniyor...</div>;
+
+                case 'caffeine_perf': {
+  const CaffeinePerf = window.CaffeinePerformancePage;
+  return (typeof CaffeinePerf === "function")
+    ? <CaffeinePerf lang={lang} />
+    : <div className="text-center p-10 text-slate-500">Loading module...</div>;
+}
+
 
                 
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
