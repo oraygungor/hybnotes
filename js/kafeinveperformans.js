@@ -58,9 +58,6 @@ const TermTooltip = ({ term, definition }) => {
   );
 };
 
-// --- İSİM DEĞİŞİKLİĞİ BURADA YAPILDI ---
-// Eski isim: CaffeinePage
-// Yeni İsim: CaffeinePerformanceComp (Böylece diğer dosya ile çakışmaz)
 const CaffeinePerformancePage = ({ lang: parentLang }) => {
   const [activeTab, setActiveTab] = useState('summary');
   const [weight, setWeight] = useState(70);
@@ -99,6 +96,14 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
       tabs: { summary: 'Genel Bakış', newScience: 'Yeni Bulgular & Veriler', calculator: 'Dozaj Hesapla', sports: 'Sporuna Özel' },
       summaryTitle: <>Bildiğimiz Doğrular ve <span className="text-primary">Yeni Keşifler</span></>,
       summaryDesc: "Literatür yıllardır dayanıklılık üzerindeki etkiyi kabul ediyordu. Ancak 2021-2025 arası yapılan çalışmalar (ISSN, Wang, Wu) resmi güncelledi.",
+      // --- DÜZELTME: EKLENEN GRAFİK AÇIKLAMALARI ---
+      graphItems: [
+        { desc: "Dayanıklılık kapasitesinde artış." },
+        { desc: "Sıcak koşullarda daha iyi çıktı." },
+        { desc: "Daha hızlı bitirme süreleri." },
+        { desc: "Aerobik kapasitede küçük artış." }
+      ],
+      // ---------------------------------------------
       classicKnowledge: {
         title: "Klasik Bilgi (Temeller)",
         items: [
@@ -160,6 +165,14 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
       tabs: { summary: 'Overview', newScience: 'New Findings & Data', calculator: 'Dosage Calc', sports: 'Sport Specific' },
       summaryTitle: <>Known Truths & <span className="text-primary">New Discoveries</span></>,
       summaryDesc: "Literature has accepted the effect on endurance for years. However, studies between 2021-2025 (ISSN, Wang, Wu) have updated the framework.",
+      // --- DÜZELTME: EKLENEN GRAFİK AÇIKLAMALARI ---
+      graphItems: [
+        { desc: "Increase in endurance capacity." },
+        { desc: "Improved output in hot conditions." },
+        { desc: "Faster completion times." },
+        { desc: "Slight increase in aerobic capacity." }
+      ],
+      // ---------------------------------------------
       classicKnowledge: {
         title: "Classic Knowledge (Basics)",
         items: [
