@@ -1,4 +1,5 @@
 const { useState, useEffect, useMemo } = React;
+const ReactDOM = window.ReactDOM; // Portal işlemi için gerekli
 
 // --- ICONS ---
 const CaffeineIcons = {
@@ -31,19 +32,19 @@ const Ref = ({ ids }) => {
 };
 
 // --- TOOLTIP COMPONENT (PORTAL VERSION) ---
+// Bu bileşen, içeriği 'body' etiketine taşır, böylece overflow/gizlenme sorunu yaşanmaz.
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // İçeriği React Portal ile Body'ye taşıyoruz.
-    // Bu, z-index ve overflow sorunlarını %100 çözer.
     const tooltipContent = (
         <>
-            {/* Backdrop */}
+            {/* Arka plan karartması (Backdrop) */}
             <div 
                 className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm animate-in fade-in" 
                 onClick={() => setIsOpen(false)} 
             />
-            {/* Modal Box */}
+            
+            {/* Modal Kutusu - Ekranın tam ortasında açılır */}
             <div className="
                 fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                 w-[90vw] max-w-xs p-5 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
@@ -60,6 +61,9 @@ const TermTooltip = ({ term, definition }) => {
                 <p className="text-sm text-slate-300 leading-relaxed text-left">
                     {definition}
                 </p>
+                <div className="mt-4 text-center">
+                   <button onClick={() => setIsOpen(false)} className="text-xs text-slate-500 underline">Kapat</button>
+                </div>
             </div>
         </>
     );
@@ -75,7 +79,8 @@ const TermTooltip = ({ term, definition }) => {
                 <CaffeineIcons.HelpCircle size={12} className="text-slate-500 group-hover:text-primary mb-0.5" />
             </button>
             
-            {isOpen && ReactDOM.createPortal(tooltipContent, document.body)}
+            {/* Eğer açıksa ve ReactDOM mevcutsa portal ile body'ye render et */}
+            {isOpen && ReactDOM && ReactDOM.createPortal(tooltipContent, document.body)}
         </span>
     );
 };
@@ -105,6 +110,7 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         }
     };
 
+    // --- Definitions ---
     const definitions = {
         tr: {
             TTE: "Time to Exhaustion (Tükenme Süresi). Sporcunun belirli bir tempoda (sabit hız/güç) tükenene kadar ne kadar süre dayanabildiğini ölçen test. Dayanıklılık kapasitesinin en net göstergelerinden biridir.",
@@ -120,6 +126,7 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         }
     };
 
+    // --- Content ---
     const content = {
         tr: {
         heroTitle: <>Kafein: <br/>Performansın <span className="text-primary">Biyolojik Hilesi</span></>,
