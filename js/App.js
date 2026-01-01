@@ -149,7 +149,7 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
-const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery', 'kosu_dili'];
+const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery', 'kosu_dili', 'caffeine_perf'];
 const PARENT_REDIRECTS = {
     'hyrox': 'hyrox_calc',
     'running': 'running_perf',
