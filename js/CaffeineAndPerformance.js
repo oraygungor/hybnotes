@@ -1,8 +1,8 @@
 const { useState, useEffect } = React;
 
-// --- 1. ICONS (YEREL TANIM) ---
-// Bu tanımları buraya koyarak "window.Icons yüklenmedi" hatasını %100 engelliyoruz.
-const Icons = {
+// --- 1. CaffeineIcons (YEREL TANIM) ---
+// Bu tanımları buraya koyarak "window.CaffeineIcons yüklenmedi" hatasını %100 engelliyoruz.
+const CaffeineIcons = {
   Activity: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
   Battery: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg>,
   Zap: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
@@ -31,7 +31,7 @@ const TermTooltip = ({ term, definition }) => {
         aria-label={`${term} hakkında bilgi`}
       >
         <span className="font-semibold text-slate-200 group-hover:text-primary">{term}</span>
-        <Icons.HelpCircle size={14} className="text-slate-500 group-hover:text-primary" />
+        <CaffeineIcons.HelpCircle size={14} className="text-slate-500 group-hover:text-primary" />
       </button>
       
       {isOpen && (
@@ -45,7 +45,7 @@ const TermTooltip = ({ term, definition }) => {
             <div className="flex justify-between items-start mb-2">
               <h4 className="text-primary font-bold text-sm">{term}</h4>
               <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white md:hidden p-1">
-                <Icons.X size={16} />
+                <CaffeineIcons.X size={16} />
               </button>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed text-left">
@@ -298,7 +298,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
                 <div className="text-xs font-normal opacity-80">{activeLang === 'tr' ? 'Dayanıklılık' : 'Endurance'}</div>
               </div>
               <h3 className="text-slate-300 font-semibold mb-4 flex items-center gap-2">
-                <Icons.Activity size={18} className="text-primary"/>
+                <CaffeineIcons.Activity size={18} className="text-primary"/>
                 {t.provenEffectsTitle}
               </h3>
               <ul className="space-y-3">
@@ -349,7 +349,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
             <div className="bg-slate-800/50 p-6 md:p-8 rounded-2xl border border-slate-700 hover:border-slate-600 transition-colors shadow-lg">
               <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-700 rounded-xl flex items-center justify-center mb-6 text-slate-300">
-                <Icons.Scale size={20} className="md:w-6 md:h-6" />
+                <CaffeineIcons.Scale size={20} className="md:w-6 md:h-6" />
               </div>
               <h3 className="text-lg md:text-xl font-bold mb-4 text-white">{t.classicKnowledge.title}</h3>
               <ul className="space-y-4">
@@ -367,7 +367,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
                 2021-2025
               </div>
               <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/20 rounded-xl flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-500">
-                <Icons.Zap size={20} className="md:w-6 md:h-6" />
+                <CaffeineIcons.Zap size={20} className="md:w-6 md:h-6" />
               </div>
               <h3 className="text-lg md:text-xl font-bold mb-4 text-white">{t.newFindings.title}</h3>
               <ul className="space-y-4">
@@ -388,7 +388,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
         <section id="newScience" className={`space-y-8 ${activeTab !== 'newScience' ? 'hidden' : 'animate-in fade-in duration-500'}`}>
           <div className="bg-slate-800 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-xl">
             <h3 className="text-xl md:text-2xl font-bold mb-8 flex items-center gap-3">
-              <Icons.TrendingUp className="text-primary" />
+              <CaffeineIcons.TrendingUp className="text-primary" />
               {t.graphsTitle}
             </h3>
             
@@ -421,7 +421,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
             </div>
 
             <div className="mt-12 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20 flex gap-4 items-start">
-              <Icons.Info className="text-blue-400 shrink-0 mt-1" size={20} />
+              <CaffeineIcons.Info className="text-blue-400 shrink-0 mt-1" size={20} />
               <div className="text-xs md:text-sm text-slate-300 leading-relaxed">
                 <strong className="block text-blue-400 mb-1 text-sm md:text-base">{t.graphNoteTitle}</strong>
                 <p>{t.graphNoteDesc}</p>
@@ -435,7 +435,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
           <div className="max-w-2xl mx-auto">
             <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl">
               <div className="text-center mb-8">
-                <Icons.Battery className="w-12 h-12 text-primary mx-auto mb-4 animate-bounce duration-[2000ms]" />
+                <CaffeineIcons.Battery className="w-12 h-12 text-primary mx-auto mb-4 animate-bounce duration-[2000ms]" />
                 <h3 className="text-xl md:text-2xl font-bold text-white">{t.calcTitle}</h3>
                 <p className="text-slate-400 mt-2 text-sm md:text-base">{t.calcDesc}</p>
               </div>
@@ -473,7 +473,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
               {/* Threshold Warnings */}
               <div className="space-y-4">
                  <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex gap-3">
-                  <Icons.Brain size={20} className="text-blue-400 shrink-0 mt-0.5" />
+                  <CaffeineIcons.Brain size={20} className="text-blue-400 shrink-0 mt-0.5" />
                   <div>
                     <h4 className="font-bold text-blue-400 text-sm">{t.techFocus.title} ({dosage.micro} mg)</h4>
                     <p className="text-xs text-slate-400 mt-1 leading-relaxed">{t.techFocus.desc}</p>
@@ -481,7 +481,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
                 </div>
 
                 <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex gap-3">
-                  <Icons.AlertCircle size={20} className="text-red-400 shrink-0 mt-0.5" />
+                  <CaffeineIcons.AlertCircle size={20} className="text-red-400 shrink-0 mt-0.5" />
                   <div>
                     <h4 className="font-bold text-red-400 text-sm">{t.riskZone.title} ({typeof dosage.extreme === 'number' ? `> ${dosage.extreme}` : '---'} mg)</h4>
                     <p className="text-xs text-slate-400 mt-1 leading-relaxed">{t.riskZone.desc}</p>
@@ -499,7 +499,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
             {/* HYROX / DAYANIKLILIK */}
             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 flex flex-col h-full hover:border-orange-500/50 transition-colors shadow-lg">
               <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4 text-orange-400">
-                <Icons.Timer size={24} />
+                <CaffeineIcons.Timer size={24} />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">{t.sportsCards.hyrox.title}</h3>
               <p className="text-slate-400 text-sm mb-4 flex-grow leading-relaxed">
@@ -507,11 +507,11 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
               </p>
               <div className="space-y-3 mt-4 pt-4 border-t border-slate-700">
                 <div className="flex items-start gap-2">
-                  <Icons.ChevronRight size={16} className="text-orange-400 mt-1 shrink-0" />
+                  <CaffeineIcons.ChevronRight size={16} className="text-orange-400 mt-1 shrink-0" />
                   <p className="text-sm text-slate-300"><strong>{t.whyLabel}</strong> {t.sportsCards.hyrox.why}</p>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Icons.ChevronRight size={16} className="text-orange-400 mt-1 shrink-0" />
+                  <CaffeineIcons.ChevronRight size={16} className="text-orange-400 mt-1 shrink-0" />
                   <p className="text-sm text-slate-300"><strong>{t.stratLabel}</strong> {t.sportsCards.hyrox.strat}</p>
                 </div>
               </div>
@@ -520,7 +520,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
             {/* CROSSFIT */}
             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 flex flex-col h-full hover:border-purple-500/50 transition-colors shadow-lg">
               <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4 text-purple-400">
-                <Icons.Activity size={24} />
+                <CaffeineIcons.Activity size={24} />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">{t.sportsCards.crossfit.title}</h3>
               <p className="text-slate-400 text-sm mb-4 flex-grow leading-relaxed">
@@ -528,11 +528,11 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
               </p>
               <div className="space-y-3 mt-4 pt-4 border-t border-slate-700">
                 <div className="flex items-start gap-2">
-                  <Icons.ChevronRight size={16} className="text-purple-400 mt-1 shrink-0" />
+                  <CaffeineIcons.ChevronRight size={16} className="text-purple-400 mt-1 shrink-0" />
                   <p className="text-sm text-slate-300"><strong>{t.whyLabel}</strong> {t.sportsCards.crossfit.why}</p>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Icons.ChevronRight size={16} className="text-purple-400 mt-1 shrink-0" />
+                  <CaffeineIcons.ChevronRight size={16} className="text-purple-400 mt-1 shrink-0" />
                   <p className="text-sm text-slate-300"><strong>{t.warnLabel}</strong> {t.sportsCards.crossfit.warn}</p>
                 </div>
               </div>
@@ -541,7 +541,7 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
             {/* KUVVET / HALTER */}
             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 flex flex-col h-full hover:border-blue-500/50 transition-colors shadow-lg">
               <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4 text-blue-400">
-                <Icons.Flame size={24} />
+                <CaffeineIcons.Flame size={24} />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">{t.sportsCards.power.title}</h3>
               <p className="text-slate-400 text-sm mb-4 flex-grow leading-relaxed">
@@ -549,11 +549,11 @@ const CaffeinePerformancePage = ({ lang: parentLang }) => {
               </p>
               <div className="space-y-3 mt-4 pt-4 border-t border-slate-700">
                 <div className="flex items-start gap-2">
-                  <Icons.ChevronRight size={16} className="text-blue-400 mt-1 shrink-0" />
+                  <CaffeineIcons.ChevronRight size={16} className="text-blue-400 mt-1 shrink-0" />
                   <p className="text-sm text-slate-300"><strong>{t.whyLabel}</strong> {t.sportsCards.power.why}</p>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Icons.ChevronRight size={16} className="text-blue-400 mt-1 shrink-0" />
+                  <CaffeineIcons.ChevronRight size={16} className="text-blue-400 mt-1 shrink-0" />
                   <p className="text-sm text-slate-300"><strong>{t.impLabel}</strong> {t.sportsCards.power.note}</p>
                 </div>
               </div>
