@@ -20,14 +20,16 @@ const CaffeineIcons = {
 };
 
 // --- HELPER COMPONENT: Reference Superscript ---
-// Otomatik sıralama ve superscript formatı yapan bileşen
+// Otomatik sıralama ve görsel format bileşeni
 const Ref = ({ ids }) => {
     // Referansları küçükten büyüğe sırala
     const sorted = [...ids].sort((a, b) => a - b);
     return (
-        <sup className="text-[10px] text-primary font-bold ml-0.5 cursor-help select-none hover:underline" title={`Kaynak: [${sorted.join(', ')}]`}>
+        // Hover etkileşimleri kaldırıldı, sadece metin ve renk
+        // Hizalama "relative -top" ile yapıldı, satır akışını daha az bozar
+        <span className="text-[10px] text-primary font-bold ml-0.5 relative -top-[4px] select-none">
             [{sorted.join(', ')}]
-        </sup>
+        </span>
     );
 };
 
