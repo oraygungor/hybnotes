@@ -750,8 +750,8 @@ const App = () => {
             case 'home': return <HomePage posts={posts} lang={lang} currentFact={currentFact} />;
             case 'research': return readingArticle ? <ArticleDetail article={readingArticle} lang={lang} /> : <ResearchPage posts={posts} lang={lang} />;
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
-            case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
-            case 'caffeine_perf': return window.CaffeinePerformancePage ? <window.CaffeinePerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
+            case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
+            case 'caffeine_perf': const CaffeinePerfPage = window.CaffeinePerformancePage;  return CaffeinePerfPage ? <CaffeinePerfPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'hyrox_calc': return window.HyroxCalculatorPage ? <window.HyroxCalculatorPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'kosu_dili': return window.KosuDili101Page ? <window.KosuDili101Page lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
