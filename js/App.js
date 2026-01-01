@@ -752,14 +752,7 @@ const App = () => {
             case 'research': return readingArticle ? <ArticleDetail article={readingArticle} lang={lang} /> : <ResearchPage posts={posts} lang={lang} />;
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
-
-
-                case 'caffeine_perf': {
-  const CaffeinePerf = window.CaffeinePerformancePage;
-  return (typeof CaffeinePerf === "function")
-    ? <CaffeinePerf lang={lang} />
-    : <div className="text-center p-10 text-slate-500">Loading module...</div>;
-}
+  case 'caffeine_perf': return window.CaffeinePerformancePage ? <window.CaffeinePerformancePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
 
 
                 
