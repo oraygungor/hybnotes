@@ -1,280 +1,587 @@
-const CaffeinePage = ({ lang, activeTheme }) => {
-    const { useState, useEffect, useRef } = React;
-    const [params, setParams] = useState({ bodyWeight: 70, halfLife: 5, raceStart: '08:00', raceDuration: 8, initialDose: 200, initialDoseTime: -0.5, doseAmount: 75, strategy: 'stay_low' });
-    const canvasRef = useRef(null);
-    const [schedule, setSchedule] = useState([]);
-    const [summary, setSummary] = useState('');
+const { useState, useEffect } = React;
 
-    const tr = {
-        tr: {
-            strategy_params_title: 'Strateji Parametreleri',
-            body_weight_label: 'Vücut Ağırlığı (kg)',
-            race_start_label: 'Yarış Başlangıç Saati',
-            race_duration_label: 'Yarış Tahmini Süresi (saat)',
-            half_life_label: 'Yarılanma Süresi (saat)',
-            initial_dose_label: 'Başlangıç Dozu (mg)',
-            initial_dose_time_label: 'İlk Doz Zamanı (yarışa göre saat)',
-            booster_dose_label: 'Takviye Dozu (mg)',
-            strategy_label: 'Strateji Tercihi',
-            strategy_low: 'Daha Seyrek Alım',
-            strategy_high: 'Daha Sık Alım',
-            calculate_btn: 'Stratejiyi Oluştur',
-            simulation_title: 'Kişiselleştirilmiş Kafein Simülasyonu',
-            schedule_title: 'Önerilen Alım Takvimi',
-            table_header_time: 'Saat',
-            table_header_amount: 'Miktar',
-            summary_base: '* Bu plana göre, yarış sırasında yaklaşık olarak her {0} saatte bir takviye kafein almanız önerilmektedir.',
-            summary_no_booster: '* Yarış sırasında ek takviye doza ihtiyaç duyulmuyor.',
-            disclaimer: 'Kafein yarılanma süresi çok değişken olabilir. Eğer yarılanma sürenizi bilmiyorsanız, varsayılan değeri baz alabilirsiniz fakat bu bir medikal öneri değildir. Bu araç, aşağıda yer alan makalelere göre hazırlanmıştır.',
-            axis_label_time: 'Günün Saati',
-            target_zone_label: 'Hedef Bölge',
-            references: 'Referanslar'
-        },
-        en: {
-            strategy_params_title: 'Strategy Parameters',
-            body_weight_label: 'Body Weight (kg)',
-            race_start_label: 'Race Start Time',
-            race_duration_label: 'Est. Race Duration (hours)',
-            half_life_label: 'Half-Life (hours)',
-            initial_dose_label: 'Initial Dose (mg)',
-            initial_dose_time_label: 'Initial Dose Time (vs race start)',
-            booster_dose_label: 'Booster Dose (mg)',
-            strategy_label: 'Strategy Preference',
-            strategy_low: 'Less Frequent Intake',
-            strategy_high: 'More Frequent Intake',
-            calculate_btn: 'Create Strategy',
-            simulation_title: 'Personalized Caffeine Simulation',
-            schedule_title: 'Recommended Intake Schedule',
-            table_header_time: 'Time',
-            table_header_amount: 'Amount',
-            summary_base: '* According to this plan, it is recommended to take a booster dose of caffeine approximately every {0} hours during the race.',
-            summary_no_booster: '* No booster dose is needed during the race.',
-            disclaimer: 'Caffeine half-life can be highly variable. If you do not know your half-life, you can use the default value, but this is not medical advice. This tool has been prepared according to the articles listed below.',
-            axis_label_time: 'Time of Day',
-            target_zone_label: 'Target Zone',
-            references: 'References'
-        }
-    };
-    const t = lang === 'tr' ? tr.tr : tr.en;
-
-    const formatTime = (baseTime, hoursOffset) => {
-        const newTime = new Date(baseTime.getTime() + hoursOffset * 60 * 60 * 1000);
-        return newTime.toLocaleTimeString(lang === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
-    };
-    
-    const formatRelTime = (val) => { const h = Math.floor(Math.abs(val)), m = Math.round((Math.abs(val) - h) * 60); let txt = (h > 0 ? h + (lang==='tr'?' sa ':' hr ') : '') + (m > 0 ? m + (lang==='tr'?' dk':' min') : ''); return val < 0 ? (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' önce':' before') : (txt || (lang==='tr'?'Anında':'Now')) + (lang==='tr'?' sonra':' after'); };
-
-    const runSimulation = () => {
-        if (!canvasRef.current) return;
-        const ctx = canvasRef.current.getContext('2d');
-        const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
-        
-        const [sh, sm] = params.raceStart.split(':');
-        const raceDate = new Date();
-        raceDate.setHours(sh, sm, 0, 0);
-
-        const targetFloor = params.bodyWeight * 3;
-        const targetPeak = params.bodyWeight * 6;
-        const absorptionTime = 20 / 60; // 20 mins
-        const timeStep = 0.05;
-        const k = Math.log(2) / params.halfLife;
-        const decayFactor = Math.exp(-k * timeStep);
-        const triggerLevel = (params.strategy === 'stay_high') ? Math.max(targetFloor, targetPeak - params.doseAmount) : targetFloor;
-
-        let currentCaffeine = 0;
-        const labels = [], dataPoints = [], doseEvents = [];
-        let isBoosterPending = false;
-        let nextBoosterDoseTime = -1;
-
-        if (params.initialDose > 0) {
-            doseEvents.push({ time: params.initialDoseTime, amount: params.initialDose.toFixed(0) });
-        }
-
-        const simStart = Math.min(-2, params.initialDoseTime);
-        const simEnd = params.raceDuration;
-        const initialDoseFullyAbsorbedTime = params.initialDoseTime + absorptionTime;
-
-        for (let t = simStart; t <= simEnd; t += timeStep) {
-            let absorbed = 0;
-            if (params.initialDose > 0 && t >= params.initialDoseTime && t < params.initialDoseTime + absorptionTime) {
-                absorbed = (params.initialDose / absorptionTime) * timeStep;
-            }
-
-            let booster = 0;
-            if (isBoosterPending && t >= nextBoosterDoseTime) {
-                booster = params.doseAmount;
-                doseEvents.push({ time: nextBoosterDoseTime, amount: params.doseAmount.toFixed(0) });
-                isBoosterPending = false;
-            }
-
-            currentCaffeine *= decayFactor;
-            currentCaffeine += absorbed + booster;
-
-            labels.push(parseFloat(t.toFixed(2)));
-            dataPoints.push(currentCaffeine);
-
-            if (t >= initialDoseFullyAbsorbedTime && !isBoosterPending && currentCaffeine < triggerLevel) {
-                isBoosterPending = true;
-                nextBoosterDoseTime = Math.max(t, Math.ceil(t * 2) / 2);
-            }
-        }
-
-        // Drawing
-        const cvs = canvasRef.current;
-        cvs.width = cvs.clientWidth;
-        cvs.height = cvs.clientHeight;
-        const padding = { top: 20, right: 20, bottom: 40, left: 50 };
-        const chartW = cvs.width - padding.left - padding.right;
-        const chartH = cvs.height - padding.top - padding.bottom;
-
-        const xMin = labels[0], xMax = labels[labels.length-1];
-        const yMax = Math.max(targetPeak * 1.2, Math.max(...dataPoints), 100);
-
-        const getX = (val) => padding.left + ((val - xMin) / (xMax - xMin)) * chartW;
-        const getY = (val) => padding.top + chartH - (val / yMax) * chartH;
-
-        ctx.clearRect(0, 0, cvs.width, cvs.height);
-        ctx.font = '11px sans-serif';
-        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-
-        // Y Axis
-        for (let i = 0; i <= yMax; i += 50) {
-            if (i % 100 === 0) {
-                const y = getY(i);
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillText(i + 'mg', padding.left - 10, y);
-                ctx.strokeStyle = '#334155';
-                ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left + chartW, y); ctx.stroke();
-            }
-        }
-
-        // X Axis
-        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-        const xStep = Math.max(1, Math.round((xMax - xMin) / 6));
-        for (let i = Math.ceil(xMin); i <= xMax; i += xStep) {
-            const x = getX(i);
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillText(formatTime(raceDate, i), x, padding.top + chartH + 10);
-            ctx.strokeStyle = '#334155';
-            ctx.beginPath(); ctx.moveTo(x, padding.top); ctx.lineTo(x, padding.top + chartH); ctx.stroke();
-        }
-
-        // Target Zone
-        const yTargetMin = getY(targetPeak), yTargetMax = getY(targetFloor);
-        ctx.fillStyle = `rgba(${color}, 0.1)`;
-        ctx.fillRect(padding.left, yTargetMin, chartW, yTargetMax - yTargetMin);
-        ctx.fillStyle = `rgb(${color})`; ctx.textAlign = 'left';
-        ctx.fillText(t.target_zone_label, padding.left + 10, yTargetMin + 5);
-
-        // Line
-        if (labels.length > 0) {
-            ctx.beginPath();
-            ctx.moveTo(getX(labels[0]), getY(dataPoints[0]));
-            for (let i=1; i<labels.length; i++) ctx.lineTo(getX(labels[i]), getY(dataPoints[i]));
-            ctx.strokeStyle = `rgb(${color})`; ctx.lineWidth = 3; ctx.stroke();
-            
-            ctx.lineTo(getX(labels[labels.length-1]), getY(0));
-            ctx.lineTo(getX(labels[0]), getY(0));
-            const grad = ctx.createLinearGradient(0, padding.top, 0, padding.top+chartH); grad.addColorStop(0, `rgba(${color},0.4)`); grad.addColorStop(1, `rgba(${color},0)`);
-            ctx.fillStyle = grad; ctx.fill();
-        }
-
-        setSchedule(doseEvents.sort((a,b)=>a.time-b.time).map(e => ({...e, timeStr: formatTime(raceDate, e.time)})));
-        
-        const boosters = doseEvents.filter(e => parseFloat(e.amount) === params.doseAmount && e.time >= 0);
-        if (boosters.length > 1) {
-            let totalInt = 0;
-            for(let i=1; i<boosters.length; i++) totalInt += boosters[i].time - boosters[i-1].time;
-            const avg = totalInt / (boosters.length - 1);
-            setSummary(t.summary_base.replace('{0}', (Math.round(avg*2)/2).toFixed(1)));
-        } else if (boosters.length === 1) {
-            setSummary(t.summary_base.replace('{0}', params.raceDuration));
-        } else {
-            setSummary(t.summary_no_booster);
-        }
-    };
-
-    // Trigger calculation on load or param change
-    useEffect(() => {
-        const timer = setTimeout(runSimulation, 100);
-        return () => clearTimeout(timer);
-    }, [params, lang, activeTheme]);
-
-    return (
-        <div className="bg-slate-800 text-slate-200 p-6 rounded-3xl max-w-[1400px] mx-auto shadow-2xl border border-slate-700 animate-fade-in">
-            <div className="text-center mb-10 pt-2"><h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Caffeine Strategy</h1></div>
-            <div className="grid lg:grid-cols-[350px_1fr] gap-8">
-                {/* LEFT PANEL */}
-                <div className="flex flex-col gap-6">
-                    <div className="border-b border-slate-700 pb-4">
-                        <h2 className="text-xl font-bold text-white mb-2">{t.strategy_params_title}</h2>
-                    </div>
-                    <div className="grid gap-4">
-                        <Slider label={t.body_weight_label} val={params.bodyWeight} min={40} max={120} step={1} unit="kg" onChange={v => setParams(p=>({...p, bodyWeight: parseFloat(v)}))} />
-                        <div className="flex flex-col"><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.race_start_label}</label><input type="time" value={params.raceStart} onChange={e=>setParams(p=>({...p, raceStart: e.target.value}))} className="bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:border-primary w-full"/></div>
-                        <Slider label={t.race_duration_label} val={params.raceDuration} min={1} max={30} step={0.5} unit="sa" onChange={v => setParams(p=>({...p, raceDuration: parseFloat(v)}))} />
-                        <Slider label={t.half_life_label} val={params.halfLife} min={2} max={10} step={0.5} unit="sa" onChange={v => setParams(p=>({...p, halfLife: parseFloat(v)}))} />
-                        <div className="h-px bg-slate-700 my-2"></div>
-                        <Slider label={t.initial_dose_label} val={params.initialDose} min={0} max={500} step={10} unit="mg" onChange={v => setParams(p=>({...p, initialDose: parseFloat(v)}))} />
-                        <div className="mb-4"><div className="flex justify-between mb-1 items-end"><span className="text-xs font-bold text-slate-400 uppercase">{t.initial_dose_time_label}</span><span className="text-primary font-bold text-sm">{formatRelTime(params.initialDoseTime)}</span></div><input type="range" min={-2} max={2} step={0.25} value={params.initialDoseTime} onChange={(e)=>setParams(p=>({...p, initialDoseTime:parseFloat(e.target.value)}))} /></div>
-                        <Slider label={t.booster_dose_label} val={params.doseAmount} min={20} max={200} step={5} unit="mg" onChange={v => setParams(p=>({...p, doseAmount: parseFloat(v)}))} />
-                        <div className="flex flex-col">
-                            <label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{t.strategy_label}</label>
-                            <select value={params.strategy} onChange={e=>setParams(p=>({...p, strategy: e.target.value}))} className="bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:border-primary">
-                                <option value="stay_low">{t.strategy_low}</option>
-                                <option value="stay_high">{t.strategy_high}</option>
-                            </select>
-                        </div>
-                        <button onClick={runSimulation} className="bg-primary hover:opacity-90 text-white font-bold py-3 rounded-lg transition-opacity mt-2 shadow-lg shadow-primary/20">{t.calculate_btn}</button>
-                    </div>
-                </div>
-
-                {/* RIGHT PANEL */}
-                <div className="flex flex-col gap-6">
-                    <div className="bg-slate-900 border border-slate-700 rounded-3xl p-4 h-[400px] shadow-lg w-full overflow-hidden">
-                        <h3 className="text-center font-bold text-white mb-2">{t.simulation_title}</h3>
-                        <div className="flex-grow relative w-full h-full">
-                            <canvas ref={canvasRef} className="w-full h-full"></canvas>
-                        </div>
-                    </div>
-
-                    <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-lg">
-                        <h3 className="text-white font-bold mb-4">{t.schedule_title}</h3>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse text-sm">
-                                <thead>
-                                    <tr className="border-b border-slate-700 text-slate-500 uppercase text-xs">
-                                        <th className="p-3">{t.table_header_time}</th>
-                                        <th className="p-3">{t.table_header_amount}</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-slate-300">
-                                    {schedule.map((row, i) => (
-                                        <tr key={i} className="border-b border-slate-700 last:border-0 hover:bg-slate-800/50">
-                                            <td className="p-3 font-mono text-primary">{row.timeStr}</td>
-                                            <td className="p-3 font-bold">{row.amount} mg</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        <p className="mt-4 text-slate-400 italic text-sm" dangerouslySetInnerHTML={{__html: summary}}></p>
-                    </div>
-
-                    <footer className="pt-6 border-t border-slate-700 text-xs text-slate-500">
-                        <p className="italic text-slate-400 mb-4">{t.disclaimer}</p>
-                        <p className="font-bold mb-2 text-white">{t.references}:</p>
-                        <ul className="list-none space-y-2">
-                            <li>1. Grgic, J., Mikulic, P., & Schoenfeld, B. J. (2024). Effects of Acute Ingestion of Caffeine Capsules on Muscle Strength and Muscle Endurance. <em>Nutrients</em>.</li>
-                            <li>2. Lin YS, Weibel J, Landolt HP, et al. (2022). Time to Recover From Daily Caffeine Intake. <em>Frontiers in Nutrition</em>.</li>
-                            <li>3. Institute of Medicine (US) Committee on Military Nutrition Research. (2001). Pharmacology of Caffeine.</li>
-                            <li>4. Tiller, N. B., et al. (2019). ISSN Position Stand: Nutritional considerations for single-stage ultra-marathon training.</li>
-                        </ul>
-                    </footer>
-                </div>
-            </div>
-        </div>
-    );
+// --- ICON SET ---
+const Icons = {
+  Activity: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
+  Battery: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg>,
+  Zap: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+  Timer: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>,
+  Flame: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.5-3.3.3-1.2 1-2.4 2-3.2"/></svg>,
+  Brain: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.97-3.284"/><path d="M17.97 14.716A4 4 0 0 1 16 18"/></svg>,
+  AlertCircle: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>,
+  TrendingUp: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+  Info: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
+  ChevronRight: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m9 18 6-6-6-6"/></svg>,
+  Scale: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m16 16 3-8 3 8c-.87.65-1.926 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.926 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>,
+  Globe: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>,
+  HelpCircle: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>,
+  X: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 };
 
-window.CaffeinePage = CaffeinePage;
+// Reusable Tooltip Component
+const TermTooltip = ({ term, definition }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative inline-block">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="group flex items-center gap-1.5 border-b border-dashed border-slate-500 hover:border-primary transition-colors focus:outline-none"
+        aria-label={`${term} hakkında bilgi`}
+      >
+        <span className="font-semibold text-slate-200 group-hover:text-primary">{term}</span>
+        <Icons.HelpCircle size={14} className="text-slate-500 group-hover:text-primary" />
+      </button>
+      
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={() => setIsOpen(false)} />
+          <div className="
+            z-50 p-4 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-in fade-in zoom-in-95 duration-200
+            fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-xs
+            md:absolute md:top-auto md:bottom-full md:left-0 md:translate-x-0 md:translate-y-0 md:mb-3 md:w-72
+          ">
+            <div className="flex justify-between items-start mb-2">
+              <h4 className="text-primary font-bold text-sm">{term}</h4>
+              <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white md:hidden p-1">
+                <Icons.X size={16} />
+              </button>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed text-left">
+              {definition}
+            </p>
+            <div className="hidden md:block absolute top-full left-4 -mt-px border-8 border-transparent border-t-slate-800" />
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+// --- İSİM DEĞİŞİKLİĞİ BURADA YAPILDI ---
+// Eski isim: CaffeinePage
+// Yeni İsim: CaffeinePerformanceComp (Böylece diğer dosya ile çakışmaz)
+const CaffeinePerformanceComp = ({ lang: parentLang }) => {
+  const [activeTab, setActiveTab] = useState('summary');
+  const [weight, setWeight] = useState(70);
+  const [showReferences, setShowReferences] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  
+  // Use parent language if provided, otherwise default to TR
+  const activeLang = parentLang || 'tr';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleWeightChange = (e) => {
+    const val = e.target.value;
+    if (val === '') {
+      setWeight('');
+      return;
+    }
+    const numVal = Number(val);
+    if (Number.isFinite(numVal) && numVal >= 0) {
+      setWeight(numVal);
+    }
+  };
+
+  const content = {
+    tr: {
+      heroTitle: <>Kafein: <br/>Performansın <span className="text-primary">Biyolojik Hilesi</span></>,
+      heroDesc: "Yıllardır \"yorgunluk alıcı\" olarak bildiğimiz kafein, performans çıktısını ve efor algısını (RPE) iyileştirir [8]. Ayrıca bazı elit sporcularda VO2max ölçümünde küçük artışlar (~%1) ve kas gücünde (özellikle bacaklarda) artış sağlayabildiği raporlanmıştır [8][3][6].",
+      provenEffectsTitle: "Kanıtlanmış Etkiler",
+      provenEffects: [
+        { label: "Aerobik Güç", val: "Çok Yüksek" },
+        { label: "Kas Kuvveti", val: "Orta/Yüksek" },
+        { label: "Reaksiyon", val: "Yüksek" }
+      ],
+      tabs: { summary: 'Genel Bakış', newScience: 'Yeni Bulgular & Veriler', calculator: 'Dozaj Hesapla', sports: 'Sporuna Özel' },
+      summaryTitle: <>Bildiğimiz Doğrular ve <span className="text-primary">Yeni Keşifler</span></>,
+      summaryDesc: "Literatür yıllardır dayanıklılık üzerindeki etkiyi kabul ediyordu. Ancak 2021-2025 arası yapılan çalışmalar (ISSN, Wang, Wu) resmi güncelledi.",
+      classicKnowledge: {
+        title: "Klasik Bilgi (Temeller)",
+        items: [
+          "Dayanıklılık performansını artırır. [8][1]",
+          "Yorgunluk algısını (RPE) düşürür. [8]",
+          "Bazı koşullarda substrat kullanımını (yağ/karbonhidrat) etkileyebilir. [8]",
+          "Standart doz 3-6 mg/kg'dır. [8]"
+        ]
+      },
+      newFindings: {
+        title: "2021+ Güncellenmiş Çerçeve",
+        items: [
+          { title: "Fizyolojik Kapasite:", desc: "Bazı elit dayanıklılık sporcularında VO2max ölçümünde küçük artışlar (~%1) raporlanmıştır. [3]" },
+          { title: "Kuvvet Seçiciliği:", desc: "Alt vücut kaslarında (Leg Press vb.) etki üst vücuda göre daha belirgin olabilir. [6][9]" },
+          { title: "Cinsiyet Eşitliği:", desc: "Bazı kontrollü çalışmalarda benzer yanıt görülmüştür; ancak literatürde bulgular tam homojen değildir (mixed evidence). [9][6]" },
+          { title: "Sıcakta Güvenlik:", desc: "Sıcak koşullarda ortalama performans artışı görülürken, çekirdek sıcaklık artışı genelde düşüktür; yine de bireysel tolerans önemlidir. [2][8]" }
+        ]
+      },
+      graphsTitle: "Performans Kazanım Grafikleri",
+      graphNoteTitle: "Veri Yorumu:",
+      graphNoteDesc: "Zamana Karşı (TT) testlerinde %0.71'lik bir iyileşme (süre azalması) küçük görünebilir ancak elit sporda bu fark kürsü ile 4.lük arasındaki farktır. Tükenme süresindeki (TTE) %16.97'lik artış ise antrenman hacmini artırmak için muazzam bir fırsattır.",
+      calcTitle: "Kişisel Dozaj Planlayıcı",
+      calcDesc: "Kilonuzu girin, ISSN standartlarına göre aralığınızı görün. [8]",
+      weightLabel: "VÜCUT AĞIRLIĞI (KG)",
+      minDose: "Alt Sınır",
+      maxDose: "Üst Sınır",
+      espresso: "fincan espresso (değişken)",
+      maxPerf: "Maksimum Performans",
+      techFocus: { title: "Teknik & Odaklanma", desc: "2-3 mg/kg genelde daha iyi tolere edilir; titreme/anksiyete riski daha düşüktür (kişiden kişiye değişir). [8]" },
+      riskZone: { title: "Riskli Bölge", desc: "Çoğu kişide 9 mg/kg civarı ve üzeri dozlarda ek fayda sınırlı olabilir; yan etki riski artar. [8][4]" },
+      sportsCards: {
+        hyrox: { title: "Hyrox & Koşu", desc: "Hem koşu hem de istasyon dayanıklılığı gerektiren hibrit yapı için ideal.", why: "TT ve TTE sürelerini iyileştirir [1], bacak kuvvet devamlılığını artırır [6].", strat: "Başlangıçtan 45-60 dk önce 3-6 mg/kg [8]. Uzun etkinliklerde (60-90 dk+) performans düşüşünü yönetmek için bazı sporcular yarış içinde ek kafein tercih eder (toleransa bağlı) [8]." },
+        crossfit: { title: "CrossFit / HIIT", desc: "Yüksek yoğunluklu, kompleks hareketler ve anlık karar verme süreçleri.", why: "Reaksiyon süresini hızlandırır, WOD çıktısını artırır [4].", warn: "6 mg/kg sık kullanılan 'yüksek ama yönetilebilir' bir doz; daha yüksek dozlar çoğu kişide yan etki riskini artırabilir [4][8]." },
+        power: { title: "Kuvvet & Powerlifting", desc: "Maksimal güç üretimi ve set arası toparlanma.", why: "1RM değerini ve \"Bar Hızını\" (Velocity) artırır [6].", note: "Alt vücut (Squat/Deadlift) hareketlerinde etki, Bench Press'e göre daha belirgindir [6][9]." }
+      },
+      footerRefsShow: "Bilimsel Referansları Göster",
+      footerRefsHide: "Referansları Gizle",
+      disclaimer: "Bu bilgiler medikal tavsiye değildir, tamamen makalelerden derlenmiş bilgilerdir, tavsiye içermemektedir.",
+      whyLabel: "Neden?",
+      stratLabel: "Strateji:",
+      warnLabel: "Doz Uyarısı:",
+      impLabel: "Önemli:",
+      definitions: {
+        TTE: "Time to Exhaustion (Tükenme Süresi). Sporcunun belirli bir tempoda (sabit hız/güç) tükenene kadar ne kadar süre dayanabildiğini ölçen test. Dayanıklılık kapasitesinin en net göstergelerinden biridir.",
+        TT: "Time-Trial (Zamana Karşı). Belirli bir mesafeyi (örneğin 5km koşu veya 20km bisiklet) en kısa sürede bitirmeye dayalı performans testi. Gerçek yarış koşullarını en iyi simüle eden testtir.",
+        VO2max: "Maksimal Oksijen Tüketimi. Vücudun egzersiz sırasında kullanabildiği maksimum oksijen miktarıdır. Aerobik (dayanıklılık) kapasitenin altın standardı olarak kabul edilir.",
+        Heat: "Sıcaklık Performansı. 30°C ve üzeri sıcaklıklarda yapılan egzersizlerdeki performans değişimi. Kafein burada da etkilidir."
+      }
+    },
+    en: {
+      heroTitle: <>Caffeine: <br/>The <span className="text-primary">Biological Cheat Code</span></>,
+      heroDesc: "Known for years as a 'fatigue fighter', caffeine improves performance output and perceived effort (RPE) [8]. Reports also suggest small increases in VO2max (~1%) and muscle power (especially in legs) in some elite athletes [8][3][6].",
+      provenEffectsTitle: "Proven Effects",
+      provenEffects: [
+        { label: "Aerobic Power", val: "Very High" },
+        { label: "Muscle Strength", val: "Med/High" },
+        { label: "Reaction Time", val: "High" }
+      ],
+      tabs: { summary: 'Overview', newScience: 'New Findings & Data', calculator: 'Dosage Calc', sports: 'Sport Specific' },
+      summaryTitle: <>Known Truths & <span className="text-primary">New Discoveries</span></>,
+      summaryDesc: "Literature has accepted the effect on endurance for years. However, studies between 2021-2025 (ISSN, Wang, Wu) have updated the framework.",
+      classicKnowledge: {
+        title: "Classic Knowledge (Basics)",
+        items: [
+          "Increases endurance performance. [8][1]",
+          "Lowers Rating of Perceived Exertion (RPE). [8]",
+          "May affect substrate use (fat/carb) in some conditions. [8]",
+          "Standard dose is 3-6 mg/kg. [8]"
+        ]
+      },
+      newFindings: {
+        title: "2021+ Updated Framework",
+        items: [
+          { title: "Physiological Capacity:", desc: "Small increases in VO2max (~1%) have been reported in some elite endurance settings. [3]" },
+          { title: "Strength Selectivity:", desc: "Effect on lower body muscles (Leg Press etc.) may be more pronounced than upper body. [6][9]" },
+          { title: "Gender Equality:", desc: "Some controlled trials show similar responses, though literature findings are not fully homogeneous (mixed evidence). [9][6]" },
+          { title: "Safety in Heat:", desc: "Average performance increases in heat, while core temp rise is generally small; individual tolerance remains important. [2][8]" }
+        ]
+      },
+      graphsTitle: "Performance Gain Charts",
+      graphNoteTitle: "Data Interpretation:",
+      graphNoteDesc: "A 0.71% improvement in Time-Trial (TT) tests may seem small, but in elite sports, this is the difference between the podium and 4th place. A 16.97% increase in Time to Exhaustion (TTE) is a massive opportunity to increase training volume.",
+      calcTitle: "Personal Dosage Planner",
+      calcDesc: "Enter your weight, see your range according to ISSN standards. [8]",
+      weightLabel: "BODY WEIGHT (KG)",
+      minDose: "Lower Limit",
+      maxDose: "Upper Limit",
+      espresso: "cups of espresso (variable)",
+      maxPerf: "Maximum Performance",
+      techFocus: { title: "Technique & Focus", desc: "2-3 mg/kg is generally better tolerated; risk of tremors/anxiety is lower (varies by individual). [8]" },
+      riskZone: { title: "Risk Zone", desc: "For most, doses above 9 mg/kg offer limited extra benefit and increase risk of side effects. [8][4]" },
+      sportsCards: {
+        hyrox: { title: "Hyrox & Running", desc: "Ideal for hybrid structures requiring both running and station endurance.", why: "Improves TT and TTE times [1], increases leg strength endurance [6].", strat: "3-6 mg/kg 45-60 mins before start [8]. In long events (60-90 min+), some athletes opt for intra-race caffeine to manage fatigue (tolerance dependent) [8]." },
+        crossfit: { title: "CrossFit / HIIT", desc: "High intensity, complex movements and instant decision making processes.", why: "Speeds up reaction time, increases WOD output [4].", warn: "6 mg/kg is a common 'high but manageable' dose; higher amounts may increase side effect risk for many [4][8]." },
+        power: { title: "Strength & Powerlifting", desc: "Maximal power production and recovery between sets.", why: "Increases 1RM value and 'Bar Velocity' [6].", note: "Effect is more pronounced in lower body (Squat/Deadlift) movements compared to Bench Press [6][9]." }
+      },
+      footerRefsShow: "Show Scientific References",
+      footerRefsHide: "Hide References",
+      disclaimer: "This information is not medical advice, it is compiled entirely from articles and does not contain recommendations.",
+      whyLabel: "Why?",
+      stratLabel: "Strategy:",
+      warnLabel: "Dose Warning:",
+      impLabel: "Important:",
+      definitions: {
+        TTE: "Time to Exhaustion. A test measuring how long an athlete can sustain a specific intensity until failure. A key indicator of endurance capacity.",
+        TT: "Time-Trial. A performance test based on completing a set distance (e.g., 5km run or 20km cycle) in the shortest possible time. It best simulates real race conditions.",
+        VO2max: "Maximal Oxygen Uptake. The maximum amount of oxygen the body can utilize during exercise. It is considered the gold standard of aerobic (endurance) capacity.",
+        Heat: "Performance in Heat. Performance changes during exercise in temperatures above 30°C. Caffeine is effective here as well."
+      }
+    }
+  };
+
+  const t = content[activeLang];
+
+  const performanceData = [
+    { 
+      term: 'TTE', 
+      label: activeLang === 'tr' ? 'Tükenme Süresi' : 'Time to Exhaustion', 
+      value: 16.97, 
+      color: 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]', 
+      desc: t.graphItems?.[0]?.desc || "Increase in endurance capacity.",
+      defKey: 'TTE'
+    },
+    { 
+      term: 'Heat', 
+      label: activeLang === 'tr' ? 'Sıcakta Performans' : 'Performance in Heat', 
+      value: 2.0, 
+      color: 'bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]', 
+      desc: t.graphItems?.[1]?.desc || "Improved output in hot conditions.",
+      defKey: 'Heat'
+    },
+    { 
+      term: 'TT', 
+      label: activeLang === 'tr' ? 'Zamana Karşı' : 'Time-Trial', 
+      value: 0.71, 
+      color: 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]', 
+      desc: t.graphItems?.[2]?.desc || "Faster completion times.",
+      defKey: 'TT'
+    },
+    { 
+      term: 'VO2max', 
+      label: 'VO2max', 
+      value: 1.2, 
+      color: 'bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]', 
+      desc: t.graphItems?.[3]?.desc || "Slight increase in aerobic capacity.",
+      defKey: 'VO2max'
+    },
+  ];
+
+  const calculateDosage = (kg) => {
+    if (kg === '' || kg === 0) {
+      return { min: '---', max: '---', extreme: '---', micro: '---', espressoMinCups: '---', espressoMaxCups: '---' };
+    }
+    const safeKg = Number(kg);
+    return {
+      min: Math.round(safeKg * 3),
+      max: Math.round(safeKg * 6),
+      extreme: Math.round(safeKg * 9),
+      micro: Math.round(safeKg * 2),
+      espressoMinCups: Math.round((safeKg * 3) / 80 * 10) / 10, 
+      espressoMaxCups: Math.round((safeKg * 3) / 40 * 10) / 10 
+    };
+  };
+
+  const dosage = calculateDosage(weight);
+
+  return (
+    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-primary/30 pb-12 overflow-x-hidden">
+      
+      {/* HERO SECTION */}
+      <header className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-blue-500 to-purple-600"></div>
+        <div className="container mx-auto px-4 py-12 md:py-20 max-w-6xl relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+            <div className="md:w-2/3 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <h1 className="text-3xl md:text-6xl font-bold leading-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+                {t.heroTitle}
+              </h1>
+              <p className="text-base md:text-lg text-slate-400 max-w-2xl leading-relaxed">
+                {t.heroDesc}
+              </p>
+            </div>
+            {/* Quick Stat Visual */}
+            <div className="md:w-1/3 w-full bg-slate-800/50 backdrop-blur-sm p-6 rounded-2xl border border-slate-700 shadow-2xl relative animate-in fade-in zoom-in-95 duration-700 delay-200">
+              <div className="absolute -top-4 -right-4 bg-primary text-slate-900 font-bold p-3 md:p-4 rounded-xl shadow-lg rotate-12 transform hover:scale-110 transition-transform">
+                +16.9%
+                <div className="text-xs font-normal opacity-80">{activeLang === 'tr' ? 'Dayanıklılık' : 'Endurance'}</div>
+              </div>
+              <h3 className="text-slate-300 font-semibold mb-4 flex items-center gap-2">
+                <Icons.Activity size={18} className="text-primary"/>
+                {t.provenEffectsTitle}
+              </h3>
+              <ul className="space-y-3">
+                {t.provenEffects.map((effect, idx) => (
+                  <li key={idx} className="flex items-center justify-between text-sm group">
+                    <span className="text-slate-400 group-hover:text-slate-200 transition-colors">{effect.label}</span>
+                    <span className="text-primary font-mono font-medium bg-primary/10 px-2 py-0.5 rounded">{effect.val}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* NAVIGATION TABS */}
+      <div className="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-lg">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="flex overflow-x-auto gap-2 md:gap-6 py-3 scrollbar-hide">
+            {Object.keys(t.tabs).map((key) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className={`whitespace-nowrap px-3 py-2 md:px-4 md:py-2 text-sm md:text-base rounded-lg font-medium transition-all ${
+                  activeTab === key 
+                    ? 'bg-slate-800 text-primary ring-1 ring-primary/50 shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)]' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                {t.tabs[key]}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <main className="container mx-auto px-4 py-8 md:py-12 max-w-6xl space-y-12 md:space-y-24">
+
+        {/* SECTION 1: GENEL BAKIŞ */}
+        <section id="summary" className={`space-y-8 md:space-y-12 ${activeTab !== 'summary' ? 'hidden' : 'animate-in fade-in duration-500'}`}>
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-white">{t.summaryTitle}</h2>
+            <p className="text-slate-400 text-sm md:text-base">
+              {t.summaryDesc}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+            <div className="bg-slate-800/50 p-6 md:p-8 rounded-2xl border border-slate-700 hover:border-slate-600 transition-colors shadow-lg">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-700 rounded-xl flex items-center justify-center mb-6 text-slate-300">
+                <Icons.Scale size={20} className="md:w-6 md:h-6" />
+              </div>
+              <h3 className="text-lg md:text-xl font-bold mb-4 text-white">{t.classicKnowledge.title}</h3>
+              <ul className="space-y-4">
+                {t.classicKnowledge.items.map((item, i) => (
+                  <li key={i} className="flex gap-3 text-slate-300 text-sm md:text-base">
+                    <span className="text-primary font-bold">✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-gradient-to-br from-slate-800 to-slate-800/30 p-6 md:p-8 rounded-2xl border border-primary/20 shadow-lg shadow-primary/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-2 md:p-3 bg-primary/10 rounded-bl-2xl border-b border-l border-primary/20 text-primary text-[10px] md:text-xs font-bold uppercase tracking-wider">
+                2021-2025
+              </div>
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/20 rounded-xl flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-500">
+                <Icons.Zap size={20} className="md:w-6 md:h-6" />
+              </div>
+              <h3 className="text-lg md:text-xl font-bold mb-4 text-white">{t.newFindings.title}</h3>
+              <ul className="space-y-4">
+                {t.newFindings.items.map((item, i) => (
+                  <li key={i} className="flex gap-3 text-slate-300 text-sm md:text-base">
+                    <div className="mt-1.5 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary shrink-0"></div>
+                    <span>
+                      <strong className="text-white block md:inline md:mr-1">{item.title}</strong> {item.desc}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 2: VERİ GRAFİKLERİ */}
+        <section id="newScience" className={`space-y-8 ${activeTab !== 'newScience' ? 'hidden' : 'animate-in fade-in duration-500'}`}>
+          <div className="bg-slate-800 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-xl">
+            <h3 className="text-xl md:text-2xl font-bold mb-8 flex items-center gap-3">
+              <Icons.TrendingUp className="text-primary" />
+              {t.graphsTitle}
+            </h3>
+            
+            <div className="space-y-8 md:space-y-10">
+              {performanceData.map((item, index) => (
+                <div key={index} className="space-y-3">
+                  <div className="flex flex-wrap justify-between items-end gap-2 text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                       <TermTooltip term={item.label} definition={t.definitions[item.defKey]} />
+                    </div>
+                    <span className="text-primary font-mono text-base md:text-lg">
+                      {item.value === 0.71 ? '~0.71%' : `+${item.value}%`}
+                    </span>
+                  </div>
+                  
+                  <div className="h-5 md:h-6 bg-slate-900/50 rounded-full overflow-hidden p-1 border border-slate-700/50">
+                    <div 
+                      className={`h-full ${item.color} rounded-full relative group transition-all duration-[1500ms] ease-out flex items-center justify-end pr-2`} 
+                      style={{ 
+                        width: mounted ? `${Math.min(item.value * 4 + 5, 100)}%` : '0%' 
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20"></div>
+                      <div className="w-1 h-full bg-white/40 blur-[1px] rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                  <p className="text-xs md:text-sm text-slate-400 pl-1 border-l-2 border-slate-700">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-12 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20 flex gap-4 items-start">
+              <Icons.Info className="text-blue-400 shrink-0 mt-1" size={20} />
+              <div className="text-xs md:text-sm text-slate-300 leading-relaxed">
+                <strong className="block text-blue-400 mb-1 text-sm md:text-base">{t.graphNoteTitle}</strong>
+                <p>{t.graphNoteDesc}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 3: DOZAJ HESAPLAYICI */}
+        <section id="calculator" className={`space-y-8 ${activeTab !== 'calculator' ? 'hidden' : 'animate-in fade-in duration-500'}`}>
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl">
+              <div className="text-center mb-8">
+                <Icons.Battery className="w-12 h-12 text-primary mx-auto mb-4 animate-bounce duration-[2000ms]" />
+                <h3 className="text-xl md:text-2xl font-bold text-white">{t.calcTitle}</h3>
+                <p className="text-slate-400 mt-2 text-sm md:text-base">{t.calcDesc}</p>
+              </div>
+
+              <div className="flex flex-col items-center mb-8">
+                <label className="text-slate-300 text-xs md:text-sm font-bold mb-2 uppercase tracking-wide">{t.weightLabel}</label>
+                <div className="flex items-center gap-4">
+                  <button onClick={() => setWeight(w => (typeof w === 'number' && w > 40 ? w - 1 : w))} className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center text-xl font-bold active:scale-95 transition-transform">-</button>
+                  <input 
+                    type="number"
+                    min="40"
+                    max="200" 
+                    value={weight}
+                    onChange={handleWeightChange}
+                    placeholder="---"
+                    className="w-28 md:w-36 bg-slate-900 border-2 border-primary/30 focus:border-primary rounded-2xl py-3 text-center text-2xl md:text-4xl font-bold text-white outline-none transition-all shadow-inner"
+                  />
+                  <button onClick={() => setWeight(w => (typeof w === 'number' ? w + 1 : 70))} className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center text-xl font-bold active:scale-95 transition-transform">+</button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="bg-slate-700/30 p-4 rounded-2xl border border-slate-600 text-center hover:bg-slate-700/50 transition-colors">
+                  <div className="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest mb-1">{t.minDose} (3mg/kg)</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary">{dosage.min} mg</div>
+                  <div className="text-[10px] md:text-xs text-slate-500 mt-1">~{dosage.espressoMinCups}-{dosage.espressoMaxCups} {t.espresso}</div>
+                </div>
+                <div className="bg-slate-700/30 p-4 rounded-2xl border border-slate-600 text-center hover:bg-slate-700/50 transition-colors">
+                  <div className="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest mb-1">{t.maxDose} (6mg/kg)</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary">{dosage.max} mg</div>
+                  <div className="text-[10px] md:text-xs text-slate-500 mt-1">{t.maxPerf}</div>
+                </div>
+              </div>
+
+              {/* Threshold Warnings */}
+              <div className="space-y-4">
+                 <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex gap-3">
+                  <Icons.Brain size={20} className="text-blue-400 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-bold text-blue-400 text-sm">{t.techFocus.title} ({dosage.micro} mg)</h4>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">{t.techFocus.desc}</p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex gap-3">
+                  <Icons.AlertCircle size={20} className="text-red-400 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-bold text-red-400 text-sm">{t.riskZone.title} ({typeof dosage.extreme === 'number' ? `> ${dosage.extreme}` : '---'} mg)</h4>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">{t.riskZone.desc}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 4: SPOR SPESİFİK */}
+        <section id="sports" className={`space-y-8 ${activeTab !== 'sports' ? 'hidden' : 'animate-in fade-in duration-500'}`}>
+          <div className="grid md:grid-cols-3 gap-6">
+            
+            {/* HYROX / DAYANIKLILIK */}
+            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 flex flex-col h-full hover:border-orange-500/50 transition-colors shadow-lg">
+              <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4 text-orange-400">
+                <Icons.Timer size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">{t.sportsCards.hyrox.title}</h3>
+              <p className="text-slate-400 text-sm mb-4 flex-grow leading-relaxed">
+                {t.sportsCards.hyrox.desc}
+              </p>
+              <div className="space-y-3 mt-4 pt-4 border-t border-slate-700">
+                <div className="flex items-start gap-2">
+                  <Icons.ChevronRight size={16} className="text-orange-400 mt-1 shrink-0" />
+                  <p className="text-sm text-slate-300"><strong>{t.whyLabel}</strong> {t.sportsCards.hyrox.why}</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Icons.ChevronRight size={16} className="text-orange-400 mt-1 shrink-0" />
+                  <p className="text-sm text-slate-300"><strong>{t.stratLabel}</strong> {t.sportsCards.hyrox.strat}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* CROSSFIT */}
+            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 flex flex-col h-full hover:border-purple-500/50 transition-colors shadow-lg">
+              <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4 text-purple-400">
+                <Icons.Activity size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">{t.sportsCards.crossfit.title}</h3>
+              <p className="text-slate-400 text-sm mb-4 flex-grow leading-relaxed">
+                {t.sportsCards.crossfit.desc}
+              </p>
+              <div className="space-y-3 mt-4 pt-4 border-t border-slate-700">
+                <div className="flex items-start gap-2">
+                  <Icons.ChevronRight size={16} className="text-purple-400 mt-1 shrink-0" />
+                  <p className="text-sm text-slate-300"><strong>{t.whyLabel}</strong> {t.sportsCards.crossfit.why}</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Icons.ChevronRight size={16} className="text-purple-400 mt-1 shrink-0" />
+                  <p className="text-sm text-slate-300"><strong>{t.warnLabel}</strong> {t.sportsCards.crossfit.warn}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* KUVVET / HALTER */}
+            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 flex flex-col h-full hover:border-blue-500/50 transition-colors shadow-lg">
+              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4 text-blue-400">
+                <Icons.Flame size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">{t.sportsCards.power.title}</h3>
+              <p className="text-slate-400 text-sm mb-4 flex-grow leading-relaxed">
+                {t.sportsCards.power.desc}
+              </p>
+              <div className="space-y-3 mt-4 pt-4 border-t border-slate-700">
+                <div className="flex items-start gap-2">
+                  <Icons.ChevronRight size={16} className="text-blue-400 mt-1 shrink-0" />
+                  <p className="text-sm text-slate-300"><strong>{t.whyLabel}</strong> {t.sportsCards.power.why}</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Icons.ChevronRight size={16} className="text-blue-400 mt-1 shrink-0" />
+                  <p className="text-sm text-slate-300"><strong>{t.impLabel}</strong> {t.sportsCards.power.note}</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+
+      {/* FOOTER & REFERANSLAR */}
+      <footer className="container mx-auto px-4 py-8 border-t border-slate-800 text-center text-slate-500 text-sm">
+        <button 
+          onClick={() => setShowReferences(!showReferences)}
+          className="text-slate-400 hover:text-primary transition-colors mb-4 underline"
+        >
+          {showReferences ? t.footerRefsHide : t.footerRefsShow}
+        </button>
+        
+        {showReferences && (
+          <div className="text-left max-w-4xl mx-auto bg-slate-900 p-6 rounded-xl border border-slate-800 text-xs space-y-2 mt-4 text-slate-400 font-mono leading-relaxed shadow-inner">
+            <p>[1] Wang, Z., Qiu, B., Gao, J., & Del Coso, J. (2023). Effects of Caffeine Intake on Endurance Running Performance and Time to Exhaustion: A Systematic Review and Meta-Analysis. Nutrients, 15(1), 148.</p>
+            <p>[2] Naulleau, C., et al. (2021). Effect of Pre-Exercise Caffeine Intake on Endurance Performance and Core Temperature Regulation During Exercise in the Heat: A Systematic Review with Meta-Analysis. Frontiers in Sports and Active Living.</p>
+            <p>[3] Stadheim, H. K., et al. (2021). Caffeine increases exercise performance, maximal oxygen uptake and oxygen deficit in elite male endurance athletes. Medicine & Science in Sports & Exercise.</p>
+            <p>[4] Główka, N., et al. (2024). The dose-dependent effect of caffeine supplementation on performance, reaction time and postural stability in CrossFit – a randomized placebo-controlled crossover trial. Journal of the International Society of Sports Nutrition.</p>
+            <p>[5] Filip-Stachnik, A., et al. (2021). The effects of different doses of caffeine on maximal strength and strength-endurance in women habituated to caffeine. Journal of the International Society of Sports Nutrition, 18(1), 25.</p>
+            <p>[6] Wu, W., et al. (2024). Effects of Acute Ingestion of Caffeine Capsules on Muscle Strength and Muscle Endurance: A Systematic Review and Meta-Analysis. Nutrients, 16(8), 1146.</p>
+            <p>[7] Grgic, J., Venier, S., & Mikulic, P. (2022). Examining the Effects of Caffeine on Isokinetic Strength, Power, and Endurance. Journal of Functional Morphology and Kinesiology, 7(4), 71.</p>
+            <p>[8] Guest, N. S., et al. (2021). International Society of Sports Nutrition position stand: caffeine and exercise performance. Journal of the International Society of Sports Nutrition.</p>
+            <p>[9] Montalvo-Alonso, J. J., et al. (2024). Sex Differences in the Ergogenic Response of Acute Caffeine Intake on Muscular Strength, Power and Endurance Performance in Resistance-Trained Individuals: A Randomized Controlled Trial. Nutrients, 16(11), 1760.</p>
+          </div>
+        )}
+        <p className="mt-6 text-slate-600">{t.disclaimer}</p>
+      </footer>
+    </div>
+  );
+};
+
+// Bu satır App.js ile bağlantıyı sağlar.
+// İçerdeki isim CaffeinePerformanceComp olsa da dışarıya CaffeinePerformancePage olarak açıyoruz.
+window.CaffeinePerformancePage = CaffeinePerformanceComp;
