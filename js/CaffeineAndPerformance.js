@@ -49,12 +49,25 @@ const Ref = ({ ids }) => {
     );
 };
 
-// --- TOOLTIP COMPONENT (PORTAL + MOBILE FIX) ---
+// --- TOOLTIP COMPONENT (PORTAL + MOBILE SCROLL FIX) ---
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // Portal Güvenlik Kontrolü: 
-    // ReactDOM ve document.body hazır mı diye bakar.
+    // 1) Body Scroll Lock: Modal açıldığında arkadaki sayfanın kaymasını engelle
+    useEffect(() => {
+        if (!isOpen) return;
+        // Mevcut scroll durumunu kaydet
+        const originalStyle = window.getComputedStyle(document.body).overflow;
+        // Scroll'u kilitle
+        document.body.style.overflow = 'hidden';
+        
+        // Modal kapandığında (cleanup) eski haline getir
+        return () => {
+            document.body.style.overflow = originalStyle;
+        };
+    }, [isOpen]);
+
+    // Portal Güvenlik Kontrolü
     const canPortal = 
         !!ReactDOM && 
         typeof ReactDOM.createPortal === 'function' && 
@@ -63,32 +76,36 @@ const TermTooltip = ({ term, definition }) => {
 
     const tooltipContent = (
         <>
-            {/* Backdrop: Arka planı karartır ve tıklayınca kapatır */}
+            {/* Backdrop */}
             <div 
                 className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm animate-in fade-in" 
                 onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} 
             />
             
-            {/* Modal: Ekranın tam ortasında, her şeyin üzerinde */}
+            {/* Modal: Ekranın tam ortasında, scroll edilebilir */}
             <div 
                 role="dialog"
                 aria-modal="true"
                 className="
                     fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                    w-[85vw] max-w-xs p-5 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
+                    w-[92vw] max-w-sm max-h-[85vh] overflow-y-auto
+                    p-5 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
+                    caff-scrollbar
                 "
             >
                 <div className="flex justify-between items-start mb-3">
-                    <h4 className="text-primary font-bold text-base">{term}</h4>
+                    {/* Uzun kelimeleri kırarak taşmayı önle (break-words) */}
+                    <h4 className="text-primary font-bold text-base break-words pr-2">{term}</h4>
                     <button 
                         onClick={() => setIsOpen(false)} 
-                        className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700 transition-colors"
+                        className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700 transition-colors shrink-0"
                         aria-label="Kapat"
                     >
                         <CaffeineIcons.X size={20} />
                     </button>
                 </div>
-                <p className="text-sm text-slate-300 leading-relaxed text-left">
+                {/* Uzun açıklamaları kır */}
+                <p className="text-sm text-slate-300 leading-relaxed text-left break-words">
                     {definition}
                 </p>
                 <div className="mt-4 text-center">
@@ -110,10 +127,6 @@ const TermTooltip = ({ term, definition }) => {
                 <CaffeineIcons.HelpCircle size={12} className="text-slate-500 group-hover:text-primary mb-0.5" />
             </button>
             
-            {/* Portal Mantığı: 
-               Eğer ortam müsaitse (canPortal), kutuyu 'document.body' içine ışınla.
-               Değilse (çok nadir), olduğu yere koy (fallback).
-            */}
             {isOpen && (canPortal ? ReactDOM.createPortal(tooltipContent, document.body) : tooltipContent)}
         </span>
     );
@@ -207,7 +220,7 @@ const CaffeinePerformancePage = ({ lang: propLang, activeTheme }) => {
         espresso: "fincan espresso (değişken)",
         maxPerf: "Maksimum Performans",
         techFocus: { title: "Teknik & Odaklanma", desc: <>2-3 mg/kg genelde daha iyi tolere edilir; titreme/anksiyete riski daha düşüktür (kişiden kişiye değişir). <Ref ids={[8]}/></> },
-        riskZone: { title: "Riskli Bölge", desc: <>Çoğu kişide 9 mg/kg civarı ve üzeri dozlarda ek fayda sınırlı olabilir; yan etki riski artar. <Ref ids={[4,8]}/></> },
+        riskZone: { title: "Risk Zone", desc: <>For most, doses above 9 mg/kg offer limited extra benefit and increase risk of side effects. <Ref ids={[4,8]}/></> },
         sportsCards: {
             hyrox: { 
                 title: "Hyrox & Koşu", 
