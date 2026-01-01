@@ -752,32 +752,13 @@ const App = () => {
             case 'research': return readingArticle ? <ArticleDetail article={readingArticle} lang={lang} /> : <ResearchPage posts={posts} lang={lang} />;
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
+// App.js içindeki renderContent fonksiyonunda ilgili satırı şöyle değiştirin:
+
 case 'caffeine_perf': 
-    // Bileşeni güvenli bir değişkene alıyoruz
-    const Comp = window.CaffeinePerformancePage;
-
-    // Eğer bileşen henüz yüklenmediyse veya bulunamadıysa:
-    if (!Comp) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-4">
-                <div className="text-red-500 font-bold text-xl mb-2">⚠️ Yükleme Hatası</div>
-                <p className="text-slate-300">
-                    'kafeinveperformans.js' dosyası yüklenemedi veya okunamadı.
-                </p>
-                <div className="text-xs text-slate-500 mt-4 bg-slate-800 p-4 rounded text-left">
-                    <strong>Kontrol Edilecekler:</strong>
-                    <ul className="list-disc pl-4 mt-1">
-                        <li>index.html dosyasında script src="js/kafeinveperformans.js" doğru mu?</li>
-                        <li>Dosya ismi gerçekten kafeinveperformans.js mi? (Harf hatası?)</li>
-                        <li>Dosya gerçekten 'js' klasörünün içinde mi?</li>
-                    </ul>
-                </div>
-            </div>
-        );
-    }
-
-    // Sorun yoksa bileşeni çiz
-    return <Comp lang={lang} />;
+    const CaffeinePerfComponent = window.CaffeinePerformancePage;
+    return CaffeinePerfComponent 
+        ? <CaffeinePerfComponent lang={lang} /> 
+        : <div className="text-center p-10 text-slate-500">Modül yükleniyor...</div>;
 
                 
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
