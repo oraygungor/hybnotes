@@ -1,8 +1,8 @@
-const { useState, useEffect } = React;
-// ReactDOM kontrolü: Tarayıcıda yüklü mü diye bakar, yoksa null atar (Hata #130 önleyici)
+const { useState, useEffect, useRef } = React;
+// ReactDOM kontrolü
 const ReactDOM = window.ReactDOM || null;
 
-// --- ICONS (Size prop desteği eklendi) ---
+// --- ICONS ---
 const IconWrapper = ({ children, size = 24, className = "", ...props }) => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
@@ -40,7 +40,7 @@ const CaffeineIcons = {
     Grid: (p) => <IconWrapper {...p}><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></IconWrapper>
 };
 
-// --- HELPER COMPONENT: Reference (Text Mode) ---
+// --- HELPER COMPONENT: Reference ---
 const Ref = ({ ids }) => {
     const sorted = [...ids].sort((a, b) => a - b);
     return (
@@ -50,17 +50,25 @@ const Ref = ({ ids }) => {
     );
 };
 
-// --- TOOLTIP COMPONENT (PORTAL + FLEX CENTER + MOBILE SCROLL FIX) ---
+// --- TOOLTIP COMPONENT (HYBRID: MOBILE MODAL / DESKTOP POPOVER) ---
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
+    const buttonRef = useRef(null);
 
-    // Body Scroll Lock (iOS Safari Compatible & Safer)
+    // Body Scroll Lock (Sadece Mobilde gerekli ama genel tutabiliriz, masaüstünde şeffaf overlay olacağı için sorun değil)
     useEffect(() => {
         if (!isOpen) return;
         if (typeof document === 'undefined') return;
 
-        const scrollY = window.scrollY || 0;
+        // Sadece mobilde scroll lock yapalım (md: breakpoint öncesi)
+        // Masaüstünde de popup açıkken scroll edilmesini istemeyebiliriz veya isteyebiliriz.
+        // Kullanıcı "tüm ekranı kaplıyor" dediği için masaüstünde scroll açık kalsın daha iyi.
         
+        const isMobile = window.innerWidth < 768;
+        if (!isMobile) return;
+
+        const scrollY = window.scrollY || 0;
         const prevStyle = {
             position: document.body.style.position,
             top: document.body.style.top,
@@ -82,6 +90,20 @@ const TermTooltip = ({ term, definition }) => {
         };
     }, [isOpen]);
 
+    const handleOpen = (e) => {
+        e.stopPropagation();
+        
+        if (buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect();
+            // Masaüstü için basit hizalama (Butonun altı, ortası)
+            setPopoverPos({
+                top: rect.bottom + 8, // Butonun biraz altı
+                left: rect.left + (rect.width / 2) // Butonun merkezi
+            });
+        }
+        setIsOpen(true);
+    };
+
     const canPortal = 
         !!ReactDOM && 
         typeof ReactDOM.createPortal === 'function' && 
@@ -90,38 +112,67 @@ const TermTooltip = ({ term, definition }) => {
 
     const tooltipContent = (
         <div 
-            className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
+            className={`
+                fixed inset-0 z-[10000] animate-in fade-in
+                md:bg-transparent md:pointer-events-auto
+                bg-black/60 backdrop-blur-sm flex items-center justify-center p-4
+            `}
             onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
         >
+            {/* KUTU YAPISI:
+               Mobil: Flex item, ortalanmış, max-w-sm, max-h-[85vh]
+               Masaüstü: Absolute pozisyonlanmış, transform ile ortalanmış
+            */}
             <div 
                 role="dialog"
                 aria-modal="true"
                 onClick={(e) => e.stopPropagation()}
-                className="
-                    w-full max-w-sm
-                    max-h-[85vh] overflow-y-auto overflow-x-hidden
-                    p-5 bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
-                    caff-scrollbar
-                "
-                style={{ maxWidth: "calc(100vw - 2rem)" }}
+                className={`
+                    bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
+                    caff-scrollbar p-5
+                    
+                    /* MOBILE STYLES (Default) */
+                    w-full max-w-sm max-h-[85vh] overflow-y-auto overflow-x-hidden
+                    
+                    /* DESKTOP STYLES (md:) */
+                    md:absolute md:w-72 md:max-w-none md:max-h-none md:overflow-visible
+                    md:top-auto md:left-auto
+                `}
+                style={{
+                    // Masaüstünde hesaplanan pozisyonları kullan
+                    ...(window.innerWidth >= 768 ? {
+                        top: popoverPos.top,
+                        left: popoverPos.left,
+                        transform: 'translateX(-50%)' // Kutuyu kendi merkezinden ortala
+                    } : {
+                        maxWidth: "calc(100vw - 2rem)" // Mobil güvenlik payı
+                    })
+                }}
             >
+                {/* Header (Sadece mobilde kapat butonu olsun, masaüstünde dışa tıklamak yeterli) */}
                 <div className="flex justify-between items-start mb-3">
                     <h4 className="text-primary font-bold text-base break-words pr-2 min-w-0">{term}</h4>
                     <button 
                         onClick={() => setIsOpen(false)} 
-                        className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700 transition-colors shrink-0"
+                        className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700 transition-colors shrink-0 md:hidden"
                         aria-label="Kapat"
                         type="button"
                     >
                         <CaffeineIcons.X size={20} />
                     </button>
                 </div>
+                
                 <p className="text-sm text-slate-300 leading-relaxed text-left break-words">
                     {definition}
                 </p>
-                <div className="mt-4 text-center">
+                
+                {/* Footer (Sadece Mobil) */}
+                <div className="mt-4 text-center md:hidden">
                    <button onClick={() => setIsOpen(false)} className="text-xs text-slate-500 underline py-2 px-4" type="button">Kapat</button>
                 </div>
+                
+                {/* Desktop Arrow (Süsleme) */}
+                <div className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 -mb-[1px] border-8 border-transparent border-b-slate-800 border-b-primary/30"></div>
             </div>
         </div>
     );
@@ -129,7 +180,8 @@ const TermTooltip = ({ term, definition }) => {
     return (
         <span className="relative inline-block">
             <button 
-                onClick={(e) => { e.stopPropagation(); setIsOpen(true); }}
+                ref={buttonRef}
+                onClick={handleOpen}
                 type="button"
                 className="group inline-flex items-center gap-1 border-b border-dashed border-slate-500 hover:border-primary transition-colors focus:outline-none align-baseline cursor-pointer"
                 aria-label={`${term} hakkında bilgi`}
@@ -148,7 +200,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
     const activeLang = propLang || 'tr';
     
     const [activeTab, setActiveTab] = useState('summary');
-    const [isGridOpen, setIsGridOpen] = useState(false); // Grid Menu State
+    const [isGridOpen, setIsGridOpen] = useState(false);
     const [weight, setWeight] = useState(70);
     const [showReferences, setShowReferences] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -615,6 +667,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                         <div className="flex items-center gap-2">
                             <TermTooltip term={item.label} definition={t.definitions[item.defKey]} />
                         </div>
+                        {/* Graphs keep their specific colors (green for TTE, etc.) but we could use primary here if needed */}
                         <span className="text-primary font-mono text-base md:text-lg">
                         {item.value === 0.71 ? '~0.71%' : `+${item.value}%`}
                         </span>
