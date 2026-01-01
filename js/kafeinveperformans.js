@@ -1,6 +1,6 @@
 const { useState, useEffect } = React;
 
-// --- ICON SET (Lucide-react dependency removed for CDN) ---
+// --- ICON SET ---
 const Icons = {
   Activity: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
   Battery: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg>,
@@ -58,7 +58,10 @@ const TermTooltip = ({ term, definition }) => {
   );
 };
 
-const CaffeinePage = ({ lang: parentLang }) => {
+// --- İSİM DEĞİŞİKLİĞİ BURADA YAPILDI ---
+// Eski isim: CaffeinePage
+// Yeni İsim: CaffeinePerformanceComp (Böylece diğer dosya ile çakışmaz)
+const CaffeinePerformanceComp = ({ lang: parentLang }) => {
   const [activeTab, setActiveTab] = useState('summary');
   const [weight, setWeight] = useState(70);
   const [showReferences, setShowReferences] = useState(false);
@@ -216,7 +219,7 @@ const CaffeinePage = ({ lang: parentLang }) => {
       label: activeLang === 'tr' ? 'Tükenme Süresi' : 'Time to Exhaustion', 
       value: 16.97, 
       color: 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]', 
-      desc: t.graphItems[0].desc,
+      desc: t.graphItems?.[0]?.desc || "Increase in endurance capacity.",
       defKey: 'TTE'
     },
     { 
@@ -224,7 +227,7 @@ const CaffeinePage = ({ lang: parentLang }) => {
       label: activeLang === 'tr' ? 'Sıcakta Performans' : 'Performance in Heat', 
       value: 2.0, 
       color: 'bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]', 
-      desc: t.graphItems[1].desc,
+      desc: t.graphItems?.[1]?.desc || "Improved output in hot conditions.",
       defKey: 'Heat'
     },
     { 
@@ -232,7 +235,7 @@ const CaffeinePage = ({ lang: parentLang }) => {
       label: activeLang === 'tr' ? 'Zamana Karşı' : 'Time-Trial', 
       value: 0.71, 
       color: 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]', 
-      desc: t.graphItems[2].desc,
+      desc: t.graphItems?.[2]?.desc || "Faster completion times.",
       defKey: 'TT'
     },
     { 
@@ -240,7 +243,7 @@ const CaffeinePage = ({ lang: parentLang }) => {
       label: 'VO2max', 
       value: 1.2, 
       color: 'bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]', 
-      desc: t.graphItems[3].desc,
+      desc: t.graphItems?.[3]?.desc || "Slight increase in aerobic capacity.",
       defKey: 'VO2max'
     },
   ];
@@ -579,4 +582,6 @@ const CaffeinePage = ({ lang: parentLang }) => {
   );
 };
 
-window.CaffeinePerformancePage = CaffeinePage;
+// Bu satır App.js ile bağlantıyı sağlar.
+// İçerdeki isim CaffeinePerformanceComp olsa da dışarıya CaffeinePerformancePage olarak açıyoruz.
+window.CaffeinePerformancePage = CaffeinePerformanceComp;
