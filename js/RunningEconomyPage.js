@@ -31,7 +31,7 @@ const RunningEconomyPage = ({ lang, activeTheme }) => {
       lang === "tr"
         ? 'Koşu ekonomisi, belirli bir submaksimal hızda koşarken vücudun ihtiyaç duyduğu enerji (oksijen) miktarıdır. Basitçe, vücudun "yakıt tasarrufu" verimliliğidir.'
         : 'Running economy is the energy (oxygen) demand for a given submaximal running velocity. Simply put, it is the body\'s "fuel efficiency".',
-    re_note_title: lang === "tr" ? "Kafa Karışmasın:" : "Quick Note:",
+    re_note_title: lang === "tr" ? "Dip Not:" : "Quick Note:",
     re_note_text:
       lang === "tr"
         ? "Bu sayfada RE’yi pratikte en sık kullanılan şekilde ‘oksijen maliyeti’ gibi düşün: aynı hızda daha AZ oksijen = daha iyi ekonomi."
