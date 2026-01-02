@@ -658,6 +658,7 @@ const switchLang = (newLang) => {
                 type: 'dropdown',
                 children: [
                     { id: 'caffeine_perf', title: lang === 'tr' ? 'Kafein & Performans' : 'Caffeine & Performance', icon: Icons.Activity },
+                    {  id: 'beetroot_nitrate', label: lang === 'tr' ? 'Pancar Suyu & Nitrat' : 'Beetroot & Nitrate',  icon: 'Zap' },
                 ]
             },
             { 
@@ -770,7 +771,7 @@ const switchLang = (newLang) => {
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
   case 'caffeine_perf': return window.CaffeinePerformancePage ? <window.CaffeinePerformancePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
-
+case 'beetroot_nitrate':  return window.BeetrootNitratePage ? <window.BeetrootNitratePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
 
                 
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
