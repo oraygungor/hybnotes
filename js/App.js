@@ -781,7 +781,7 @@ const switchLang = (newLang) => {
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
   case 'caffeine_perf': return window.CaffeinePerformancePage ? <window.CaffeinePerformancePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
 case 'beetroot_nitrate':  return window.BeetrootNitratePage ? <window.BeetrootNitratePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
-case 'running_economy': return window.RunningEconomyPage ? <window.RunningEconomyPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
+case 'running_economy': return window.RunningEconomyPage ? <window.RunningEconomyPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
                 
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'hyrox_calc': return window.HyroxCalculatorPage ? <window.HyroxCalculatorPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
