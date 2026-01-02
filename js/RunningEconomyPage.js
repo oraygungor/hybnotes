@@ -1,13 +1,4 @@
 
-/* RunningEconomyPage.js
-   - Fixes:
-     ✅ 100 km/s -> 100 km/h (typo)
-     ✅ RE wording: “daha düşük oksijen maliyeti = daha iyi ekonomi” (ambiguity fix)
-     ✅ “Breaking 2” label softened to “2-saat maraton temposu” (more accurate wording)
-     ✅ Zanini (2025) “Model A” table updated to match the paper’s phased progression (Weeks 1–3 / 4–7 / 8–10)
-     ✅ Added tiny “How to track RE” box (general-audience, consistent with Barnes & Kilding measurement framing)
-     ✅ References list expanded: Barnes & Kilding 2014 + 2015 both included
-*/
 
 const RunningEconomyPage = ({ lang, activeTheme }) => {
   const [activeModel, setActiveModel] = React.useState("zanini");
