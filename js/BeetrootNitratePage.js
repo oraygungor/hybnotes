@@ -91,7 +91,7 @@ const BeetrootNitratePage = ({ lang = 'tr', activeTheme }) => {
                     title: "Patlayıcı Güç (<6sn)",
                     desc: "Sprint ve ani güç üretiminde Peak Power Output (PPO) artışı görülebilir. Bu etkinin Tip II (hızlı kasılan) kas lifleri üzerinde daha belirgin olması olasıdır.",
                     icon: NitrateIcons.Muscle,
-                    ref: "[9]"
+                    ref: "[8][9][14]"
                 },
                 {
                     title: "Zamana Karşı (TT)",
@@ -123,13 +123,13 @@ const BeetrootNitratePage = ({ lang = 'tr', activeTheme }) => {
                 warnings: {
                     hygiene: {
                         title: "Ağız Hijyeni Uyarısı",
-                        desc: "Nitratın nitrite dönüşümü için ağız bakterileri şarttır. Sadece gargara değil, güçlü antibakteriyel diş macunları veya sakızlar da bu döngüyü bozarak takviyeyi etkisiz kılabilir.",
+                        desc: "Güçlü antiseptik/antibakteriyel ağız ürünleri oral bakterileri baskılayabilir; bu da nitrat-nitrit döngüsünü azaltabilir.",
                         ref: "[1]"
                     },
                     elite: {
                         title: "Kimler Daha Az Yanıt Verir?",
-                        desc: "Çok yüksek kondisyonlu (Elit/VO2max yüksek) sporcularda bazal NO seviyesi zaten optimize olduğu için etki daha az görülebilir.",
-                        note: "*Not: İdrar/dışkı renginin kırmızıya dönmesi (beeturia) zararsız ve yaygın bir durumdur. Nadiren mide hassasiyeti yapabilir.",
+                        desc: "Zaten yüksek antrenmanlı bireylerde fizyolojik sistemler daha optimize olduğundan etki daha küçük/heterojen olabilir.",
+                        note: "Not: beeturia zararsız olabilir; bazı kişilerde GI hassasiyeti görülebilir.",
                         ref: "[14]"
                     }
                 }
@@ -233,7 +233,7 @@ const BeetrootNitratePage = ({ lang = 'tr', activeTheme }) => {
                     title: "Explosive Power (<6s)",
                     desc: "Peak Power Output (PPO) increase may be seen in sprints. This effect is likely more pronounced on Type II (fast-twitch) muscle fibers.",
                     icon: NitrateIcons.Muscle,
-                    ref: "[9]"
+                    ref: "[8][9][14]"
                 },
                 {
                     title: "Time Trial (TT)",
@@ -265,13 +265,13 @@ const BeetrootNitratePage = ({ lang = 'tr', activeTheme }) => {
                 warnings: {
                     hygiene: {
                         title: "Oral Hygiene Warning",
-                        desc: "Oral bacteria are essential for nitrate conversion. Strong antibacterial mouthwashes, toothpaste, or gum can disrupt this cycle and nullify the supplement.",
+                        desc: "Strong antiseptic/antibacterial oral products can suppress oral bacteria, potentially reducing the nitrate-nitrite cycle.",
                         ref: "[1]"
                     },
                     elite: {
                         title: "Who Responds Less?",
-                        desc: "Highly trained (Elite/High VO2max) athletes may see less effect as their basal NO levels are already optimized.",
-                        note: "*Note: Red urine/stool (beeturia) is harmless and common. Mild GI discomfort may occur rarely.",
+                        desc: "In highly trained individuals, physiological systems are already more optimized, so the effect may be smaller or heterogeneous.",
+                        note: "Note: Beeturia (red urine) is harmless; mild GI discomfort may occur in some individuals.",
                         ref: "[14]"
                     }
                 }
@@ -343,8 +343,8 @@ const BeetrootNitratePage = ({ lang = 'tr', activeTheme }) => {
     // Helper for chemical subscript
     const ChemicalText = ({ text }) => {
         if (!text) return null;
-        // Simple replace for common chemicals mentioned
-        const parts = text.split(/(NO3-|NO2-|Ca2+|NO)/g);
+        // Fix regex for Ca2+ escaping and NO word boundary
+        const parts = text.split(/(NO3-|NO2-|Ca2\+|\bNO\b)/g);
         return (
             <>
                 {parts.map((part, i) => {
@@ -360,8 +360,9 @@ const BeetrootNitratePage = ({ lang = 'tr', activeTheme }) => {
     // Helper for References
     const RefText = ({ text }) => {
         if (!text) return null;
-        const regex = /(\[\d+(?:,\d+)*\])/g;
-        const parts = text.split(regex);
+        // Remove global flag 'g' to prevent stateful issues with .test()
+        const regex = /(\[\d+(?:,\d+)*\])/;
+        const parts = text.split(/(\[\d+(?:,\d+)*\])/g);
         return (
             <>
                 {parts.map((part, i) => {
@@ -396,7 +397,7 @@ const BeetrootNitratePage = ({ lang = 'tr', activeTheme }) => {
                         {t.header.subtitle}
                     </p>
                     <p className="text-slate-400 max-w-2xl mx-auto text-base leading-relaxed">
-                        <RefText text={t.header.desc + " " + t.header.refs.join('')} />
+                        <RefText text={t.header.desc + " " + t.header.refs.join(' ')} />
                     </p>
                 </div>
             </header>
@@ -624,6 +625,7 @@ const BeetrootNitratePage = ({ lang = 'tr', activeTheme }) => {
                                     iconBg = "bg-emerald-500/10";
                                     iconColor = "text-emerald-400";
                                     tagColor = "text-emerald-400";
+                                    starsColor = "text-emerald-400";
                                 } else if (card.stars === 4) {
                                     // Use theme color for strong but not 'perfect' or yellow?
                                     // HTML used yellow for explosive, emerald for economy. Let's adapt based on idx for variety or stick to logic.
@@ -632,11 +634,13 @@ const BeetrootNitratePage = ({ lang = 'tr', activeTheme }) => {
                                         iconBg = "bg-yellow-500/10";
                                         iconColor = "text-yellow-400";
                                         tagColor = "text-yellow-400";
+                                        starsColor = "text-yellow-500";
                                     } else { // Economy
                                         borderColorClass = "border-slate-700 hover:border-emerald-500/50";
                                         iconBg = "bg-emerald-500/10";
                                         iconColor = "text-emerald-400";
                                         tagColor = "text-emerald-400";
+                                        starsColor = "text-emerald-400";
                                     }
                                 }
 
