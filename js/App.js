@@ -72,6 +72,8 @@ const Icons = {
   Info: (p) => <IconWrapper size={16} {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></IconWrapper>,
 };
 
+const IconTrendDot = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 16l6-6 4 4 6-8" /><circle cx="20" cy="6" r="1.5" fill="currentColor" stroke="none" /></svg>);
+
 const PulseBarLogo = ({ size = 24, className = "" }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
@@ -649,7 +651,7 @@ const switchLang = (newLang) => {
                 type: 'dropdown',
                 children: [
                          { id: 'kosu_dili', title: lang === 'tr' ? 'Koşu Dili 101' : 'Running Lingo 101', icon: Icons.BookOpen },
-                    { id: 'running_economy', title: lang === 'tr' ? 'Koşu Ekonomisi' : 'Running Economy', icon: Icons.Headphones}, 
+                    { id: 'running_economy', title: lang === 'tr' ? 'Koşu Ekonomisi' : 'Running Economy', icon: IconTrendDot}, 
                     { id: 'running_perf', title: lang === 'tr' ? 'Performansın Temeli' : 'Performance Fundamentals', icon: Icons.Activity },
                
                 ]
