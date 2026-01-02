@@ -78,6 +78,8 @@ const PulseBarLogo = ({ size = 24, className = "" }) => (
     </svg>
 );
 
+const IncreasingChartIcon=({size=24,...props})=>(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 297 297" width={size} height={size} fill="currentColor" {...props}><path d="M294.075,8.927c-2.079-2.098-4.974-3.182-7.914-2.966l-46.357,3.39c-5.564,0.407-9.745,5.247-9.338,10.812 s5.249,9.727,10.812,9.338l19.262-1.409L192.68,96.04l-78.921-66.833c-4.011-3.398-9.956-3.151-13.672,0.565L2.959,126.901 c-3.945,3.945-3.945,10.342,0,14.287c1.973,1.972,4.558,2.959,7.143,2.959s5.17-0.987,7.143-2.959l90.552-90.553l78.925,66.837 c4.012,3.4,9.961,3.15,13.676-0.57l74.159-74.255l-1.532,18.499c-0.461,5.56,3.674,10.44,9.234,10.901 c0.284,0.024,0.565,0.036,0.844,0.036c5.202-0.001,9.62-3.993,10.057-9.269l3.804-45.944 C297.209,13.927,296.154,11.025,294.075,8.927z"/><path d="M90.107,124.711c-3.774-1.562-8.12-0.698-11.01,2.19L37.12,168.877c-1.894,1.895-2.959,4.464-2.959,7.143v104.944 c0,5.579,4.523,10.102,10.102,10.102H86.24c5.579,0,10.102-4.523,10.102-10.102v-146.92 C96.342,129.958,93.881,126.274,90.107,124.711z M76.138,270.862H54.366v-90.657l21.773-21.773V270.862z"/><path d="M135.363,126.901c-2.889-2.889-7.233-3.752-11.01-2.19c-3.774,1.564-6.236,5.247-6.236,9.334v146.92 c0,5.579,4.523,10.102,10.102,10.102h41.977c5.579,0,10.102-4.523,10.102-10.102V176.022c0-2.679-1.064-5.248-2.959-7.143 L135.363,126.901z M160.094,270.862h-21.773v-112.43l21.773
+
 const IconCalculator = ({ size = 24, className = "" }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
 );
@@ -151,7 +153,7 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
-const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery', 'kosu_dili', 'caffeine_perf','beetroot_nitrate'];
+const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery', 'kosu_dili', 'caffeine_perf','beetroot_nitrate','running_economy'];
 const PARENT_REDIRECTS = {
     'hyrox': 'hyrox_calc',
     'running': 'running_perf',
@@ -224,6 +226,7 @@ const App = () => {
     running_perf: `Running Performance | ${baseTitle}`,
     caffeine: `Caffeine Strategy | ${baseTitle}`,
     caffeine_perf: `Caffeine & Performance | ${baseTitle}`, 
+    running_economy: `Running Economy | ${baseTitle}`,
     beetroot_nitrate: `Beetroot & Performance | ${baseTitle}`, 
     utmb_lottery: `UTMB Lottery | ${baseTitle}`,
 };
@@ -651,8 +654,10 @@ const switchLang = (newLang) => {
                 icon: RunningLogo,
                 type: 'dropdown',
                 children: [
+                         { id: 'kosu_dili', title: lang === 'tr' ? 'Koşu Dili 101' : 'Running Lingo 101', icon: Icons.BookOpen },
+                    { id: 'running_economy', title: lang === 'tr' ? 'Koşu Ekonomisi' : 'Running Economy', icon: IncreasingChartIcon}, 
                     { id: 'running_perf', title: lang === 'tr' ? 'Performansın Temeli' : 'Performance Fundamentals', icon: Icons.Activity },
-                    { id: 'kosu_dili', title: lang === 'tr' ? 'Koşu Dili 101' : 'Running Lingo 101', icon: Icons.BookOpen },
+               
                 ]
             },
             { 
@@ -776,7 +781,7 @@ const switchLang = (newLang) => {
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
   case 'caffeine_perf': return window.CaffeinePerformancePage ? <window.CaffeinePerformancePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
 case 'beetroot_nitrate':  return window.BeetrootNitratePage ? <window.BeetrootNitratePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
-
+case 'running_economy': return window.RunningEconomyPage ? <window.RunningEconomyPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
                 
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'hyrox_calc': return window.HyroxCalculatorPage ? <window.HyroxCalculatorPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
