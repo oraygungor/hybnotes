@@ -658,7 +658,7 @@ const switchLang = (newLang) => {
                 type: 'dropdown',
                 children: [
                     { id: 'caffeine_perf', title: lang === 'tr' ? 'Kafein & Performans' : 'Caffeine & Performance', icon: Icons.Activity },
-                    {  id: 'beetroot_nitrate', label: lang === 'tr' ? 'Pancar Suyu & Nitrat' : 'Beetroot & Nitrate',  icon: 'Zap' },
+                    {  id: 'beetroot_nitrate', label: lang === 'tr' ? 'Pancar Suyu & Nitrat' : 'Beetroot & Nitrate',  icon: Icon.Zap },
                 ]
             },
             { 
