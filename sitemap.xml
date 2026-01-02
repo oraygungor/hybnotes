@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- generated: 2026-01-01T04:18:14Z | source: crawl https://hybnotes.com/ -->
+  <!-- generated: 2026-01-02T04:11:19Z | source: crawl https://hybnotes.com/ -->
   <url>
     <loc>https://hybnotes.com/?lang=en</loc>
   </url>
@@ -54,5 +54,11 @@
   </url>
   <url>
     <loc>https://hybnotes.com/?lang=tr&amp;page=utmb_lottery</loc>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?lang=en&amp;page=caffeine_perf</loc>
+  </url>
+  <url>
+    <loc>https://hybnotes.com/?lang=tr&amp;page=caffeine_perf</loc>
   </url>
 </urlset>
