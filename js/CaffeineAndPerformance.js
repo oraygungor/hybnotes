@@ -41,30 +41,26 @@ const CaffeineIcons = {
 };
 
 // --- HELPER COMPONENT: Reference ---
+// DUZELTME 1: Referans rengi artık normal yazı rengi (text-slate-500) ve tıklanabilir gibi durmuyor.
 const Ref = ({ ids }) => {
     const sorted = [...ids].sort((a, b) => a - b);
     return (
-        <span className="text-xs text-primary/90 font-semibold ml-1 select-none">
+        <span className="text-[11px] text-slate-500 font-bold ml-1 select-none opacity-80 align-top">
             [{sorted.join(', ')}]
         </span>
     );
 };
 
-// --- TOOLTIP COMPONENT (HYBRID: MOBILE MODAL / DESKTOP POPOVER) ---
+// --- TOOLTIP COMPONENT ---
 const TermTooltip = ({ term, definition }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
     const buttonRef = useRef(null);
 
-    // Body Scroll Lock (Sadece Mobilde gerekli ama genel tutabiliriz, masaüstünde şeffaf overlay olacağı için sorun değil)
     useEffect(() => {
         if (!isOpen) return;
         if (typeof document === 'undefined') return;
 
-        // Sadece mobilde scroll lock yapalım (md: breakpoint öncesi)
-        // Masaüstünde de popup açıkken scroll edilmesini istemeyebiliriz veya isteyebiliriz.
-        // Kullanıcı "tüm ekranı kaplıyor" dediği için masaüstünde scroll açık kalsın daha iyi.
-        
         const isMobile = window.innerWidth < 768;
         if (!isMobile) return;
 
@@ -95,10 +91,9 @@ const TermTooltip = ({ term, definition }) => {
         
         if (buttonRef.current) {
             const rect = buttonRef.current.getBoundingClientRect();
-            // Masaüstü için basit hizalama (Butonun altı, ortası)
             setPopoverPos({
-                top: rect.bottom + 8, // Butonun biraz altı
-                left: rect.left + (rect.width / 2) // Butonun merkezi
+                top: rect.bottom + 8, 
+                left: rect.left + (rect.width / 2) 
             });
         }
         setIsOpen(true);
@@ -119,10 +114,6 @@ const TermTooltip = ({ term, definition }) => {
             `}
             onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
         >
-            {/* KUTU YAPISI:
-               Mobil: Flex item, ortalanmış, max-w-sm, max-h-[85vh]
-               Masaüstü: Absolute pozisyonlanmış, transform ile ortalanmış
-            */}
             <div 
                 role="dialog"
                 aria-modal="true"
@@ -131,25 +122,21 @@ const TermTooltip = ({ term, definition }) => {
                     bg-slate-800 rounded-xl border border-primary/30 shadow-2xl animate-zoom-in
                     caff-scrollbar p-5
                     
-                    /* MOBILE STYLES (Default) */
                     w-full max-w-sm max-h-[85vh] overflow-y-auto overflow-x-hidden
                     
-                    /* DESKTOP STYLES (md:) */
                     md:absolute md:w-72 md:max-w-none md:max-h-none md:overflow-visible
                     md:top-auto md:left-auto
                 `}
                 style={{
-                    // Masaüstünde hesaplanan pozisyonları kullan
                     ...(window.innerWidth >= 768 ? {
                         top: popoverPos.top,
                         left: popoverPos.left,
-                        transform: 'translateX(-50%)' // Kutuyu kendi merkezinden ortala
+                        transform: 'translateX(-50%)'
                     } : {
-                        maxWidth: "calc(100vw - 2rem)" // Mobil güvenlik payı
+                        maxWidth: "calc(100vw - 2rem)"
                     })
                 }}
             >
-                {/* Header (Sadece mobilde kapat butonu olsun, masaüstünde dışa tıklamak yeterli) */}
                 <div className="flex justify-between items-start mb-3">
                     <h4 className="text-primary font-bold text-base break-words pr-2 min-w-0">{term}</h4>
                     <button 
@@ -166,12 +153,10 @@ const TermTooltip = ({ term, definition }) => {
                     {definition}
                 </p>
                 
-                {/* Footer (Sadece Mobil) */}
                 <div className="mt-4 text-center md:hidden">
                    <button onClick={() => setIsOpen(false)} className="text-xs text-slate-500 underline py-2 px-4" type="button">Kapat</button>
                 </div>
                 
-                {/* Desktop Arrow (Süsleme) */}
                 <div className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 -mb-[1px] border-8 border-transparent border-b-slate-800 border-b-primary/30"></div>
             </div>
         </div>
@@ -221,6 +206,28 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
         }
     };
 
+    // DUZELTME 2: Scroll Logic
+    // Menüden seçim yapıldığında sayfayı en tepeye değil, içeriğin başladığı yere kaydırır.
+    const handleTabChange = (key) => {
+        setActiveTab(key);
+        setIsGridOpen(false);
+        
+        // İçeriğin olduğu ana div'e kaydır (Header'ın altına)
+        setTimeout(() => {
+            const contentElement = document.getElementById('content-start');
+            if (contentElement) {
+                const headerOffset = 100; // Sticky header payı
+                const elementPosition = contentElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
+        }, 50);
+    };
+
     const definitions = {
         tr: {
             TTE: "Time to Exhaustion (Tükenme Süresi). Sporcunun belirli bir tempoda (sabit hız/güç) tükenene kadar ne kadar süre dayanabildiğini ölçen test. Dayanıklılık kapasitesinin en net göstergelerinden biridir.",
@@ -247,6 +254,10 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
             { label: "Reaksiyon", val: "Yüksek" }
         ],
         tabs: { summary: 'Genel Bakış', newScience: 'Yeni Bulgular & Veriler', calculator: 'Dozaj Hesapla', sports: 'Sporuna Özel' },
+        menuBtn: "MENÜ",
+        menuTitle: "MENÜ",
+        menuSub: "Görüntülemek istediğiniz bölümü seçin",
+        closeBtn: "KAPAT",
         summaryTitle: <>Bildiğimiz Doğrular ve <span className="text-primary">Yeni Keşifler</span></>,
         summaryDesc: "Literatür yıllardır dayanıklılık üzerindeki etkiyi kabul ediyordu. Ancak 2021-2025 arası yapılan çalışmalar (ISSN, Wang, Wu) resmi güncelledi.",
         graphItems: [
@@ -324,6 +335,10 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
             { label: "Reaction Time", val: "High" }
         ],
         tabs: { summary: 'Overview', newScience: 'New Findings & Data', calculator: 'Dosage Calc', sports: 'Sport Specific' },
+        menuBtn: "MENU",
+        menuTitle: "MENU",
+        menuSub: "Select the section you want to view",
+        closeBtn: "CLOSE",
         summaryTitle: <>Known Truths & <span className="text-primary">New Discoveries</span></>,
         summaryDesc: "Literature has accepted the effect on endurance for years. However, studies between 2021-2025 (ISSN, Wang, Wu) have updated the framework.",
         graphItems: [
@@ -523,7 +538,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                     {Object.keys(t.tabs).map((key) => (
                     <button
                         key={key}
-                        onClick={() => setActiveTab(key)}
+                        onClick={() => handleTabChange(key)}
                         className={`whitespace-nowrap px-3 py-2 md:px-4 md:py-2 text-sm md:text-base rounded-lg font-medium transition-all ${
                         activeTab === key 
                             ? 'bg-slate-800 text-primary ring-1 ring-primary/50 shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)]' 
@@ -541,19 +556,20 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                         <span className="text-primary bg-primary/10 p-1.5 rounded-lg border border-primary/20">
                             <activeTabConfig.icon size={18} />
                         </span>
+                        {/* DUZELTME 3: 'Aktif Bölüm' yazısı kaldırıldı. */}
                         <div className="flex flex-col">
-                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-none mb-0.5">Aktif Bölüm</span>
-                            <span className="text-white font-bold text-sm leading-none">
+                            <span className="text-white font-bold text-sm leading-none pt-0.5">
                                 {activeTabConfig.label}
                             </span>
                         </div>
                     </div>
+                    {/* DUZELTME 4: Dil desteği - MENU */}
                     <button 
                         onClick={() => setIsGridOpen(true)}
                         className="bg-slate-800 border border-slate-700 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider hover:border-primary hover:text-white transition-all shadow-md active:scale-95 flex items-center gap-2"
                     >
                         <CaffeineIcons.Grid size={16} />
-                        <span>Menü</span>
+                        <span>{t.menuBtn}</span>
                     </button>
                 </div>
 
@@ -565,8 +581,8 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
             <div className="fixed inset-0 z-[10000] bg-slate-900/98 backdrop-blur-xl flex items-center justify-center p-6 animate-in fade-in duration-300">
                 <div className="w-full max-w-sm space-y-8">
                     <div className="text-center space-y-2">
-                        <h3 className="text-2xl font-black text-white tracking-tight">Menü</h3>
-                        <p className="text-slate-400 text-sm font-medium">Görüntülemek istediğiniz bölümü seçin</p>
+                        <h3 className="text-2xl font-black text-white tracking-tight">{t.menuTitle}</h3>
+                        <p className="text-slate-400 text-sm font-medium">{t.menuSub}</p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
@@ -576,7 +592,7 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                             return (
                                 <button
                                     key={key}
-                                    onClick={() => { setActiveTab(key); setIsGridOpen(false); window.scrollTo({top: 0, behavior: 'smooth'}); }}
+                                    onClick={() => handleTabChange(key)}
                                     className={`
                                         p-5 rounded-2xl border flex flex-col items-center justify-center gap-3 transition-all duration-200 aspect-square group
                                         ${isActive 
@@ -593,17 +609,19 @@ const CaffeinePerformancePage = ({ lang: propLang }) => {
                         })}
                     </div>
 
+                    {/* DUZELTME 5: Dil desteği - CLOSE */}
                     <button 
                         onClick={() => setIsGridOpen(false)}
                         className="w-full py-4 text-slate-500 font-bold hover:text-white transition-colors text-sm uppercase tracking-widest"
                     >
-                        Kapat
+                        {t.closeBtn}
                     </button>
                 </div>
             </div>
         )}
 
-        <main className="container mx-auto px-4 py-8 md:py-12 max-w-6xl space-y-12 md:space-y-24">
+        {/* DUZELTME 2: Scroll Hedefi (content-start ID) */}
+        <main id="content-start" className="container mx-auto px-4 py-8 md:py-12 max-w-6xl space-y-12 md:space-y-24">
 
             {/* SECTION 1: SUMMARY */}
             <section id="summary" className={`space-y-8 md:space-y-12 ${activeTab !== 'summary' ? 'hidden' : 'animate-in'}`}>
