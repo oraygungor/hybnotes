@@ -100,6 +100,9 @@ const RunningLogo = ({ size = 24, className = "" }) => (
     </svg>
 );
 
+const BeetrootIcon = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 512 512" fill="currentColor" className={className}><g><g><path d="M342.355,156.256c-19.234-8.681-38.352-13.602-53.684-16.399L321.788,9.525l-30.381-7.72l-19.733,77.66V0h-31.347v79.247L220.617,1.68L190.236,9.4l33.041,130.033c-15.317,2.608-34.368,7.308-53.534,15.803c-40.706,18.04-89.23,56.673-89.23,138.273c0,85.621,64.183,133.466,111.047,168.401c25.081,18.695,48.769,36.354,48.769,50.089h31.347c0-13.735,23.688-31.394,48.767-50.089c46.865-34.935,111.047-82.781,111.047-168.401C431.488,230.034,400.667,182.573,342.355,156.256z M301.706,436.779c-17.812,13.279-34.309,25.576-45.706,38.732c-11.396-13.156-27.894-25.454-45.706-38.732c-46.14-34.395-98.436-73.379-98.436-143.269c0-51.67,23.476-88.429,69.775-109.253c35.305-15.88,71.594-16.685,74.24-16.722c2.675,0.08,39.011,1.467,74.381,17.656c46.373,21.224,69.886,57.668,69.886,108.32C400.141,363.4,347.845,402.384,301.706,436.779z"/></g></g><g><g><path d="M183.005,249.785l-0.091,0.083l-21.011-23.262c-1.605,1.449-39.138,36.139-25.637,92.599l30.488-7.291C157.677,273.953,181.967,250.754,183.005,249.785z"/></g></g></svg>);
+
+
 const Nutrition = ({ size = 24, className = "" }) => (
     <svg 
         width={size} 
@@ -659,7 +662,7 @@ const switchLang = (newLang) => {
                 type: 'dropdown',
                 children: [
                     { id: 'caffeine_perf', title: lang === 'tr' ? 'Kafein & Performans' : 'Caffeine & Performance', icon: Icons.Activity },
-                    {  id: 'beetroot_nitrate', title: lang === 'tr' ? 'Pancar Suyu & Nitrat' : 'Beetroot & Nitrate',  icon: Icon.Zap },
+                    {  id: 'beetroot_nitrate', title: lang === 'tr' ? 'Pancar Suyu & Nitrat' : 'Beetroot & Nitrate',  icon:BeetrootIcon },
                 ]
             },
             { 
