@@ -205,7 +205,7 @@ const App = () => {
                 "description": readingArticle.summary[safeLang],
                 "articleBody": readingArticle.content[safeLang].replace(/<[^>]*>?/gm, ''),
                 "author": { "@type": "Person", "name": "HybNotes" },
-                "url": `${window.location.origin}/?article=${readingArticle.id}&lang=${lang}` 
+               "url": `${CANONICAL_ORIGIN}/?lang=${lang}&article=${readingArticle.id}`
             };
             const script = document.createElement('script');
             script.type = 'application/ld+json';
