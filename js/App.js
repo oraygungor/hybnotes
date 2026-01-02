@@ -69,19 +69,16 @@ const Icons = {
   Info: (p) => <IconWrapper size={16} {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></IconWrapper>,
 };
 
-// App.js içindeki Icons objesine bunu ekleyin:
 const PulseBarLogo = ({ size = 24, className = "" }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
     </svg>
 );
 
-// ... existing code ...
 const IconCalculator = ({ size = 24, className = "" }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
 );
 
-// YENİ EKLENECEK İKON (IconCalculator'ın altına)
 const IconCoffee = ({ size = 24, className = "" }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
@@ -91,7 +88,6 @@ const IconCoffee = ({ size = 24, className = "" }) => (
         <line x1="14" y1="1" x2="14" y2="4" />
     </svg>
 );
-
 
 const RunningLogo = ({ size = 24, className = "" }) => (
     <svg 
@@ -153,7 +149,7 @@ const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine
 const PARENT_REDIRECTS = {
     'hyrox': 'hyrox_calc',
     'running': 'running_perf',
-    'nutrition': 'caffeine',
+    'nutrition': 'caffeine_perf', // Changed from 'caffeine' to 'caffeine_perf'
     'tools': 'utmb_lottery'
 };
 
@@ -414,9 +410,9 @@ const App = () => {
                                             <span className="text-sm">{lang === 'tr' ? 'Sesli Dinle' : 'Listen Audio'}</span>
                                         </div>
                                         {/* Standart HTML5 Audio Player - Tailwind ile biraz stilize edildi */}
-                                        <audio   controls 
-                                                 preload="none"
-                                            className="w-full h-8 block rounded-lg focus:outline-none accent-primary" 
+                                        <audio    controls 
+                                                preload="none"
+                                           className="w-full h-8 block rounded-lg focus:outline-none accent-primary" 
                                                 src={article.audio[lang]}
                                                 key={article.audio[lang]}
                                         >
@@ -640,7 +636,6 @@ const App = () => {
                 icon: Nutrition,
                 type: 'dropdown',
                 children: [
-                    { id: 'caffeine', title: lang === 'tr' ? 'Kafein Stratejisi' : 'Caffeine Strategy', icon: Icons.Zap },
                     { id: 'caffeine_perf', title: lang === 'tr' ? 'Kafein & Performans' : 'Caffeine & Performance', icon: Icons.Activity },
                 ]
             },
@@ -651,6 +646,7 @@ const App = () => {
                 type: 'dropdown',
                 children: [
                     { id: 'utmb_lottery', title: lang === 'tr' ? 'UTMB Kura' : 'UTMB Lottery', icon: Icons.Ticket },
+                    { id: 'caffeine', title: lang === 'tr' ? 'Kafein Stratejisi' : 'Caffeine Strategy', icon: Icons.Zap },
                 ]
             },
         ];
