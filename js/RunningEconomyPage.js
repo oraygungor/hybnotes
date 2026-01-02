@@ -1,5 +1,3 @@
-
-
 const RunningEconomyPage = ({ lang, activeTheme }) => {
   const [activeModel, setActiveModel] = React.useState("zanini");
   const [zaniniPhase, setZaniniPhase] = React.useState("w1_3"); // w1_3 | w4_7 | w8_10
@@ -386,6 +384,8 @@ const RunningEconomyPage = ({ lang, activeTheme }) => {
 
       {/* SECTION 1: WHAT IS IT? */}
       <div id="what" className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        {/* Left Column */}
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-white border-l-4 border-primary pl-4">{t.sec1_title}</h2>
           <p className="text-slate-400 text-lg leading-relaxed">{t.sec1_desc}</p>
@@ -403,31 +403,35 @@ const RunningEconomyPage = ({ lang, activeTheme }) => {
             </div>
             <p className="text-slate-300 text-sm md:text-base leading-relaxed">{t.analogy_text}</p>
           </div>
-
-          {/* Simple measurement/tracking */}
-          <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-lg">
-            <div className="flex items-center gap-3 mb-2 text-primary">
-              <BoltIcon className="w-6 h-6" />
-              <h3 className="font-bold text-lg">{t.track_title}</h3>
-            </div>
-            <p className="text-slate-300 text-sm md:text-base leading-relaxed">{t.track_text}</p>
-          </div>
         </div>
 
-        <div className="bg-slate-800 rounded-2xl border border-slate-700 p-8 shadow-xl flex flex-col justify-center border-t-4 border-t-primary">
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <BoltIcon className="w-6 h-6 text-primary" /> {t.why_title}
-          </h3>
-          <p className="text-slate-400 mb-6">{t.why_text}</p>
+        {/* Right Column (Moved Tracking here) */}
+        <div className="space-y-4">
+            {/* Why Important Card */}
+            <div className="bg-slate-800 rounded-2xl border border-slate-700 p-8 shadow-xl flex flex-col justify-center border-t-4 border-t-primary">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <BoltIcon className="w-6 h-6 text-primary" /> {t.why_title}
+                </h3>
+                <p className="text-slate-400 mb-6">{t.why_text}</p>
 
-          <div className="bg-slate-900 p-4 rounded-xl border border-slate-700">
-            <div className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t.breaking2_label}</div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black text-primary">191</span>
-              <span className="text-slate-400 font-bold">± 19 ml/kg/km</span>
+                <div className="bg-slate-900 p-4 rounded-xl border border-slate-700">
+                    <div className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t.breaking2_label}</div>
+                    <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-black text-primary">191</span>
+                    <span className="text-slate-400 font-bold">± 19 ml/kg/km</span>
+                    </div>
+                    <div className="text-slate-600 text-xs mt-1">@ 21.1 km/h — {t.breaking2_sub}</div>
+                </div>
             </div>
-            <div className="text-slate-600 text-xs mt-1">@ 21.1 km/h — {t.breaking2_sub}</div>
-          </div>
+
+            {/* Simple measurement/tracking (MOVED HERE) */}
+            <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-lg">
+                <div className="flex items-center gap-3 mb-2 text-primary">
+                <BoltIcon className="w-6 h-6" />
+                <h3 className="font-bold text-lg">{t.track_title}</h3>
+                </div>
+                <p className="text-slate-300 text-sm md:text-base leading-relaxed">{t.track_text}</p>
+            </div>
         </div>
       </div>
 
@@ -559,7 +563,8 @@ const RunningEconomyPage = ({ lang, activeTheme }) => {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-900 text-primary text-sm uppercase tracking-wider">
-                      <th className="p-4 rounded-tl-lg">{t.th_section}</th>
+                      {/* ADDED MIN-WIDTH HERE for wider column */}
+                      <th className="p-4 rounded-tl-lg min-w-[140px]">{t.th_section}</th>
                       <th className="p-4">{t.th_ex}</th>
                       <th className="p-4">{t.th_set}</th>
                       <th className="p-4 rounded-tr-lg">{t.th_note}</th>
