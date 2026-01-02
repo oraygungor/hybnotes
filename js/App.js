@@ -1,5 +1,8 @@
 const { useState, useEffect, useMemo, useRef } = React;
 
+// Canonical host (keep ONE; match your Search Console preference)
+const CANONICAL_ORIGIN = "https://www.hybnotes.com";
+
 // --- HELPERS: SEO & DOM ---
 const upsertMeta = (name, content) => {
     if (!content) return;
@@ -191,7 +194,7 @@ const App = () => {
             upsertMeta("description", readingArticle.summary?.[safeLang] || "");
             
             // Makale için temiz canonical (URL lang içerir)
-            upsertCanonical(`${window.location.origin}/?article=${readingArticle.id}&lang=${lang}`);
+            upsertCanonical(`${CANONICAL_ORIGIN}/?lang=${lang}&article=${readingArticle.id}`);
             
             // JSON-LD
             const schemaData = {
@@ -231,7 +234,13 @@ const App = () => {
             
             // Navigasyon URL'yi güncellediği için window.location doğrudur
             const url = new URL(window.location.href);
-            upsertCanonical(`${url.origin}${url.pathname}${url.search}`);
+            const langParam = url.searchParams.get("lang") || lang;
+            const pageParam = url.searchParams.get("page");
+            const articleParam = url.searchParams.get("article");
+            let canon = `${CANONICAL_ORIGIN}/?lang=${langParam}`;
+            if (pageParam) canon += `&page=${pageParam}`;
+            if (articleParam) canon += `&article=${articleParam}`;
+            upsertCanonical(canon);
         }
     }, [activeTab, readingArticle, lang]);
 
@@ -279,44 +288,56 @@ const App = () => {
     }, [posts]);
 
     // --- NAVIGATE (Updated to persist Lang) ---
+    const buildUrl = ({ lang, page, article }) => {
+        let s = `/?lang=${encodeURIComponent(lang)}`;
+        if (page) s += `&page=${encodeURIComponent(page)}`;
+        if (article) s += `&article=${encodeURIComponent(article)}`;
+        return s;
+    };
+
+    // --- NAVIGATE (Updated to persist Lang; stable query order) ---
     const navigateTo = (destination, param = null) => {
         setIsMenuOpen(false);
-        const url = new URL(window.location);
         let safeDestination = PARENT_REDIRECTS[destination] || destination;
-
-        // URL'e her zaman mevcut dili ekle
-        url.searchParams.set('lang', lang);
 
         if (safeDestination !== 'article' && safeDestination !== 'home' && !VALID_PAGES.includes(safeDestination)) {
             safeDestination = 'home';
         }
 
+        let nextUrl = "";
+
         if (safeDestination === 'article' && param) {
-            url.searchParams.set('article', param.id);
-            url.searchParams.delete('page');
+            nextUrl = buildUrl({ lang, article: param.id });
             setReadingArticle(param);
             setActiveTab('research');
         } else {
             if (safeDestination === 'home') {
-                url.searchParams.delete('page');
-                url.searchParams.delete('article');
+                nextUrl = buildUrl({ lang });
             } else {
-                url.searchParams.set('page', safeDestination);
-                url.searchParams.delete('article');
+                nextUrl = buildUrl({ lang, page: safeDestination });
             }
             setReadingArticle(null);
             setActiveTab(safeDestination);
         }
-        window.history.pushState({}, '', url);
+
+        window.history.pushState({}, '', nextUrl);
         window.scrollTo(0, 0);
     };
 
-    // --- CHANGE LANG (Updates URL too) ---
-    const switchLang = (newLang) => {
+    // --- CHANGE LANG (Updates URL too; stable query order) ---
+
+const switchLang = (newLang) => {
         setLang(newLang);
-        const url = new URL(window.location);
-        url.searchParams.set('lang', newLang);
-        window.history.pushState({}, '', url);
+
+        const params = new URLSearchParams(window.location.search);
+        const page = params.get("page");
+        const article = params.get("article");
+
+        let nextUrl = `/?lang=${newLang}`;
+        if (page) nextUrl += `&page=${page}`;
+        if (article) nextUrl += `&article=${article}`;
+
+        window.history.pushState({}, '', nextUrl);
     };
 
     // --- SIDE EFFECTS (Auth, Facts, Theme) ---
@@ -381,7 +402,7 @@ const App = () => {
             <div className="animate-fade-in pb-20">
                 <div className="flex justify-between items-center mb-6">
                     <HybLink 
-                        href={`?page=research&lang=${lang}`}
+                        href={`/?lang=${lang}&page=research`}
                         onNavigate={() => navigateTo('research')} 
                         className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors font-bold group text-sm md:text-base"
                     >
@@ -508,7 +529,7 @@ const App = () => {
                         {filteredAndSortedPosts.map(post => (
                             <HybLink 
                                 key={post.id} 
-                                href={`?article=${post.id}&lang=${lang}`}
+                                href={`/?lang=${lang}&article=${post.id}`}
                                 onNavigate={() => navigateTo('article', post)} 
                                 className="bg-slate-800 rounded-2xl border border-slate-700 hover:border-primary/50 transition-all cursor-pointer group hover-lift shadow-lg overflow-hidden flex flex-col h-full"
                             >
@@ -531,13 +552,13 @@ const App = () => {
                 <div className="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50"><h3 className="font-bold text-white flex items-center gap-2"><Icons.FileText size={18} className="text-primary"/> {t.title}</h3><span className="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-md">{t.new}</span></div>
                 <div className="divide-y divide-slate-700/50">
                     {latest.map(post => (
-                        <HybLink key={post.id} href={`?article=${post.id}&lang=${lang}`} onNavigate={() => navigateTo('article', post)} className="block p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group">
+                        <HybLink key={post.id} href={`/?lang=${lang}&article=${post.id}`} onNavigate={() => navigateTo('article', post)} className="block p-4 hover:bg-slate-700/50 cursor-pointer transition-colors group">
                             <div className="text-[10px] text-slate-500 mb-1 font-mono">{post.date}</div>
                             <div className="text-sm font-medium text-slate-200 group-hover:text-primary transition-colors line-clamp-2">{post.title[lang]}</div>
                         </HybLink>
                     ))}
                 </div>
-                <HybLink href={`?page=research&lang=${lang}`} onNavigate={() => navigateTo('research')} className="block p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</HybLink>
+                <HybLink href={`/?lang=${lang}&page=research`} onNavigate={() => navigateTo('research')} className="block p-3 text-center text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer transition-colors mt-auto border-t border-slate-700">{t.viewAll}</HybLink>
             </div>
         );
     };
@@ -557,7 +578,7 @@ const App = () => {
                     <p className="text-slate-400 text-base md:text-xl max-w-xl mb-8 relative z-10">{lang === 'tr' ? 'Sporcular için bilimsel analizlerin, tecrübelerin ve makalelerin yer aldığı kişisel bir not defteri.' : 'A personal notebook containing scientific analysis, experiences, and articles for athletes.'}</p>
                     
                     <HybLink 
-                        href={`?page=research&lang=${lang}`}
+                        href={`/?lang=${lang}&page=research`}
                         onNavigate={() => navigateTo('research')} 
                         className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 relative z-10 inline-block"
                     >
@@ -568,7 +589,7 @@ const App = () => {
                     <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                         {latestPost ? (
                             <HybLink 
-                                href={`?article=${latestPost.id}&lang=${lang}`}
+                                href={`/?lang=${lang}&article=${latestPost.id}`}
                                 onNavigate={() => navigateTo('article', latestPost)} 
                                 className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between cursor-pointer hover:border-primary transition-colors group hover-lift shadow-xl"
                             >
@@ -680,7 +701,7 @@ const App = () => {
                                                 {item.children.map((subItem) => (
                                                     <HybLink 
                                                         key={subItem.id} 
-                                                        href={`?page=${subItem.id}&lang=${lang}`}
+                                                        href={`/?lang=${lang}&page=${subItem.id}`}
                                                         onNavigate={() => navigateTo(subItem.id)} 
                                                         className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-3 block"
                                                     >
@@ -716,7 +737,7 @@ const App = () => {
                                         {item.children.map(sub => (
                                             <HybLink 
                                                 key={sub.id} 
-                                                href={`?page=${sub.id}&lang=${lang}`}
+                                                href={`/?lang=${lang}&page=${sub.id}`}
                                                 onNavigate={() => navigateTo(sub.id)} 
                                                 className={`w-full text-left px-4 py-3 rounded-lg font-medium text-slate-300 hover:bg-slate-700 block ${activeTab === sub.id ? 'text-primary bg-primary/10' : ''}`}
                                             >
