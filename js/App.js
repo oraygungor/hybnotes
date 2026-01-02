@@ -221,6 +221,7 @@ const App = () => {
     running_perf: `Running Performance | ${baseTitle}`,
     caffeine: `Caffeine Strategy | ${baseTitle}`,
     caffeine_perf: `Caffeine & Performance | ${baseTitle}`, 
+    beetroot_nitrate: `Beetroot & Performance | ${baseTitle}`, 
     utmb_lottery: `UTMB Lottery | ${baseTitle}`,
 };
 
@@ -658,7 +659,7 @@ const switchLang = (newLang) => {
                 type: 'dropdown',
                 children: [
                     { id: 'caffeine_perf', title: lang === 'tr' ? 'Kafein & Performans' : 'Caffeine & Performance', icon: Icons.Activity },
-                    {  id: 'beetroot_nitrate', label: lang === 'tr' ? 'Pancar Suyu & Nitrat' : 'Beetroot & Nitrate',  icon: Icon.Zap },
+                    {  id: 'beetroot_nitrate', title: lang === 'tr' ? 'Pancar Suyu & Nitrat' : 'Beetroot & Nitrate',  icon: Icon.Zap },
                 ]
             },
             { 
