@@ -31,6 +31,24 @@ def _toggle_www(netloc: str) -> str:
     return "www." + netloc
 
 
+def _prefer_www_origin(origin: str) -> str:
+    """Force origin to www.<domain> form."""
+    p = urlparse(origin)
+    netloc = p.netloc
+    if not netloc.startswith("www."):
+        netloc = "www." + netloc
+    return f"{p.scheme}://{netloc}"
+
+
+def _prefer_nonwww_origin(origin: str) -> str:
+    """Force origin to non-www form."""
+    p = urlparse(origin)
+    netloc = p.netloc
+    if netloc.startswith("www."):
+        netloc = netloc[len("www."):]
+    return f"{p.scheme}://{netloc}"
+
+
 def _allowed_origins(canonical_origin: str) -> set[str]:
     """
     Allow canonical origin + its www/non-www counterpart.
@@ -59,7 +77,6 @@ def _normalize_url(
     - stable query ordering: lang, page, article
     - normalize path: '/' if empty
     """
-    # absolute-ize
     u = urlparse(url)
     if not u.scheme:
         url = urljoin(canonical_origin.rstrip("/") + "/", url)
@@ -116,7 +133,6 @@ def crawl_site(base: str, canonical: str, max_urls: int, timeout_ms: int) -> set
     canonical_origin = _norm_base(canonical).rstrip("/")  # "https://www.hybnotes.com"
     allowed = _allowed_origins(canonical_origin)
 
-    # Start crawl from --base (might be www or non-www); we normalize it
     start_raw = _norm_base(base).rstrip("/") + "/"
     start = _normalize_url(start_raw, canonical_origin, allowed, drop_lang=True) or (canonical_origin + "/")
 
@@ -193,12 +209,12 @@ def expand_langs(urls: set[str], canonical: str, langs: list[str]) -> list[str]:
 
 def write_sitemap(urls: list[str], out_path: str, canonical: str, include_lastmod: bool = False):
     now = dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-    canonical_origin = _norm_base(canonical)
+    canonical_origin_slash = _norm_base(canonical)  # includes trailing /
 
     lines = []
     lines.append("<?xml version='1.0' encoding='utf-8'?>")
     lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
-    lines.append(f"  <!-- generated: {now} | canonical: {canonical_origin} -->")
+    lines.append(f"  <!-- generated: {now} | canonical: {canonical_origin_slash} -->")
 
     lastmod = dt.datetime.utcnow().date().isoformat()
 
@@ -221,8 +237,11 @@ def main():
     ap.add_argument(
         "--canonical",
         default=None,
-        help='Canonical origin for sitemap output, e.g. "https://www.hybnotes.com/". Default: --base'
+        help='Canonical origin for sitemap output, e.g. "https://www.hybnotes.com/". '
+             "If omitted, it will be derived from --base."
     )
+    ap.add_argument("--prefer-www", action="store_true", help="If --canonical is omitted, default to www host")
+    ap.add_argument("--prefer-nonwww", action="store_true", help="If --canonical is omitted, default to non-www host")
     ap.add_argument("--out", default="sitemap.xml")
     ap.add_argument("--max", type=int, default=5000)
     ap.add_argument("--timeout", type=int, default=30000, help="Navigation timeout (ms)")
@@ -230,11 +249,20 @@ def main():
     ap.add_argument("--lastmod", action="store_true", help="Include <lastmod> for each URL (today)")
 
     args = ap.parse_args()
-    canonical = args.canonical or args.base
 
-    langs = [x.strip() for x in args.langs.split(",") if x.strip()]
-    if not langs:
-        langs = LANGS_DEFAULT
+    base_origin = _norm_base(args.base).rstrip("/")  # origin without trailing slash
+
+    if args.canonical:
+        canonical = args.canonical
+    else:
+        # Default behavior: prefer www unless explicitly prefer-nonwww is set.
+        if args.prefer_nonwww:
+            canonical = _prefer_nonwww_origin(base_origin) + "/"
+        else:
+            # either --prefer-www or default path
+            canonical = _prefer_www_origin(base_origin) + "/"
+
+    langs = [x.strip() for x in args.langs.split(",") if x.strip()] or LANGS_DEFAULT
 
     discovered = crawl_site(args.base, canonical, max_urls=args.max, timeout_ms=args.timeout)
     final_urls = expand_langs(discovered, canonical=canonical, langs=langs)
