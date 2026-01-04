@@ -96,6 +96,12 @@ window.HybNotesData = {
       "tr": "Taş, Çamur, İniş… Asıl Risk Başka: Ultra’da Hastalık Gerçeği",
       "en": "Rocks, Mud, Downhills… The Real Risk Is Elsewhere: The Truth About Illness in Ultras"
     },
+
+      
+      "audio": {
+        "tr": "https://files.hybnotes.com/3t.wav",
+        "en": "https://files.hybnotes.com/3e.wav"
+    },
     "summary": {
       "tr": "Ultra’da DNF’lerin en büyük sebebi sizce nedir? Güney Afrika’daki dağ ultra yarışında yapılan bir çalışma, çoğu koşucuyu yarışı bıraktıranın sakatlıktan çok “hastalık” olduğunu bulmuş.",
       "en": "What do you think is the biggest reason for DNFs in ultras? A study on a mountainous ultra in South Africa found that what forces most runners to drop isn’t injury, but “illness.”"
