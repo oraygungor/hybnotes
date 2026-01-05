@@ -38,23 +38,24 @@ const UTMBLotteryPage = ({ lang }) => {
             tableAvgStones: "Avg. Stones",
             tableProjection: "2026 (Projection)",
             modelTitle: "Calculation Model & Methodology",
-            formulaTitle: "Approximated Formula (Weighted w/o Replacement):",
+            formulaTitle: "Approximated Formula (Person-Level Heuristic):",
             defP: "Probability of winning",
             defW: "Your number of stones",
             defB: "Race capacity (Bib number)",
-            defT: "Estimated total stones (Demand × Avg. Stones + Your Stones)",
-            defMean: "Avg. stones per applicant (estimated loss per draw)",
+            defN: "Total Applicants",
+            defT: "Estimated total stones in the pool",
+            defMean: "Avg. stones (proxy for removal per winner)",
             defValW: "Value: ",
             defValB: "Value: ",
-            defValT: "Approx. Value: ",
-            defI: "An iterator for the calculation (from 0 to B-1)",
+            defValT: "Pool Size: ",
+            defI: "Iterator",
             methodTitle: "Method Descriptions",
             defCAGR: "Applies the 2023→2025 compound annual growth rate (CAGR) to 2026.",
             defLinear: "Extrapolates the linear trend from 2023→2025.",
             defConservative: "Applies 70% of the CAGR growth (lower demand).",
             defOptimistic: "Applies 130% of the CAGR growth (higher demand).",
-            noteTitle: "Model Update:",
-            noteText: "This model simulates a 'person-level' draw. It assumes that for every winner drawn, the pool decreases by the average number of stones (µ), rather than just 1 ticket. This better reflects the increasing odds for remaining players.",
+            noteTitle: "Important Note on Methodology:",
+            noteText: "This is a <strong>heuristic approximation</strong>. It assumes the pool decreases by the average number of stones (µ) for each winner. In reality, winners often have higher-than-average stones (size-biased sampling), so the pool might drain faster, potentially making your actual odds slightly higher than shown here.",
             tooltipTitleSuffix: " Stones",
             tooltipLabelPrefix: "Probability: ",
             xAxisLabel: "Number of Running Stones",
@@ -83,23 +84,24 @@ const UTMBLotteryPage = ({ lang }) => {
             tableAvgStones: "Ort. Taş",
             tableProjection: "2026 (Tahmin)",
             modelTitle: "Hesaplama Modeli ve Metodolojisi",
-            formulaTitle: "Yaklaşık Hesaplama Formülü (Ağırlıklı/İadesiz):",
+            formulaTitle: "Yaklaşık Hesaplama Formülü (Kişi Bazlı Sezgisel):",
             defP: "Kazanma olasılığı",
             defW: "Sizin taş sayınız",
             defB: "Yarış kapasitesi (Bib sayısı)",
-            defT: "Tahmini toplam taş sayısı (Talep × Ort. Taş + Sizin Taşınız)",
-            defMean: "Kişi başı ort. taş (Her çekilişte havuzdan eksilen tahmini miktar)",
+            defN: "Toplam Başvuru",
+            defT: "Havuzdaki tahmini toplam taş",
+            defMean: "Ort. Taş (Her kazananda eksilen tahmini miktar)",
             defValW: "Değer: ",
             defValB: "Değer: ",
-            defValT: "Yaklaşık Değer: ",
-            defI: "Hesaplama için bir sayaç (0'dan B-1'e kadar)",
+            defValT: "Havuz: ",
+            defI: "Sayaç",
             methodTitle: "Metod Açıklamaları",
             defCAGR: "2023→2025 arası bileşik büyüme oranını (CAGR) 2026’ya uygular.",
             defLinear: "2023→2025 arasındaki doğrusal eğilimi sürdürür.",
             defConservative: "CAGR büyümesinin %70’ini uygular (düşük talep).",
             defOptimistic: "CAGR büyümesinin %130’unu uygular (yüksek talep).",
-            noteTitle: "Model Güncellemesi:",
-            noteText: "Bu model 'kişi bazlı' çekilişi simüle eder. Her kazanan belirlendiğinde, havuzdan sadece 1 biletin değil, o kişinin ortalama taş sayısının (µ) eksildiğini varsayar. Bu, kalanlar için şansın daha gerçekçi artmasını sağlar.",
+            noteTitle: "Metodoloji Üzerine Önemli Not:",
+            noteText: "Bu bir <strong>sezgisel (heuristic) yaklaşımdır</strong>. Model, her kazananla havuzdan 'ortalama' (µ) kadar taş eksildiğini varsayar. Gerçekte çok taşı olanların kazanma şansı yüksek olduğundan (size-biased sampling), havuz daha hızlı boşalabilir. Bu nedenle gerçek şansınız burada görünenden bir miktar daha yüksek olabilir.",
             tooltipTitleSuffix: " Taş",
             tooltipLabelPrefix: "Olasılık: ",
             xAxisLabel: "Taş Sayısı",
@@ -114,30 +116,32 @@ const UTMBLotteryPage = ({ lang }) => {
     const cagr = (v1, v2, f = 1) => Math.round(v2 * (1 + (Math.pow(v2 / v1, 1 / 2) - 1) * f));
 
     // ** GÜNCELLENMİŞ OLASILIK FONKSİYONU **
-    // Person-Level Simulation: Her 'i' artışında havuzdan 'mean' kadar taş eksilir.
     const getProb = (B, N, mean, w) => { 
         if (w <= 0) return 0; 
         
-        // T: Başlangıçtaki toplam taş (Rakiplerin Taşları + Benim Taşlarım)
-        const T = N * mean + w; 
+        // DÜZELTME 1: Double-counting önlendi. 
+        // Toplam başvuru (N) içinde ben de varım. Diğer insanların toplam taşı: (N-1)*mean
+        const T = (N - 1) * mean + w; 
         
         let logNoHit = 0; 
-        // Kapasite (B) veya Başvuran Sayısı (N)'den hangisi küçükse o kadar tur döner
-        const loops = Math.min(B, N); 
         
-        for (let i = 0; i < loops; i++) {
-            // DÜZELTME: Her turda (i. kişi) kazanır ve ortalama 'mean' kadar taş havuzdan çıkar.
+        // DÜZELTME 2: Döngü limiti (L)
+        const L = Math.min(B, N); 
+        
+        for (let i = 0; i < L; i++) {
+            // Heuristic Yaklaşım: i. kazanan havuzdan ortalama 'mean' kadar taş götürür.
             const stonesRemoved = i * mean;
-            const currentPool = T - stonesRemoved;
+            
+            // DÜZELTME 3: Güvenlik clamp'i (Havuz negatif olamaz)
+            const currentPool = Math.max(1e-9, T - stonesRemoved);
 
             // Güvenlik: Eğer havuzda kalan taş sayısı benim taşlarıma eşit veya azsa,
-            // havuzda benden başkası kalmamış demektir. Kesin kazanırım.
+            // havuzda benden başkası kalmamış demektir.
             if (currentPool <= w) {
                 return 1;
             }
 
             // Bu turda SEÇİLMEME ihtimali: (Kalan Havuz - Benim Taşım) / Kalan Havuz
-            // İşlem kolaylığı için logaritma topluyoruz.
             logNoHit += Math.log(currentPool - w) - Math.log(currentPool);
         }
         return 1 - Math.exp(logNoHit); 
@@ -145,7 +149,7 @@ const UTMBLotteryPage = ({ lang }) => {
 
     const vals = useMemo(() => {
         const d = data[race].demand;
-        // N: Tahmini başvuru sayısı (Ben hariç diğer insanlar gibi düşünülebilir ama ölçekte ihmal edilebilir)
+        // N: Tahmini Toplam Başvuru
         const N = method === 'linear' ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) : method === 'conservative' ? cagr(d[2023], d[2025], 0.7) : method === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
         
         const mS = data[race].meanStones;
@@ -153,7 +157,10 @@ const UTMBLotteryPage = ({ lang }) => {
         
         const B = data[race].capacity;
         const p = getProb(B, N, mean, stones);
-        const T = N * mean + stones;
+        
+        // Gösterge için T (Formüldeki T ile tutarlı)
+        const T = (N - 1) * mean + stones;
+        
         return { N, mean, B, p, T };
     }, [race, method, stones, data]);
 
@@ -164,7 +171,6 @@ const UTMBLotteryPage = ({ lang }) => {
         const ctx = chartRef.current.getContext('2d');
         
         const labels = Array.from({length: 50}, (_, i) => i + 1);
-        // Chart datasını üretirken de güncel getProb kullanılıyor
         const dataPoints = labels.map(w => getProb(vals.B, vals.N, vals.mean, w) * 100);
         
         const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
@@ -228,7 +234,7 @@ const UTMBLotteryPage = ({ lang }) => {
                 throwOnError: false
             });
         }
-    }, [lang, race, method, stones, t]); // t bağımlılığı eklendi (formül texti değişirse)
+    }, [lang, race, method, stones, t]);
 
     return (
         <div className="bg-slate-800 text-slate-200 rounded-3xl p-6 max-w-[1100px] mx-auto border border-slate-700 shadow-2xl animate-fade-in font-sans">
@@ -317,8 +323,8 @@ const UTMBLotteryPage = ({ lang }) => {
                     <h3 className="text-white font-bold mb-4">{t.modelTitle}</h3>
                     <div ref={formulaRef} className="bg-slate-800 rounded-xl p-4 font-mono text-slate-300 text-sm leading-relaxed mb-4 border border-slate-700">
                         <div className="mb-2 text-slate-500 text-xs font-bold uppercase font-sans">{t.formulaTitle}</div>
-                        {/* FORMÜL GÖRSELİ GÜNCELLENDİ: (i * mean) */}
-                        {`$$ p = 1 - \\prod_{i=0}^{B-1} \\frac{T - w - (i \\cdot \\mu)}{T - (i \\cdot \\mu)} $$`}
+                        {/* FORMÜL GÖRSELİ DÜZELTİLDİ: L tanımı eklendi ve min(B,N) uyumu sağlandı */}
+                        {`$$ p = 1 - \\prod_{i=0}^{L-1} \\frac{T - w - (i \\cdot \\mu)}{T - (i \\cdot \\mu)}, \\quad L = \\min(B, N) $$`}
                         <div className="text-[1.2em] font-bold text-primary mt-2 text-center">p = % {(vals.p * 100).toFixed(2)}</div>
                     </div>
 
