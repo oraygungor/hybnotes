@@ -38,11 +38,12 @@ const UTMBLotteryPage = ({ lang }) => {
             tableAvgStones: "Avg. Stones",
             tableProjection: "2026 (Projection)",
             modelTitle: "Calculation Model & Methodology",
-            formulaTitle: "Exact Calculation Formula (Hypergeometric):",
+            formulaTitle: "Approximated Formula (Weighted w/o Replacement):",
             defP: "Probability of winning",
             defW: "Your number of stones",
             defB: "Race capacity (Bib number)",
             defT: "Estimated total stones (Demand × Avg. Stones + Your Stones)",
+            defMean: "Avg. stones per applicant (estimated loss per draw)",
             defValW: "Value: ",
             defValB: "Value: ",
             defValT: "Approx. Value: ",
@@ -52,8 +53,8 @@ const UTMBLotteryPage = ({ lang }) => {
             defLinear: "Extrapolates the linear trend from 2023→2025.",
             defConservative: "Applies 70% of the CAGR growth (lower demand).",
             defOptimistic: "Applies 130% of the CAGR growth (higher demand).",
-            noteTitle: "A Clarification on the Model:",
-            noteText: "If the lottery is weighted and without replacement, we use the hypergeometric distribution.",
+            noteTitle: "Model Update:",
+            noteText: "This model simulates a 'person-level' draw. It assumes that for every winner drawn, the pool decreases by the average number of stones (µ), rather than just 1 ticket. This better reflects the increasing odds for remaining players.",
             tooltipTitleSuffix: " Stones",
             tooltipLabelPrefix: "Probability: ",
             xAxisLabel: "Number of Running Stones",
@@ -82,11 +83,12 @@ const UTMBLotteryPage = ({ lang }) => {
             tableAvgStones: "Ort. Taş",
             tableProjection: "2026 (Tahmin)",
             modelTitle: "Hesaplama Modeli ve Metodolojisi",
-            formulaTitle: "Kesin Hesaplama Formülü (Hipergeometrik):",
+            formulaTitle: "Yaklaşık Hesaplama Formülü (Ağırlıklı/İadesiz):",
             defP: "Kazanma olasılığı",
             defW: "Sizin taş sayınız",
             defB: "Yarış kapasitesi (Bib sayısı)",
             defT: "Tahmini toplam taş sayısı (Talep × Ort. Taş + Sizin Taşınız)",
+            defMean: "Kişi başı ort. taş (Her çekilişte havuzdan eksilen tahmini miktar)",
             defValW: "Değer: ",
             defValB: "Değer: ",
             defValT: "Yaklaşık Değer: ",
@@ -96,8 +98,8 @@ const UTMBLotteryPage = ({ lang }) => {
             defLinear: "2023→2025 arasındaki doğrusal eğilimi sürdürür.",
             defConservative: "CAGR büyümesinin %70’ini uygular (düşük talep).",
             defOptimistic: "CAGR büyümesinin %130’unu uygular (yüksek talep).",
-            noteTitle: "Model Üzerine Bir Netleştirme:",
-            noteText: "Kura ağırlıklı ve yenilemesiz ise, hipergeometrik dağılım kullanılır.",
+            noteTitle: "Model Güncellemesi:",
+            noteText: "Bu model 'kişi bazlı' çekilişi simüle eder. Her kazanan belirlendiğinde, havuzdan sadece 1 biletin değil, o kişinin ortalama taş sayısının (µ) eksildiğini varsayar. Bu, kalanlar için şansın daha gerçekçi artmasını sağlar.",
             tooltipTitleSuffix: " Taş",
             tooltipLabelPrefix: "Olasılık: ",
             xAxisLabel: "Taş Sayısı",
@@ -108,25 +110,47 @@ const UTMBLotteryPage = ({ lang }) => {
 
     const t = lang === 'tr' ? tr.TR : tr.EN;
 
-    // Maths
+    // --- MATH HELPERS ---
     const cagr = (v1, v2, f = 1) => Math.round(v2 * (1 + (Math.pow(v2 / v1, 1 / 2) - 1) * f));
+
+    // ** GÜNCELLENMİŞ OLASILIK FONKSİYONU **
+    // Person-Level Simulation: Her 'i' artışında havuzdan 'mean' kadar taş eksilir.
     const getProb = (B, N, mean, w) => { 
         if (w <= 0) return 0; 
+        
+        // T: Başlangıçtaki toplam taş (Rakiplerin Taşları + Benim Taşlarım)
         const T = N * mean + w; 
+        
         let logNoHit = 0; 
-        const loops = Math.min(B, T - w); 
+        // Kapasite (B) veya Başvuran Sayısı (N)'den hangisi küçükse o kadar tur döner
+        const loops = Math.min(B, N); 
+        
         for (let i = 0; i < loops; i++) {
-            logNoHit += Math.log(T - w - i) - Math.log(T - i);
-            if (T - i <= 0 || T - w - i <= 0) break;
+            // DÜZELTME: Her turda (i. kişi) kazanır ve ortalama 'mean' kadar taş havuzdan çıkar.
+            const stonesRemoved = i * mean;
+            const currentPool = T - stonesRemoved;
+
+            // Güvenlik: Eğer havuzda kalan taş sayısı benim taşlarıma eşit veya azsa,
+            // havuzda benden başkası kalmamış demektir. Kesin kazanırım.
+            if (currentPool <= w) {
+                return 1;
+            }
+
+            // Bu turda SEÇİLMEME ihtimali: (Kalan Havuz - Benim Taşım) / Kalan Havuz
+            // İşlem kolaylığı için logaritma topluyoruz.
+            logNoHit += Math.log(currentPool - w) - Math.log(currentPool);
         }
         return 1 - Math.exp(logNoHit); 
     };
 
     const vals = useMemo(() => {
         const d = data[race].demand;
+        // N: Tahmini başvuru sayısı (Ben hariç diğer insanlar gibi düşünülebilir ama ölçekte ihmal edilebilir)
         const N = method === 'linear' ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) : method === 'conservative' ? cagr(d[2023], d[2025], 0.7) : method === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
+        
         const mS = data[race].meanStones;
         const mean = method === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) : mS[2025] * (1 + (mS[2025] / mS[2024] - 1) * (method === 'conservative' ? 0.7 : method === 'optimistic' ? 1.3 : 1));
+        
         const B = data[race].capacity;
         const p = getProb(B, N, mean, stones);
         const T = N * mean + stones;
@@ -140,6 +164,7 @@ const UTMBLotteryPage = ({ lang }) => {
         const ctx = chartRef.current.getContext('2d');
         
         const labels = Array.from({length: 50}, (_, i) => i + 1);
+        // Chart datasını üretirken de güncel getProb kullanılıyor
         const dataPoints = labels.map(w => getProb(vals.B, vals.N, vals.mean, w) * 100);
         
         const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
@@ -203,7 +228,7 @@ const UTMBLotteryPage = ({ lang }) => {
                 throwOnError: false
             });
         }
-    }, [lang, race, method, stones]); // Bağımlılıklar güncellendi
+    }, [lang, race, method, stones, t]); // t bağımlılığı eklendi (formül texti değişirse)
 
     return (
         <div className="bg-slate-800 text-slate-200 rounded-3xl p-6 max-w-[1100px] mx-auto border border-slate-700 shadow-2xl animate-fade-in font-sans">
@@ -292,8 +317,8 @@ const UTMBLotteryPage = ({ lang }) => {
                     <h3 className="text-white font-bold mb-4">{t.modelTitle}</h3>
                     <div ref={formulaRef} className="bg-slate-800 rounded-xl p-4 font-mono text-slate-300 text-sm leading-relaxed mb-4 border border-slate-700">
                         <div className="mb-2 text-slate-500 text-xs font-bold uppercase font-sans">{t.formulaTitle}</div>
-                        {/* HATA DÜZELTİLDİ: Formül string literal olarak verildi */}
-                        {`$$ p = 1 - \\prod_{i=0}^{B-1} \\frac{T - w - i}{T - i} $$`}
+                        {/* FORMÜL GÖRSELİ GÜNCELLENDİ: (i * mean) */}
+                        {`$$ p = 1 - \\prod_{i=0}^{B-1} \\frac{T - w - (i \\cdot \\mu)}{T - (i \\cdot \\mu)} $$`}
                         <div className="text-[1.2em] font-bold text-primary mt-2 text-center">p = % {(vals.p * 100).toFixed(2)}</div>
                     </div>
 
@@ -302,6 +327,7 @@ const UTMBLotteryPage = ({ lang }) => {
                         <dt className="font-mono text-slate-400 font-bold">w</dt><dd className="text-slate-500 m-0">{t.defW} <span className="text-primary font-bold ml-1">({t.defValW} {stones})</span></dd>
                         <dt className="font-mono text-slate-400 font-bold">B</dt><dd className="text-slate-500 m-0">{t.defB} <span className="text-primary font-bold ml-1">({t.defValB} {vals.B})</span></dd>
                         <dt className="font-mono text-slate-400 font-bold">T</dt><dd className="text-slate-500 m-0">{t.defT} <span className="text-primary font-bold ml-1">({t.defValT} {Math.round(vals.T).toLocaleString(t.locale)})</span></dd>
+                        <dt className="font-mono text-slate-400 font-bold">µ</dt><dd className="text-slate-500 m-0">{t.defMean} <span className="text-primary font-bold ml-1">({vals.mean.toFixed(2)})</span></dd>
                     </dl>
 
                     <div className="mt-4 text-[10px] text-slate-500 bg-slate-800/50 p-2 rounded-lg border border-slate-800">
