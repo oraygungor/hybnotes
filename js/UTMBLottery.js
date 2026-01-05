@@ -1,206 +1,325 @@
 const UTMBLotteryPage = ({ lang }) => {
-    const { useState, useMemo, useEffect, useRef } = React;
+    const { useState, useMemo, useEffect, useRef, useCallback } = React;
+    
+    // --- STATE ---
     const [race, setRace] = useState('UTMB');
     const [method, setMethod] = useState('cagr');
     const [stones, setStones] = useState(1);
     
-    // Grafikler ve Matematik için Ref'ler
+    // Yeni State'ler
+    const [model, setModel] = useState('heuristic'); // 'heuristic', 'bias', 'mc', 'ensemble'
+    const [biasK, setBiasK] = useState(1.25); // Bias çarpanı
+    const [mcSettings, setMcSettings] = useState({ sims: 500, seed: 12345 }); // MC ayarları
+    const [mcResult, setMcResult] = useState(null); // { pHat, ciLow, ciHigh, wins, totalRuns }
+    const [isMcRunning, setIsMcRunning] = useState(false);
+
+    // Refs
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
     const formulaRef = useRef(null); 
 
+    // --- DATA & CONSTANTS ---
     const data = useMemo(() => ({ 
         UTMB: { capacity: 2300, demand: { 2023: 6578, 2024: 7200, 2025: 8900 }, meanStones: { 2024: 5.4, 2025: 6.4 } }, 
         CCC: { capacity: 1900, demand: { 2023: 5249, 2024: 5400, 2025: 6000 }, meanStones: { 2024: 4.0, 2025: 4.4 } }, 
         OCC: { capacity: 1200, demand: { 2023: 5171, 2024: 6500, 2025: 10000 }, meanStones: { 2024: 2.8, 2025: 3.2 } } 
     }), []);
 
+    // --- TRANSLATIONS ---
     const tr = {
         EN: {
-            title: "UTMB 2026 Lottery Chance Calculator",
-            subtitle: "Interactively displays estimated 2026 lottery probabilities based on 2023→2025 data.",
+            title: "UTMB 2026 Lottery Analytics",
+            subtitle: "Advanced probability modeling with Heuristic, Bias Correction & Monte Carlo simulations.",
             raceLabel: "Race",
             utmbOption: "UTMB (2300 Runners)",
             cccOption: "CCC (1900 Runners)",
             occOption: "OCC (1200 Runners)",
             methodLabel: "Projection Method",
-            cagrOption: "CAGR (Recommended)",
-            linearOption: "Linear",
-            conservativeOption: "Conservative (CAGR x0.7)",
-            optimisticOption: "Optimistic (CAGR x1.3)",
+            modelLabel: "Calculation Model",
+            modelHeuristic: "Heuristic (Standard)",
+            modelBias: "Heuristic + Bias",
+            modelMC: "Monte Carlo Sim.",
+            modelEnsemble: "All Models (Range)",
+            biasLabel: "Bias Factor (k)",
+            mcSimsLabel: "Simulations",
+            mcRunBtn: "Run Simulation",
+            mcRunning: "Running...",
             stonesLabelPrefix: "Running Stones: ",
-            probLabel: "Estimated Probability",
+            probLabel: "Probability",
+            rangeLabel: "Est. Range",
             demandLabel: "2026 Demand",
             avgStonesLabel: "Avg. Stones",
-            dataTitle: "Historical Data & Projection",
+            dataTitle: "Data & Projection",
             tableYear: "Year",
             tableDemand: "Demand",
             tableAvgStones: "Avg. Stones",
-            tableProjection: "2026 (Projection)",
-            modelTitle: "Calculation Model & Methodology",
-            formulaTitle: "Approximated Formula (Person-Level Heuristic):",
-            defP: "Probability of winning",
-            defW: "Your number of stones",
-            defB: "Race capacity (Bib number)",
-            defN: "Total Applicants",
-            defT: "Estimated total stones in the pool",
-            defMean: "Avg. stones (proxy for removal per winner)",
-            defValW: "Value: ",
-            defValB: "Value: ",
-            defValT: "Pool Size: ",
-            defI: "Iterator",
-            methodTitle: "Method Descriptions",
-            defCAGR: "Applies the 2023→2025 compound annual growth rate (CAGR) to 2026.",
-            defLinear: "Extrapolates the linear trend from 2023→2025.",
-            defConservative: "Applies 70% of the CAGR growth (lower demand).",
-            defOptimistic: "Applies 130% of the CAGR growth (higher demand).",
-            noteTitle: "Important Note on Methodology:",
-            noteText: "This is a <strong>heuristic approximation</strong>. It assumes the pool decreases by the average number of stones (µ) for each winner. In reality, winners often have higher-than-average stones (size-biased sampling), so the pool might drain faster, potentially making your actual odds slightly higher than shown here.",
-            tooltipTitleSuffix: " Stones",
-            tooltipLabelPrefix: "Probability: ",
-            xAxisLabel: "Number of Running Stones",
-            yAxisLabel: "Probability (%)",
+            tableProjection: "2026 (Proj.)",
+            modelTitle: "Mathematical Model",
+            formulaTitle: "Model Formula:",
+            mcResTitle: "Monte Carlo Results:",
+            mcWarn: "Run simulation to see MC data.",
+            chartX: "Running Stones",
+            chartY: "Probability (%)",
+            tooltipSuffix: " Stones",
+            noteTitle: "Model Note:",
+            noteHeuristic: "Assumes average stone removal per winner.",
+            noteBias: "Adjusts mean to account for size-biased sampling.",
+            noteMC: "Simulates the weighted lottery draw N times.",
             locale: "en-US"
         },
         TR: {
-            title: "UTMB 2026 Kura Şansı Hesaplayıcı",
-            subtitle: "2023→2025 verilerine dayanarak 2026 için tahmini kura olasılıklarını interaktif olarak gösterir.",
+            title: "UTMB 2026 Kura Analizi",
+            subtitle: "Heuristic, Bias Düzeltme ve Monte Carlo simülasyonları ile gelişmiş olasılık modellemesi.",
             raceLabel: "Yarış",
             utmbOption: "UTMB (2300 Kişi)",
             cccOption: "CCC (1900 Kişi)",
             occOption: "OCC (1200 Kişi)",
-            methodLabel: "Tahmin Metodu",
-            cagrOption: "CAGR (Önerilen)",
-            linearOption: "Doğrusal",
-            conservativeOption: "Temkinli (CAGR x0.7)",
-            optimisticOption: "İyimser (CAGR x1.3)",
+            methodLabel: "Talep Tahmini",
+            modelLabel: "Hesaplama Modeli",
+            modelHeuristic: "Heuristic (Standart)",
+            modelBias: "Heuristic + Bias",
+            modelMC: "Monte Carlo Sim.",
+            modelEnsemble: "Tüm Modeller (Aralık)",
+            biasLabel: "Bias Çarpanı (k)",
+            mcSimsLabel: "Simülasyon Sayısı",
+            mcRunBtn: "Simülasyonu Başlat",
+            mcRunning: "Hesaplanıyor...",
             stonesLabelPrefix: "Taş Sayısı: ",
-            probLabel: "Tahmini Olasılık",
+            probLabel: "Olasılık",
+            rangeLabel: "Tahmini Aralık",
             demandLabel: "2026 Talep",
             avgStonesLabel: "Ort. Taş",
-            dataTitle: "Geçmiş Veriler ve Projeksiyon",
+            dataTitle: "Veri ve Projeksiyon",
             tableYear: "Yıl",
             tableDemand: "Talep",
             tableAvgStones: "Ort. Taş",
             tableProjection: "2026 (Tahmin)",
-            modelTitle: "Hesaplama Modeli ve Metodolojisi",
-            formulaTitle: "Yaklaşık Hesaplama Formülü (Kişi Bazlı Sezgisel):",
-            defP: "Kazanma olasılığı",
-            defW: "Sizin taş sayınız",
-            defB: "Yarış kapasitesi (Bib sayısı)",
-            defN: "Toplam Başvuru",
-            defT: "Havuzdaki tahmini toplam taş",
-            defMean: "Ort. Taş (Her kazananda eksilen tahmini miktar)",
-            defValW: "Değer: ",
-            defValB: "Değer: ",
-            defValT: "Havuz: ",
-            defI: "Sayaç",
-            methodTitle: "Metod Açıklamaları",
-            defCAGR: "2023→2025 arası bileşik büyüme oranını (CAGR) 2026’ya uygular.",
-            defLinear: "2023→2025 arasındaki doğrusal eğilimi sürdürür.",
-            defConservative: "CAGR büyümesinin %70’ini uygular (düşük talep).",
-            defOptimistic: "CAGR büyümesinin %130’unu uygular (yüksek talep).",
-            noteTitle: "Metodoloji Üzerine Önemli Not:",
-            noteText: "Bu bir <strong>sezgisel (heuristic) yaklaşımdır</strong>. Model, her kazananla havuzdan 'ortalama' (µ) kadar taş eksildiğini varsayar. Gerçekte çok taşı olanların kazanma şansı yüksek olduğundan (size-biased sampling), havuz daha hızlı boşalabilir. Bu nedenle gerçek şansınız burada görünenden bir miktar daha yüksek olabilir.",
-            tooltipTitleSuffix: " Taş",
-            tooltipLabelPrefix: "Olasılık: ",
-            xAxisLabel: "Taş Sayısı",
-            yAxisLabel: "Olasılık (%)",
+            modelTitle: "Matematiksel Model",
+            formulaTitle: "Model Formülü:",
+            mcResTitle: "Monte Carlo Sonucu:",
+            mcWarn: "MC verisi için simülasyonu çalıştırın.",
+            chartX: "Taş Sayısı",
+            chartY: "Olasılık (%)",
+            tooltipSuffix: " Taş",
+            noteTitle: "Model Notu:",
+            noteHeuristic: "Kazanan başına 'ortalama' taş eksildiğini varsayar.",
+            noteBias: "Büyük taşların daha hızlı seçilme etkisini (Bias) katsayı ile düzeltir.",
+            noteMC: "Ağırlıklı kurayı birebir N kez simüle eder.",
             locale: "tr-TR"
         }
     };
-
     const t = lang === 'tr' ? tr.TR : tr.EN;
 
     // --- MATH HELPERS ---
     const cagr = (v1, v2, f = 1) => Math.round(v2 * (1 + (Math.pow(v2 / v1, 1 / 2) - 1) * f));
 
-    // ** GÜNCELLENMİŞ OLASILIK FONKSİYONU **
-    const getProb = (B, N, mean, w) => { 
+    // 1. Heuristic Probability (Analytical)
+    const getProbHeuristic = (B, N, mean, w) => { 
         if (w <= 0) return 0; 
-        
-        // DÜZELTME 1: Double-counting önlendi. 
-        // Toplam başvuru (N) içinde ben de varım. Diğer insanların toplam taşı: (N-1)*mean
-        const T = (N - 1) * mean + w; 
-        
+        const T = (N - 1) * mean + w; // Total stones logic corrected
         let logNoHit = 0; 
-        
-        // DÜZELTME 2: Döngü limiti (L)
         const L = Math.min(B, N); 
-        
         for (let i = 0; i < L; i++) {
-            // Heuristic Yaklaşım: i. kazanan havuzdan ortalama 'mean' kadar taş götürür.
             const stonesRemoved = i * mean;
-            
-            // DÜZELTME 3: Güvenlik clamp'i (Havuz negatif olamaz)
             const currentPool = Math.max(1e-9, T - stonesRemoved);
-
-            // Güvenlik: Eğer havuzda kalan taş sayısı benim taşlarıma eşit veya azsa,
-            // havuzda benden başkası kalmamış demektir.
-            if (currentPool <= w) {
-                return 1;
-            }
-
-            // Bu turda SEÇİLMEME ihtimali: (Kalan Havuz - Benim Taşım) / Kalan Havuz
+            if (currentPool <= w) return 1;
             logNoHit += Math.log(currentPool - w) - Math.log(currentPool);
         }
         return 1 - Math.exp(logNoHit); 
     };
 
+    // 2. Bias Probability
+    const getProbBias = (B, N, mean, w, k) => {
+        // Effective mean for removal: High stone holders win first, draining pool faster.
+        const effectiveMean = mean * k;
+        return getProbHeuristic(B, N, effectiveMean, w);
+    };
+
+    // 3. Monte Carlo Simulation Helpers
+    // Wilson Score Interval for CI
+    const wilsonInterval = (wins, n, z = 1.96) => {
+        if (n === 0) return { low: 0, high: 0 };
+        const p = wins / n;
+        const denominator = 1 + (z * z) / n;
+        const centerAdjust = (z * z) / (2 * n);
+        const center = (p + centerAdjust) / denominator;
+        const width = (z * Math.sqrt((p * (1 - p) / n) + (z * z) / (4 * n * n))) / denominator;
+        return { low: Math.max(0, center - width), high: Math.min(1, center + width) };
+    };
+
+    // Pseudo-random generator for consistent distribution testing if needed, 
+    // but here we use Math.random for true MC variability.
+    // We assume Stone Distribution ~ Exponential/Geometric shifted to start at 1 to match Mean.
+    // E[X] = 1/lambda + 1 (roughly) => lambda = 1 / (mean - 1)
+    const generateRandomStones = (mean) => {
+        if (mean <= 1.01) return 1;
+        const lambda = 1 / (mean - 1);
+        // Inverse transform sampling for shifted exponential
+        const val = 1 + Math.floor(-Math.log(1 - Math.random()) / lambda);
+        return Math.max(1, Math.min(100, val)); // Cap at 100 for sanity
+    };
+
+    // --- CORE CALCULATION VALUES ---
     const vals = useMemo(() => {
         const d = data[race].demand;
-        // N: Tahmini Toplam Başvuru
-        const N = method === 'linear' ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) : method === 'conservative' ? cagr(d[2023], d[2025], 0.7) : method === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
+        const N = method === 'linear' 
+            ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) 
+            : method === 'conservative' 
+                ? cagr(d[2023], d[2025], 0.7) 
+                : method === 'optimistic' 
+                    ? cagr(d[2023], d[2025], 1.3) 
+                    : cagr(d[2023], d[2025], 1);
         
         const mS = data[race].meanStones;
-        const mean = method === 'linear' ? mS[2025] + (mS[2025] - mS[2024]) : mS[2025] * (1 + (mS[2025] / mS[2024] - 1) * (method === 'conservative' ? 0.7 : method === 'optimistic' ? 1.3 : 1));
+        const meanRaw = method === 'linear' 
+            ? mS[2025] + (mS[2025] - mS[2024]) 
+            : mS[2025] * (1 + (mS[2025] / mS[2024] - 1) * (method === 'conservative' ? 0.7 : method === 'optimistic' ? 1.3 : 1));
         
+        const mean = Math.max(1.1, meanRaw);
         const B = data[race].capacity;
-        const p = getProb(B, N, mean, stones);
-        
-        // Gösterge için T (Formüldeki T ile tutarlı)
-        const T = (N - 1) * mean + stones;
-        
-        return { N, mean, B, p, T };
-    }, [race, method, stones, data]);
 
-    // --- CHART EFFECT ---
+        // Calculate Probabilities based on active model(s)
+        const pHeuristic = getProbHeuristic(B, N, mean, stones);
+        const pBias = getProbBias(B, N, mean, stones, biasK);
+
+        return { N, mean, B, pHeuristic, pBias };
+    }, [race, method, stones, biasK, data]);
+
+    // --- MONTE CARLO RUNNER ---
+    const runSimulation = useCallback(() => {
+        setIsMcRunning(true);
+        // Use setTimeout to allow UI render (loading state) before heavy calculation
+        setTimeout(() => {
+            const { N, B, mean } = vals;
+            const { sims } = mcSettings;
+            let wins = 0;
+
+            // Pre-calculate logic to avoid object creation in loop
+            // Efraimidis-Spirakis Algorithm for Weighted Sampling without Replacement
+            // Key k_i = u_i ^ (1/w_i) where u_i is uniform(0,1)
+            // We just need to know if User is in the top B.
+            // Optimization: Count how many people have Key > UserKey. If count < B, User wins.
+
+            for (let s = 0; s < sims; s++) {
+                // 1. Generate User Key
+                const rUser = Math.random();
+                const kUser = Math.pow(rUser, 1 / stones);
+                
+                // 2. Generate Competitors and count those who beat User
+                let rank = 0;
+                
+                // We simulate N-1 competitors
+                // Optimization: Instead of N-1 calls, we can batch or approximation. 
+                // But for N=10,000 and sims=500, 5M iterations is fine for modern JS (~50-100ms).
+                for (let i = 0; i < N - 1; i++) {
+                    // Generate random stone count for competitor based on mean
+                    const wComp = generateRandomStones(mean); 
+                    const rComp = Math.random();
+                    const kComp = Math.pow(rComp, 1 / wComp);
+                    
+                    if (kComp > kUser) {
+                        rank++;
+                    }
+                    // Early exit optimization? No, rank is total. 
+                    // But if rank >= B, we know user lost. However, we need strict > check.
+                    if (rank >= B) break; 
+                }
+
+                if (rank < B) {
+                    wins++;
+                }
+            }
+
+            const ci = wilsonInterval(wins, sims);
+            setMcResult({
+                pHat: wins / sims,
+                ciLow: ci.low,
+                ciHigh: ci.high,
+                wins,
+                sims
+            });
+            setIsMcRunning(false);
+        }, 50);
+    }, [vals, stones, mcSettings]);
+
+    // Reset MC results when inputs change drastically
+    useEffect(() => {
+        setMcResult(null);
+    }, [race, method, stones]); // Don't reset on model change alone
+
+    // --- CHART MANAGEMENT ---
     useEffect(() => {
         if (chartInstance.current) chartInstance.current.destroy();
         if (!chartRef.current) return;
         const ctx = chartRef.current.getContext('2d');
         
         const labels = Array.from({length: 50}, (_, i) => i + 1);
-        const dataPoints = labels.map(w => getProb(vals.B, vals.N, vals.mean, w) * 100);
+        const { B, N, mean } = vals;
         
-        const color = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim().split(' ').join(',');
-        const pointColors = labels.map(w => w === stones ? `rgb(${color})` : `rgba(${color}, 0.5)`);
-        const pointRadii = labels.map(w => w === stones ? 6 : 2);
+        // Data generation helpers
+        const getH = (w) => getProbHeuristic(B, N, mean, w) * 100;
+        const getB = (w) => getProbBias(B, N, mean, w, biasK) * 100;
+
+        const datasets = [];
+        const colorPrimary = '99, 102, 241'; // Indigo-500
+        const colorBias = '236, 72, 153'; // Pink-500
+        const colorMC = '16, 185, 129'; // Emerald-500
+
+        // 1. Heuristic Curve (Always visible unless MC only? No, standard baseline)
+        if (model === 'heuristic' || model === 'ensemble' || model === 'bias') {
+            datasets.push({
+                label: 'Heuristic',
+                data: labels.map(w => getH(w)),
+                borderColor: `rgba(${colorPrimary}, 0.8)`,
+                backgroundColor: `rgba(${colorPrimary}, 0.1)`,
+                pointRadius: 0,
+                borderWidth: 2,
+                fill: model === 'heuristic',
+                tension: 0.4
+            });
+        }
+
+        // 2. Bias Curve
+        if (model === 'bias' || model === 'ensemble') {
+            datasets.push({
+                label: `Bias (k=${biasK})`,
+                data: labels.map(w => getB(w)),
+                borderColor: `rgba(${colorBias}, 0.8)`,
+                backgroundColor: `rgba(${colorBias}, 0.05)`,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                borderWidth: 2,
+                tension: 0.4
+            });
+        }
+
+        // 3. MC Point (Single point for current stones, expensive to plot curve)
+        if ((model === 'mc' || model === 'ensemble') && mcResult) {
+            // Create a dataset that is null everywhere except current stone
+            const mcData = labels.map(w => w === stones ? mcResult.pHat * 100 : null);
+            datasets.push({
+                label: 'Monte Carlo',
+                data: mcData,
+                borderColor: `rgba(${colorMC}, 1)`,
+                backgroundColor: `rgba(${colorMC}, 1)`,
+                pointRadius: 6,
+                pointStyle: 'rectRot',
+                showLine: false
+            });
+        }
 
         chartInstance.current = new Chart(ctx, { 
             type: 'line', 
-            data: { 
-                labels, 
-                datasets: [{ 
-                    label: 'Probability (%)', 
-                    data: dataPoints, 
-                    borderColor: `rgb(${color})`, 
-                    backgroundColor: `rgba(${color}, 0.1)`, 
-                    pointBackgroundColor: pointColors, 
-                    pointRadius: pointRadii, 
-                    fill: true,
-                    tension: 0.3
-                }] 
-            }, 
+            data: { labels, datasets }, 
             options: { 
                 responsive: true, 
                 maintainAspectRatio: false, 
                 plugins: { 
-                    legend: { display: false },
+                    legend: { display: model === 'ensemble' }, // Show legend only in ensemble
                     tooltip: {
                         callbacks: {
-                            title: (items) => `${items[0].label} ${t.tooltipTitleSuffix}`,
-                            label: (item) => `${t.tooltipLabelPrefix}${item.formattedValue}%`
+                            title: (items) => `${items[0].label} ${t.tooltipSuffix}`,
+                            label: (item) => `${item.dataset.label}: ${parseFloat(item.formattedValue).toFixed(2)}%`
                         }
                     }
                 }, 
@@ -210,20 +329,20 @@ const UTMBLotteryPage = ({ lang }) => {
                         max: 100, 
                         grid: { color: 'rgba(148, 163, 184, 0.1)' }, 
                         ticks: { color: '#94a3b8' },
-                        title: { display: true, text: t.yAxisLabel, color: '#94a3b8' }
+                        title: { display: true, text: t.chartY, color: '#94a3b8' }
                     }, 
                     x: { 
                         grid: { display: false },
                         ticks: { color: '#94a3b8' },
-                        title: { display: true, text: t.xAxisLabel, color: '#94a3b8' }
+                        title: { display: true, text: t.chartX, color: '#94a3b8' }
                     } 
                 } 
             } 
         });
         return () => chartInstance.current?.destroy();
-    }, [vals, stones, t]);
+    }, [vals, stones, model, mcResult, biasK, t]);
 
-    // --- KATEX RENDER EFFECT ---
+    // --- KATEX RENDER ---
     useEffect(() => {
         if (window.renderMathInElement && formulaRef.current) {
             window.renderMathInElement(formulaRef.current, {
@@ -234,7 +353,43 @@ const UTMBLotteryPage = ({ lang }) => {
                 throwOnError: false
             });
         }
-    }, [lang, race, method, stones, t]);
+    }, [lang, race, method, stones, model, mcResult]);
+
+    // --- FORMULA TEXT GENERATOR ---
+    const getFormulaContent = () => {
+        const { pHeuristic, pBias } = vals;
+        
+        const heuristicTex = `$$ p_{heur} \\approx 1 - \\prod_{i=0}^{L-1} \\frac{T - w - (i \\cdot \\mu)}{T - (i \\cdot \\mu)} $$`;
+        const biasTex = `$$ \\mu_{eff} = \\mu \\cdot k, \\quad p_{bias} \\approx 1 - \\prod \\dots (\\text{using } \\mu_{eff}) $$`;
+        const mcTex = `$$ k_i = u_i^{1/w_i}, \\quad p_{mc} = \\frac{\\text{wins}}{\\text{sims}} $$`;
+
+        if (model === 'heuristic') return `
+            <div class="mb-2 text-xs uppercase font-bold text-indigo-400">Heuristic Model</div>
+            ${heuristicTex}
+            <div class="text-center mt-2 text-indigo-300">p = ${(pHeuristic * 100).toFixed(2)}%</div>
+        `;
+        if (model === 'bias') return `
+            <div class="mb-2 text-xs uppercase font-bold text-pink-400">Bias Corrected Model</div>
+            ${biasTex}
+            <div class="text-center mt-2 text-pink-300">p = ${(pBias * 100).toFixed(2)}% <span class="text-xs text-slate-500">(k=${biasK})</span></div>
+        `;
+        if (model === 'mc') return `
+            <div class="mb-2 text-xs uppercase font-bold text-emerald-400">Monte Carlo (Efraimidis-Spirakis)</div>
+            ${mcTex}
+            <div class="text-center mt-2 text-emerald-300">
+                ${mcResult ? `$\\hat{p} = ${(mcResult.pHat * 100).toFixed(2)}\\%$` : t.mcWarn}
+            </div>
+            ${mcResult ? `<div class="text-xs text-center text-slate-500 mt-1">95% CI: [${(mcResult.ciLow*100).toFixed(1)}%, ${(mcResult.ciHigh*100).toFixed(1)}%]</div>` : ''}
+        `;
+        // Ensemble
+        return `
+            <div class="grid grid-cols-1 gap-2 text-xs">
+                <div><span class="text-indigo-400 font-bold">H:</span> $p \\approx ${(pHeuristic*100).toFixed(2)}\\%$</div>
+                <div><span class="text-pink-400 font-bold">B:</span> $p \\approx ${(pBias*100).toFixed(2)}\\%$ (k=${biasK})</div>
+                <div><span class="text-emerald-400 font-bold">MC:</span> ${mcResult ? `$${(mcResult.pHat*100).toFixed(2)}\\%$` : 'N/A'}</div>
+            </div>
+        `;
+    };
 
     return (
         <div className="bg-slate-800 text-slate-200 rounded-3xl p-6 max-w-[1100px] mx-auto border border-slate-700 shadow-2xl animate-fade-in font-sans">
@@ -244,44 +399,133 @@ const UTMBLotteryPage = ({ lang }) => {
             </div>
 
             <div className="grid lg:grid-cols-[300px_1fr] gap-5 mb-5">
-                {/* Controls */}
+                {/* CONTROLS PANEL */}
                 <div className="bg-slate-900 border border-slate-700 rounded-3xl p-5 flex flex-col gap-4 shadow-lg">
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-bold text-slate-400 uppercase">{t.raceLabel}</label>
-                        <select value={race} onChange={e=>setRace(e.target.value)} className="w-full bg-slate-800 border border-slate-700 text-white p-2.5 rounded-xl focus:outline-none focus:border-primary">
-                            <option value="UTMB">{t.utmbOption}</option>
-                            <option value="CCC">{t.cccOption}</option>
-                            <option value="OCC">{t.occOption}</option>
+                    {/* Race & Method */}
+                    <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase">{t.raceLabel}</label>
+                            <select value={race} onChange={e=>setRace(e.target.value)} className="w-full bg-slate-800 border border-slate-700 text-white text-xs p-2 rounded-lg focus:outline-none focus:border-indigo-500">
+                                <option value="UTMB">UTMB</option>
+                                <option value="CCC">CCC</option>
+                                <option value="OCC">OCC</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase">{t.methodLabel}</label>
+                            <select value={method} onChange={e=>setMethod(e.target.value)} className="w-full bg-slate-800 border border-slate-700 text-white text-xs p-2 rounded-lg focus:outline-none focus:border-indigo-500">
+                                <option value="cagr">CAGR</option>
+                                <option value="linear">Linear</option>
+                                <option value="conservative">Consv.</option>
+                                <option value="optimistic">Optim.</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr className="border-slate-800" />
+
+                    {/* Model Select */}
+                    <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-indigo-400 uppercase">{t.modelLabel}</label>
+                        <select value={model} onChange={e=>setModel(e.target.value)} className="w-full bg-slate-800 border border-indigo-900/50 text-indigo-100 p-2 rounded-lg focus:outline-none focus:border-indigo-500 font-bold text-sm">
+                            <option value="heuristic">{t.modelHeuristic}</option>
+                            <option value="bias">{t.modelBias}</option>
+                            <option value="mc">{t.modelMC}</option>
+                            <option value="ensemble">{t.modelEnsemble}</option>
                         </select>
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-bold text-slate-400 uppercase">{t.methodLabel}</label>
-                        <select value={method} onChange={e=>setMethod(e.target.value)} className="w-full bg-slate-800 border border-slate-700 text-white p-2.5 rounded-xl focus:outline-none focus:border-primary">
-                            <option value="cagr">{t.cagrOption}</option>
-                            <option value="linear">{t.linearOption}</option>
-                            <option value="conservative">{t.conservativeOption}</option>
-                            <option value="optimistic">{t.optimisticOption}</option>
-                        </select>
-                    </div>
+
+                    {/* Dynamic Model Controls */}
+                    {model === 'bias' && (
+                        <div className="bg-pink-900/20 p-3 rounded-xl border border-pink-900/30">
+                            <div className="flex justify-between text-[10px] uppercase font-bold text-pink-400 mb-1">
+                                <span>{t.biasLabel}</span>
+                                <span>{biasK}</span>
+                            </div>
+                            <input type="range" min="1.0" max="2.0" step="0.05" value={biasK} onChange={e=>setBiasK(parseFloat(e.target.value))} className="w-full h-1 bg-pink-900 rounded-lg appearance-none cursor-pointer accent-pink-500"/>
+                        </div>
+                    )}
+
+                    {(model === 'mc' || model === 'ensemble') && (
+                        <div className="bg-emerald-900/20 p-3 rounded-xl border border-emerald-900/30 flex flex-col gap-2">
+                            <div className="flex justify-between items-center">
+                                <label className="text-[10px] uppercase font-bold text-emerald-400">{t.mcSimsLabel}</label>
+                                <select 
+                                    value={mcSettings.sims} 
+                                    onChange={e=>setMcSettings({...mcSettings, sims: parseInt(e.target.value)})}
+                                    className="bg-emerald-900/40 text-emerald-100 text-[10px] border border-emerald-800 rounded px-1"
+                                >
+                                    <option value="200">200</option>
+                                    <option value="500">500</option>
+                                    <option value="1000">1000</option>
+                                    <option value="2000">2000</option>
+                                </select>
+                            </div>
+                            <button 
+                                onClick={runSimulation} 
+                                disabled={isMcRunning}
+                                className={`w-full py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${isMcRunning ? 'bg-slate-700 text-slate-500' : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20'}`}
+                            >
+                                {isMcRunning ? t.mcRunning : t.mcRunBtn}
+                            </button>
+                            {mcResult && (
+                                <div className="text-[10px] text-emerald-200/70 text-center">
+                                    Sims: {mcResult.sims} | Wins: {mcResult.wins}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <Slider label={t.stonesLabelPrefix} val={stones} min={1} max={50} step={1} unit="" onChange={setStones} />
 
-                    <div className="grid grid-cols-2 gap-3 mt-2">
-                        <div className="col-span-2 bg-primary/10 border border-primary/20 rounded-xl p-3 text-center">
-                            <h3 className="m-0 mb-2 text-[10px] text-primary font-bold uppercase tracking-wider">{t.probLabel}</h3>
-                            <div className="text-[32px] md:text-[38px] font-black leading-none text-white">% {(vals.p * 100).toFixed(2)}</div>
-                        </div>
-                        <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
-                            <h3 className="m-0 mb-2 text-[10px] text-slate-500 font-bold uppercase">{t.demandLabel}</h3>
-                            <div className="text-xl md:text-2xl font-bold leading-none text-white">{vals.N.toLocaleString(t.locale)}</div>
-                        </div>
-                        <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
-                            <h3 className="m-0 mb-2 text-[10px] text-slate-500 font-bold uppercase">{t.avgStonesLabel}</h3>
-                            <div className="text-xl md:text-2xl font-bold leading-none text-white">{vals.mean.toFixed(2)}</div>
-                        </div>
+                    {/* RESULTS DISPLAY */}
+                    <div className="mt-2">
+                        {model === 'ensemble' ? (
+                            <div className="grid grid-cols-3 gap-1 text-center bg-slate-800 rounded-xl p-2 border border-slate-700">
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] uppercase text-indigo-400 font-bold">Heur.</span>
+                                    <span className="text-sm font-bold text-white">{(vals.pHeuristic*100).toFixed(1)}%</span>
+                                </div>
+                                <div className="flex flex-col border-l border-slate-700">
+                                    <span className="text-[9px] uppercase text-pink-400 font-bold">Bias</span>
+                                    <span className="text-sm font-bold text-white">{(vals.pBias*100).toFixed(1)}%</span>
+                                </div>
+                                <div className="flex flex-col border-l border-slate-700">
+                                    <span className="text-[9px] uppercase text-emerald-400 font-bold">MC</span>
+                                    <span className={`text-sm font-bold ${mcResult ? 'text-white' : 'text-slate-500'}`}>
+                                        {mcResult ? (mcResult.pHat*100).toFixed(1) + '%' : '-'}
+                                    </span>
+                                </div>
+                                <div className="col-span-3 mt-1 pt-1 border-t border-slate-700 flex justify-between items-center px-2">
+                                    <span className="text-[9px] text-slate-400">{t.rangeLabel}</span>
+                                    <span className="text-xs font-mono font-bold text-amber-400">
+                                        {mcResult 
+                                            ? `${Math.min(vals.pHeuristic, vals.pBias, mcResult.pHat).toLocaleString(undefined, {style:'percent', minimumFractionDigits:1})} - ${Math.max(vals.pHeuristic, vals.pBias, mcResult.pHat).toLocaleString(undefined, {style:'percent', minimumFractionDigits:1})}`
+                                            : `${Math.min(vals.pHeuristic, vals.pBias).toLocaleString(undefined, {style:'percent', minimumFractionDigits:1})} - ${Math.max(vals.pHeuristic, vals.pBias).toLocaleString(undefined, {style:'percent', minimumFractionDigits:1})}`
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-center">
+                                <h3 className="m-0 mb-1 text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t.probLabel}</h3>
+                                <div className="text-[36px] font-black leading-none text-white tracking-tight">
+                                    {model === 'mc' 
+                                        ? (mcResult ? (mcResult.pHat * 100).toFixed(2) : '---') 
+                                        : (model === 'bias' ? (vals.pBias * 100).toFixed(2) : (vals.pHeuristic * 100).toFixed(2))
+                                    }%
+                                </div>
+                                {model === 'mc' && mcResult && (
+                                    <div className="text-[10px] text-emerald-400 mt-1 font-mono">
+                                        ± {((mcResult.ciHigh - mcResult.pHat)*100).toFixed(2)}% (95% CI)
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Chart */}
+                {/* CHART AREA */}
                 <div className="bg-slate-900 border border-slate-700 rounded-3xl p-4 h-[400px] md:h-auto flex flex-col relative shadow-lg w-full overflow-hidden">
                     <div className="flex-grow relative w-full h-full min-h-[300px]">
                         <canvas ref={chartRef}></canvas>
@@ -309,8 +553,8 @@ const UTMBLotteryPage = ({ lang }) => {
                                     <td className="p-2 text-right font-mono rounded-r-lg">{data[race].meanStones[y] ? data[race].meanStones[y].toFixed(2) : '-'}</td>
                                 </tr>
                             ))}
-                            <tr className="bg-primary/10">
-                                <td className="p-2 rounded-l-lg font-bold text-primary">{t.tableProjection}</td>
+                            <tr className="bg-indigo-500/10">
+                                <td className="p-2 rounded-l-lg font-bold text-indigo-400">{t.tableProjection}</td>
                                 <td className="p-2 text-right font-bold text-white font-mono">{vals.N.toLocaleString(t.locale)}</td>
                                 <td className="p-2 text-right font-bold text-white font-mono rounded-r-lg">{vals.mean.toFixed(2)}</td>
                             </tr>
@@ -318,27 +562,20 @@ const UTMBLotteryPage = ({ lang }) => {
                     </table>
                 </div>
 
-                {/* Formula */}
-                <div className="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-lg">
+                {/* Formula Box */}
+                <div className="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-lg flex flex-col">
                     <h3 className="text-white font-bold mb-4">{t.modelTitle}</h3>
-                    <div ref={formulaRef} className="bg-slate-800 rounded-xl p-4 font-mono text-slate-300 text-sm leading-relaxed mb-4 border border-slate-700">
+                    <div className="bg-slate-800 rounded-xl p-4 font-mono text-slate-300 text-sm leading-relaxed mb-4 border border-slate-700 flex-grow">
                         <div className="mb-2 text-slate-500 text-xs font-bold uppercase font-sans">{t.formulaTitle}</div>
-                        {/* FORMÜL GÖRSELİ DÜZELTİLDİ: L tanımı eklendi ve min(B,N) uyumu sağlandı */}
-                        {`$$ p = 1 - \\prod_{i=0}^{L-1} \\frac{T - w - (i \\cdot \\mu)}{T - (i \\cdot \\mu)}, \\quad L = \\min(B, N) $$`}
-                        <div className="text-[1.2em] font-bold text-primary mt-2 text-center">p = % {(vals.p * 100).toFixed(2)}</div>
+                        <div ref={formulaRef} dangerouslySetInnerHTML={{__html: getFormulaContent()}} />
                     </div>
 
-                    <dl className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-1.5 text-xs">
-                        <dt className="font-mono text-slate-400 font-bold">p</dt><dd className="text-slate-500 m-0">{t.defP}</dd>
-                        <dt className="font-mono text-slate-400 font-bold">w</dt><dd className="text-slate-500 m-0">{t.defW} <span className="text-primary font-bold ml-1">({t.defValW} {stones})</span></dd>
-                        <dt className="font-mono text-slate-400 font-bold">B</dt><dd className="text-slate-500 m-0">{t.defB} <span className="text-primary font-bold ml-1">({t.defValB} {vals.B})</span></dd>
-                        <dt className="font-mono text-slate-400 font-bold">T</dt><dd className="text-slate-500 m-0">{t.defT} <span className="text-primary font-bold ml-1">({t.defValT} {Math.round(vals.T).toLocaleString(t.locale)})</span></dd>
-                        <dt className="font-mono text-slate-400 font-bold">µ</dt><dd className="text-slate-500 m-0">{t.defMean} <span className="text-primary font-bold ml-1">({vals.mean.toFixed(2)})</span></dd>
-                    </dl>
-
-                    <div className="mt-4 text-[10px] text-slate-500 bg-slate-800/50 p-2 rounded-lg border border-slate-800">
+                    <div className="mt-auto text-[10px] text-slate-500 bg-slate-800/50 p-3 rounded-lg border border-slate-800">
                         <b className="text-slate-400 block mb-1">{t.noteTitle}</b>
-                        <span dangerouslySetInnerHTML={{__html: t.noteText}}></span>
+                        {model === 'heuristic' && t.noteHeuristic}
+                        {model === 'bias' && t.noteBias}
+                        {model === 'mc' && t.noteMC}
+                        {model === 'ensemble' && `${t.noteHeuristic} ${t.noteBias}`}
                     </div>
                 </div>
             </div>
