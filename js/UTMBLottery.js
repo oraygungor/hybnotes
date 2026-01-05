@@ -6,14 +6,12 @@ const UTMBLotteryPage = ({ lang }) => {
     const [method, setMethod] = useState('cagr');
     const [stones, setStones] = useState(1);
     
-    // Model State'leri
     const [model, setModel] = useState('heuristic'); // 'heuristic', 'bias', 'mc', 'ensemble'
-    const [biasK, setBiasK] = useState(1.25); // Bias çarpanı
+    const [biasK, setBiasK] = useState(1.30); // Default bias
     const [mcSettings, setMcSettings] = useState({ sims: 500, seed: 12345 });
     const [mcResult, setMcResult] = useState(null);
     const [isMcRunning, setIsMcRunning] = useState(false);
 
-    // Refs
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
     const formulaRef = useRef(null); 
@@ -31,9 +29,6 @@ const UTMBLotteryPage = ({ lang }) => {
             title: "UTMB 2026 Lottery Analytics",
             subtitle: "Advanced probability modeling with Heuristic, Bias Correction & Monte Carlo simulations.",
             raceLabel: "Race",
-            utmbOption: "UTMB (2300 Runners)",
-            cccOption: "CCC (1900 Runners)",
-            occOption: "OCC (1200 Runners)",
             methodLabel: "Projection Method",
             modelLabel: "Calculation Model",
             modelHeuristic: "Heuristic (Standard)",
@@ -41,10 +36,7 @@ const UTMBLotteryPage = ({ lang }) => {
             modelMC: "Monte Carlo Sim.",
             modelEnsemble: "All Models (Range)",
             biasLabel: "Bias Factor (k)",
-            biasExplainer: (k) => k > 1.0 
-                ? `High Bias (k=${k}): Assumes winners have MORE stones than average. This drains the pool faster, slightly INCREASING odds for survivors.` 
-                : `Neutral Bias (k=1.0): Assumes winners have exactly the average number of stones.`,
-            mcSimsLabel: "Simulations",
+            biasExplainer: (k) => `Winners remove ${k}x more stones than average. Total pool size remains fixed, but drains faster.`,
             mcRunBtn: "Run Simulation",
             mcRunning: "Running...",
             stonesLabelPrefix: "Running Stones: ",
@@ -59,31 +51,24 @@ const UTMBLotteryPage = ({ lang }) => {
             tableProjection: "2026 (Proj.)",
             modelTitle: "Mathematical Model",
             formulaTitle: "Model Formula:",
-            mcResTitle: "Monte Carlo Results:",
             mcWarn: "Run simulation to see MC data.",
             defP: "Prob. of winning",
             defW: "Your Stones",
-            defB: "Capacity (Bibs)",
-            defN: "Total Applicants",
-            defT: "Total Pool Stones",
-            defMu: "Removal Rate (µ)",
-            defValT: "Pool:",
-            chartX: "Running Stones",
+            defB: "Capacity",
+            defT: "Total Pool Stones (Fixed)",
+            defMu: "Removal Rate (µ_eff)",
             chartY: "Probability (%)",
             tooltipSuffix: " Stones",
             noteTitle: "Model Note:",
-            noteHeuristic: "Standard approach: Assumes average stone removal per winner.",
-            noteBias: "Adjusted approach: Accounts for 'size-biased sampling' (winners usually have more stones).",
-            noteMC: "Simulation: Runs the actual weighted lottery N times.",
+            noteHeuristic: "Assumes winners remove exactly the average number of stones.",
+            noteBias: "Assumes winners have more stones (k*µ), draining the fixed pool faster.",
+            noteMC: "Simulates the actual weighted lottery draw N times.",
             locale: "en-US"
         },
         TR: {
             title: "UTMB 2026 Kura Analizi",
             subtitle: "Heuristic, Bias Düzeltme ve Monte Carlo simülasyonları ile gelişmiş olasılık modellemesi.",
             raceLabel: "Yarış",
-            utmbOption: "UTMB (2300 Kişi)",
-            cccOption: "CCC (1900 Kişi)",
-            occOption: "OCC (1200 Kişi)",
             methodLabel: "Talep Tahmini",
             modelLabel: "Hesaplama Modeli",
             modelHeuristic: "Heuristic (Standart)",
@@ -91,10 +76,7 @@ const UTMBLotteryPage = ({ lang }) => {
             modelMC: "Monte Carlo Sim.",
             modelEnsemble: "Tüm Modeller (Aralık)",
             biasLabel: "Bias Çarpanı (k)",
-            biasExplainer: (k) => k > 1.0 
-                ? `Yüksek Bias (k=${k}): Kazananların ortalamadan DAHA ÇOK taşı olduğunu varsayar. Bu havuzu hızlı boşaltır, kalanların şansını artırır.` 
-                : `Nötr Bias (k=1.0): Kazananların tam olarak ortalama taşa sahip olduğunu varsayar (Standart).`,
-            mcSimsLabel: "Simülasyon Sayısı",
+            biasExplainer: (k) => `Kazananlar ortalamanın ${k} katı taş götürür. Toplam havuz SABİTTİR, ancak daha hızlı boşalır (Şansınızı artırır).`,
             mcRunBtn: "Simülasyonu Başlat",
             mcRunning: "Hesaplanıyor...",
             stonesLabelPrefix: "Taş Sayısı: ",
@@ -109,59 +91,52 @@ const UTMBLotteryPage = ({ lang }) => {
             tableProjection: "2026 (Tahmin)",
             modelTitle: "Matematiksel Model ve Tanımlar",
             formulaTitle: "Model Formülü:",
-            mcResTitle: "Monte Carlo Sonucu:",
             mcWarn: "MC verisi için simülasyonu çalıştırın.",
             defP: "Kazanma Olasılığı",
             defW: "Sizin Taşınız",
-            defB: "Kontenjan (Bib)",
-            defN: "Toplam Başvuru",
-            defT: "Havuzdaki Toplam Taş",
-            defMu: "Eksilme Hızı (µ)",
-            defValT: "Havuz:",
-            chartX: "Taş Sayısı",
+            defB: "Kontenjan",
+            defT: "Toplam Havuz (Sabit)",
+            defMu: "Eksilme Hızı (µ_eff)",
             chartY: "Olasılık (%)",
             tooltipSuffix: " Taş",
             noteTitle: "Model Notu:",
-            noteHeuristic: "Standart yaklaşım: Her kazananda havuzdan 'ortalama' taş eksildiğini varsayar.",
-            noteBias: "Düzeltilmiş yaklaşım: Çok taşı olanların önce seçilmesi (size-biased) etkisini hesaba katar.",
-            noteMC: "Simülasyon: Ağırlıklı kurayı birebir N kez simüle eder.",
+            noteHeuristic: "Kazananların tam olarak ortalama taş (µ) eksilttiğini varsayar.",
+            noteBias: "Kazananların çok taşı olduğunu (k*µ) ve sabit havuzun hızlı boşaldığını varsayar.",
+            noteMC: "Ağırlıklı kurayı birebir N kez simüle eder.",
             locale: "tr-TR"
         }
     };
     const t = lang === 'tr' ? tr.TR : tr.EN;
 
-    // --- MATH HELPERS ---
     const cagr = (v1, v2, f = 1) => Math.round(v2 * (1 + (Math.pow(v2 / v1, 1 / 2) - 1) * f));
 
-    // 1. Heuristic Probability
-    const getProbHeuristic = (B, N, mean, w) => { 
+    // --- CORE LOGIC FIX ---
+    // poolMean: Havuzun büyüklüğünü belirleyen gerçek ortalama (Sabit)
+    // removalMean: Her turda havuzdan eksilen miktar (Bias ile değişir)
+    const getProb = (B, N, poolMean, removalMean, w) => { 
         if (w <= 0) return 0; 
-        const T = (N - 1) * mean + w; 
+        
+        // 1. ADIM: Toplam Havuz (T) hesaplanırken bias KULLANILMAZ. 
+        // Havuz fiziksel olarak bellidir: (Kişi Sayısı * Gerçek Ortalama)
+        const T = (N - 1) * poolMean + w; 
+        
         let logNoHit = 0; 
         const L = Math.min(B, N); 
+        
         for (let i = 0; i < L; i++) {
-            const stonesRemoved = i * mean;
+            // 2. ADIM: Havuzdan eksiltirken bias KULLANILIR.
+            // Çünkü kazananlar "zengin" (çok taşlı) kişilerdir.
+            const stonesRemoved = i * removalMean;
+            
+            // Havuz negatif olamaz, 1e-9 clamp
             const currentPool = Math.max(1e-9, T - stonesRemoved);
+            
+            // Eğer havuzda kalan taş sayısı benimkine eşit/azsa kesin kazanırım
             if (currentPool <= w) return 1;
+            
             logNoHit += Math.log(currentPool - w) - Math.log(currentPool);
         }
         return 1 - Math.exp(logNoHit); 
-    };
-
-    // 2. Bias Probability
-    const getProbBias = (B, N, mean, w, k) => {
-        const effectiveMean = mean * k;
-        return getProbHeuristic(B, N, effectiveMean, w);
-    };
-
-    // 3. MC Helpers
-    const wilsonInterval = (wins, n, z = 1.96) => {
-        if (n === 0) return { low: 0, high: 0 };
-        const p = wins / n;
-        const denominator = 1 + (z * z) / n;
-        const center = ((p + (z * z) / (2 * n))) / denominator;
-        const width = (z * Math.sqrt((p * (1 - p) / n) + (z * z) / (4 * n * n))) / denominator;
-        return { low: Math.max(0, center - width), high: Math.min(1, center + width) };
     };
 
     const generateRandomStones = (mean) => {
@@ -171,16 +146,11 @@ const UTMBLotteryPage = ({ lang }) => {
         return Math.max(1, Math.min(100, val));
     };
 
-    // --- CALCULATION VALUES ---
     const vals = useMemo(() => {
         const d = data[race].demand;
         const N = method === 'linear' 
             ? Math.round(d[2025] + (d[2025] - d[2023]) / 2) 
-            : method === 'conservative' 
-                ? cagr(d[2023], d[2025], 0.7) 
-                : method === 'optimistic' 
-                    ? cagr(d[2023], d[2025], 1.3) 
-                    : cagr(d[2023], d[2025], 1);
+            : method === 'conservative' ? cagr(d[2023], d[2025], 0.7) : method === 'optimistic' ? cagr(d[2023], d[2025], 1.3) : cagr(d[2023], d[2025], 1);
         
         const mS = data[race].meanStones;
         const meanRaw = method === 'linear' 
@@ -190,17 +160,21 @@ const UTMBLotteryPage = ({ lang }) => {
         const mean = Math.max(1.1, meanRaw);
         const B = data[race].capacity;
 
-        const pHeuristic = getProbHeuristic(B, N, mean, stones);
-        const pBias = getProbBias(B, N, mean, stones, biasK);
+        // HEURISTIC: Havuz Ortalama ile kurulur, Ortalama ile eksilir.
+        const pHeuristic = getProb(B, N, mean, mean, stones);
         
-        // Formül ve Tanımlar için yardımcı değerler
-        const effectiveMean = model === 'bias' ? mean * biasK : mean;
-        const totalPool = (N - 1) * effectiveMean + stones;
+        // BIAS: Havuz Ortalama ile kurulur, (Ortalama * K) ile eksilir.
+        const removalMean = mean * biasK;
+        const pBias = getProb(B, N, mean, removalMean, stones);
+        
+        // Gösterim için değerler
+        // T (Total Pool) artık Bias'tan etkilenmiyor, sabit kalıyor!
+        const totalPool = (N - 1) * mean + stones; 
+        const effectiveRemoval = model === 'bias' ? removalMean : mean;
 
-        return { N, mean, B, pHeuristic, pBias, effectiveMean, totalPool };
+        return { N, mean, B, pHeuristic, pBias, totalPool, effectiveRemoval };
     }, [race, method, stones, biasK, data, model]);
 
-    // --- MC RUNNER ---
     const runSimulation = useCallback(() => {
         setIsMcRunning(true);
         setTimeout(() => {
@@ -219,112 +193,72 @@ const UTMBLotteryPage = ({ lang }) => {
                 }
                 if (rank < B) wins++;
             }
-            const ci = wilsonInterval(wins, sims);
-            setMcResult({ pHat: wins / sims, ciLow: ci.low, ciHigh: ci.high, wins, sims });
+            // Wilson Interval
+            const z = 1.96;
+            const n = sims;
+            const p = wins/n;
+            const center = (p + z*z/(2*n)) / (1 + z*z/n);
+            const width = z * Math.sqrt(p*(1-p)/n + z*z/(4*n*n)) / (1 + z*z/n);
+            
+            setMcResult({ pHat: wins / sims, ciLow: Math.max(0, center-width), ciHigh: Math.min(1, center+width), wins, sims });
             setIsMcRunning(false);
         }, 50);
     }, [vals, stones, mcSettings]);
 
-    // MC reset
     useEffect(() => { setMcResult(null); }, [race, method, stones]);
 
-    // --- CHART ---
     useEffect(() => {
         if (chartInstance.current) chartInstance.current.destroy();
         if (!chartRef.current) return;
         const ctx = chartRef.current.getContext('2d');
         const labels = Array.from({length: 50}, (_, i) => i + 1);
         const { B, N, mean } = vals;
-        const getH = (w) => getProbHeuristic(B, N, mean, w) * 100;
-        const getB = (w) => getProbBias(B, N, mean, w, biasK) * 100;
+        
+        // Chart üretirken de doğru fonksiyonu kullanıyoruz
+        const getH = (w) => getProb(B, N, mean, mean, w) * 100;
+        const getB = (w) => getProb(B, N, mean, mean * biasK, w) * 100;
 
         const datasets = [];
-        const c1 = '99, 102, 241'; // Indigo
-        const c2 = '236, 72, 153'; // Pink
-        const c3 = '16, 185, 129'; // Emerald
+        const c1 = '99, 102, 241'; 
+        const c2 = '236, 72, 153'; 
+        const c3 = '16, 185, 129'; 
 
         if (['heuristic', 'ensemble', 'bias'].includes(model)) {
-            datasets.push({
-                label: 'Heuristic',
-                data: labels.map(w => getH(w)),
-                borderColor: `rgba(${c1}, 0.8)`,
-                backgroundColor: `rgba(${c1}, 0.1)`,
-                pointRadius: 0,
-                borderWidth: 2,
-                fill: model === 'heuristic',
-                tension: 0.4
-            });
+            datasets.push({ label: 'Heuristic', data: labels.map(w => getH(w)), borderColor: `rgba(${c1}, 0.8)`, backgroundColor: `rgba(${c1}, 0.1)`, pointRadius: 0, borderWidth: 2, fill: model === 'heuristic', tension: 0.4 });
         }
         if (['bias', 'ensemble'].includes(model)) {
-            datasets.push({
-                label: `Bias (k=${biasK})`,
-                data: labels.map(w => getB(w)),
-                borderColor: `rgba(${c2}, 0.8)`,
-                backgroundColor: `rgba(${c2}, 0.05)`,
-                borderDash: [5, 5],
-                pointRadius: 0,
-                borderWidth: 2,
-                tension: 0.4
-            });
+            datasets.push({ label: `Bias (k=${biasK})`, data: labels.map(w => getB(w)), borderColor: `rgba(${c2}, 0.8)`, backgroundColor: `rgba(${c2}, 0.05)`, borderDash: [5, 5], pointRadius: 0, borderWidth: 2, tension: 0.4 });
         }
         if (['mc', 'ensemble'].includes(model) && mcResult) {
-            datasets.push({
-                label: 'Monte Carlo',
-                data: labels.map(w => w === stones ? mcResult.pHat * 100 : null),
-                borderColor: `rgba(${c3}, 1)`,
-                backgroundColor: `rgba(${c3}, 1)`,
-                pointRadius: 6,
-                pointStyle: 'rectRot',
-                showLine: false
-            });
+            datasets.push({ label: 'Monte Carlo', data: labels.map(w => w === stones ? mcResult.pHat * 100 : null), borderColor: `rgba(${c3}, 1)`, backgroundColor: `rgba(${c3}, 1)`, pointRadius: 6, pointStyle: 'rectRot', showLine: false });
         }
 
         chartInstance.current = new Chart(ctx, { 
             type: 'line', 
             data: { labels, datasets }, 
-            options: { 
-                responsive: true, maintainAspectRatio: false, 
-                plugins: { legend: { display: model === 'ensemble' }, tooltip: { callbacks: { title: i=>`${i[0].label} ${t.tooltipSuffix}`, label: i=>`${i.dataset.label}: ${parseFloat(i.formattedValue).toFixed(2)}%` } } }, 
-                scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { color: '#94a3b8' }, title: { display: true, text: t.chartY, color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' }, title: { display: true, text: t.chartX, color: '#94a3b8' } } } 
-            } 
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: model === 'ensemble' }, tooltip: { callbacks: { title: i=>`${i[0].label} ${t.tooltipSuffix}`, label: i=>`${i.dataset.label}: ${parseFloat(i.formattedValue).toFixed(2)}%` } } }, scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { color: '#94a3b8' }, title: { display: true, text: t.chartY, color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } } 
         });
         return () => chartInstance.current?.destroy();
     }, [vals, stones, model, mcResult, biasK, t]);
 
-    // --- KATEX RENDER (Fixed Dependencies) ---
     useEffect(() => {
         if (window.renderMathInElement && formulaRef.current) {
-            window.renderMathInElement(formulaRef.current, {
-                delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
-                throwOnError: false
-            });
+            window.renderMathInElement(formulaRef.current, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}], throwOnError: false });
         }
-    }, [lang, race, method, stones, model, mcResult, biasK]); // biasK eklendi!
+    }, [lang, race, method, stones, model, mcResult, biasK]);
 
-    // --- FORMULA CONTENT ---
     const getFormulaContent = () => {
         const { pHeuristic, pBias } = vals;
-        
-        // Strings
+        // LaTeX stringlerinde T ve mu_eff ayrımı yapıldı
         const hTex = `$$ p \\approx 1 - \\prod_{i=0}^{L-1} \\frac{T - w - (i \\cdot \\mu)}{T - (i \\cdot \\mu)} $$`;
-        const bTex = `$$ \\mu_{eff} = \\mu \\cdot ${biasK}, \\quad p \\approx 1 - \\prod_{i=0}^{L-1} \\frac{T - w - (i \\cdot \\mu_{eff})}{T - (i \\cdot \\mu_{eff})} $$`;
+        const bTex = `$$ \\mu_{eff} = \\mu \\cdot ${biasK} \\quad (T \\text{ fixed}) $$ 
+                      $$ p \\approx 1 - \\prod_{i=0}^{L-1} \\frac{T - w - (i \\cdot \\mu_{eff})}{T - (i \\cdot \\mu_{eff})} $$`;
         const mcTex = `$$ k_i = u_i^{1/w_i} \\quad (\\text{Efraimidis-Spirakis}) $$`;
 
-        if (model === 'heuristic') return `
-            <div class="mb-2 text-xs uppercase font-bold text-indigo-400">Heuristic Model</div>${hTex}
-            <div class="text-center mt-2 text-indigo-300">p = ${(pHeuristic * 100).toFixed(2)}%</div>`;
-        if (model === 'bias') return `
-            <div class="mb-2 text-xs uppercase font-bold text-pink-400">Bias Corrected Model</div>${bTex}
-            <div class="text-center mt-2 text-pink-300">p = ${(pBias * 100).toFixed(2)}%</div>`;
-        if (model === 'mc') return `
-            <div class="mb-2 text-xs uppercase font-bold text-emerald-400">Monte Carlo Simulation</div>${mcTex}
-            <div class="text-center mt-2 text-emerald-300">${mcResult ? `$\\hat{p} = ${(mcResult.pHat * 100).toFixed(2)}\\%$` : t.mcWarn}</div>`;
-        
-        return `<div class="grid grid-cols-1 gap-2 text-xs">
-            <div><span class="text-indigo-400 font-bold">H:</span> $p \\approx ${(pHeuristic*100).toFixed(2)}\\%$</div>
-            <div><span class="text-pink-400 font-bold">B:</span> $p \\approx ${(pBias*100).toFixed(2)}\\%$</div>
-            <div><span class="text-emerald-400 font-bold">MC:</span> ${mcResult ? `$${(mcResult.pHat*100).toFixed(2)}\\%$` : 'N/A'}</div>
-        </div>`;
+        if (model === 'heuristic') return `<div class="mb-2 text-xs uppercase font-bold text-indigo-400">Heuristic Model</div>${hTex}<div class="text-center mt-2 text-indigo-300">p = ${(pHeuristic * 100).toFixed(2)}%</div>`;
+        if (model === 'bias') return `<div class="mb-2 text-xs uppercase font-bold text-pink-400">Bias Corrected Model</div>${bTex}<div class="text-center mt-2 text-pink-300">p = ${(pBias * 100).toFixed(2)}%</div>`;
+        if (model === 'mc') return `<div class="mb-2 text-xs uppercase font-bold text-emerald-400">Monte Carlo Simulation</div>${mcTex}<div class="text-center mt-2 text-emerald-300">${mcResult ? `$\\hat{p} = ${(mcResult.pHat * 100).toFixed(2)}\\%$` : t.mcWarn}</div>`;
+        return `<div class="grid grid-cols-1 gap-2 text-xs"><div><span class="text-indigo-400 font-bold">H:</span> $p \\approx ${(pHeuristic*100).toFixed(2)}\\%$</div><div><span class="text-pink-400 font-bold">B:</span> $p \\approx ${(pBias*100).toFixed(2)}\\%$</div><div><span class="text-emerald-400 font-bold">MC:</span> ${mcResult ? `$${(mcResult.pHat*100).toFixed(2)}\\%$` : 'N/A'}</div></div>`;
     };
 
     return (
@@ -335,9 +269,7 @@ const UTMBLotteryPage = ({ lang }) => {
             </div>
 
             <div className="grid lg:grid-cols-[300px_1fr] gap-5 mb-5">
-                {/* CONTROLS */}
                 <div className="bg-slate-900 border border-slate-700 rounded-3xl p-5 flex flex-col gap-4 shadow-lg">
-                    {/* Race & Method */}
                     <div className="grid grid-cols-2 gap-2">
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] font-bold text-slate-500 uppercase">{t.raceLabel}</label>
@@ -354,7 +286,6 @@ const UTMBLotteryPage = ({ lang }) => {
                     </div>
                     <hr className="border-slate-800" />
                     
-                    {/* Model Select */}
                     <div className="flex flex-col gap-1">
                         <label className="text-[10px] font-bold text-indigo-400 uppercase">{t.modelLabel}</label>
                         <select value={model} onChange={e=>setModel(e.target.value)} className="w-full bg-slate-800 border border-indigo-900/50 text-indigo-100 p-2 rounded-lg focus:outline-none focus:border-indigo-500 font-bold text-sm">
@@ -362,39 +293,23 @@ const UTMBLotteryPage = ({ lang }) => {
                         </select>
                     </div>
 
-                    {/* BIAS CONTROL (YENİ: Açıklama metni eklendi) */}
                     {model === 'bias' && (
                         <div className="bg-pink-900/20 p-3 rounded-xl border border-pink-900/30">
-                            <div className="flex justify-between text-[10px] uppercase font-bold text-pink-400 mb-1">
-                                <span>{t.biasLabel}</span><span>{biasK}</span>
-                            </div>
+                            <div className="flex justify-between text-[10px] uppercase font-bold text-pink-400 mb-1"><span>{t.biasLabel}</span><span>{biasK}</span></div>
                             <input type="range" min="1.0" max="2.0" step="0.05" value={biasK} onChange={e=>setBiasK(parseFloat(e.target.value))} className="w-full h-1 bg-pink-900 rounded-lg appearance-none cursor-pointer accent-pink-500"/>
-                            {/* KULLANICI İÇİN AÇIKLAMA BURADA */}
-                            <div className="mt-2 text-[10px] text-pink-200/70 leading-tight">
-                                {t.biasExplainer(biasK)}
-                            </div>
+                            <div className="mt-2 text-[10px] text-pink-200/70 leading-tight">{t.biasExplainer(biasK)}</div>
                         </div>
                     )}
 
-                    {/* MC Controls */}
                     {(model === 'mc' || model === 'ensemble') && (
                         <div className="bg-emerald-900/20 p-3 rounded-xl border border-emerald-900/30 flex flex-col gap-2">
-                            <div className="flex justify-between items-center">
-                                <label className="text-[10px] uppercase font-bold text-emerald-400">{t.mcSimsLabel}</label>
-                                <select value={mcSettings.sims} onChange={e=>setMcSettings({...mcSettings, sims: parseInt(e.target.value)})} className="bg-emerald-900/40 text-emerald-100 text-[10px] border border-emerald-800 rounded px-1">
-                                    <option value="200">200</option><option value="500">500</option><option value="1000">1000</option><option value="2000">2000</option>
-                                </select>
-                            </div>
-                            <button onClick={runSimulation} disabled={isMcRunning} className={`w-full py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${isMcRunning ? 'bg-slate-700 text-slate-500' : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20'}`}>
-                                {isMcRunning ? t.mcRunning : t.mcRunBtn}
-                            </button>
+                            <button onClick={runSimulation} disabled={isMcRunning} className={`w-full py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${isMcRunning ? 'bg-slate-700 text-slate-500' : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20'}`}>{isMcRunning ? t.mcRunning : t.mcRunBtn}</button>
                             {mcResult && <div className="text-[10px] text-emerald-200/70 text-center">Sims: {mcResult.sims} | Wins: {mcResult.wins}</div>}
                         </div>
                     )}
 
                     <Slider label={t.stonesLabelPrefix} val={stones} min={1} max={50} step={1} unit="" onChange={setStones} />
 
-                    {/* RESULT BOX */}
                     <div className="mt-2">
                         {model === 'ensemble' ? (
                             <div className="grid grid-cols-3 gap-1 text-center bg-slate-800 rounded-xl p-2 border border-slate-700">
@@ -416,7 +331,6 @@ const UTMBLotteryPage = ({ lang }) => {
                     </div>
                 </div>
 
-                {/* CHART AREA */}
                 <div className="bg-slate-900 border border-slate-700 rounded-3xl p-4 h-[400px] md:h-auto flex flex-col relative shadow-lg w-full overflow-hidden">
                     <div className="flex-grow relative w-full h-full min-h-[300px]">
                         <canvas ref={chartRef}></canvas>
@@ -438,7 +352,6 @@ const UTMBLotteryPage = ({ lang }) => {
                     </table>
                 </div>
 
-                {/* FORMULA & DEFINITIONS */}
                 <div className="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-lg flex flex-col">
                     <h3 className="text-white font-bold mb-4">{t.modelTitle}</h3>
                     <div className="bg-slate-800 rounded-xl p-4 font-mono text-slate-300 text-sm leading-relaxed mb-4 border border-slate-700 flex-grow">
@@ -446,7 +359,6 @@ const UTMBLotteryPage = ({ lang }) => {
                         <div ref={formulaRef} dangerouslySetInnerHTML={{__html: getFormulaContent()}} />
                     </div>
 
-                    {/* TANIMLAR (Geri Eklendi ve Dinamik Hale Getirildi) */}
                     <dl className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-1.5 text-xs mb-4 px-2">
                         <dt className="font-mono text-slate-400 font-bold">p</dt><dd className="text-slate-500 m-0">{t.defP}</dd>
                         <dt className="font-mono text-slate-400 font-bold">w</dt><dd className="text-slate-500 m-0">{t.defW} <span className="text-indigo-400 font-bold ml-1">({stones})</span></dd>
@@ -457,7 +369,7 @@ const UTMBLotteryPage = ({ lang }) => {
                                 <dd className="text-slate-500 m-0">{t.defT} <span className="text-indigo-400 font-bold ml-1">({t.defValT} {Math.round(vals.totalPool).toLocaleString(t.locale)})</span></dd>
                                 
                                 <dt className="font-mono text-slate-400 font-bold">µ{model === 'bias' ? 'eff' : ''}</dt>
-                                <dd className="text-slate-500 m-0">{t.defMu} <span className="text-indigo-400 font-bold ml-1">({vals.effectiveMean.toFixed(2)})</span></dd>
+                                <dd className="text-slate-500 m-0">{t.defMu} <span className="text-indigo-400 font-bold ml-1">({vals.effectiveRemoval.toFixed(2)})</span></dd>
                             </>
                         )}
                         {model === 'mc' && (
