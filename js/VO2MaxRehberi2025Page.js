@@ -3,15 +3,15 @@ const { useState } = React;
 const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
     const [activeTab, setActiveTab] = useState('rst');
 
-    // --- Sabit Renkler (Sadece Grafikler İçin) ---
+    // --- HTML Dosyasından Orijinal Renkler (Grafikler için Sabit) ---
     const chartColors = {
-        rst: { bg: 'bg-sky-500', text: 'text-sky-500', border: 'border-sky-500', hex: '#0ea5e9' },
-        hiit: { bg: 'bg-indigo-500', text: 'text-indigo-500', border: 'border-indigo-500', hex: '#6366f1' },
-        sit: { bg: 'bg-purple-500', text: 'text-purple-500', border: 'border-purple-500', hex: '#a855f7' },
-        ct: { bg: 'bg-slate-500', text: 'text-slate-500', border: 'border-slate-500', hex: '#64748b' }
+        rst: { hex: '#0ea5e9', bg: 'bg-sky-500', text: 'text-sky-500', border: 'border-sky-500', badgeBg: 'bg-sky-900', badgeText: 'text-sky-200' },
+        hiit: { hex: '#6366f1', bg: 'bg-indigo-500', text: 'text-indigo-500', border: 'border-indigo-500', badgeBg: 'bg-indigo-900', badgeText: 'text-indigo-200' },
+        sit: { hex: '#a855f7', bg: 'bg-purple-500', text: 'text-purple-500', border: 'border-purple-500', badgeBg: 'bg-purple-900', badgeText: 'text-purple-200' },
+        ct: { hex: '#64748b', bg: 'bg-slate-500', text: 'text-slate-500', border: 'border-slate-500' }
     };
 
-    // --- İçerik ---
+    // --- İçerik ve Çeviriler ---
     const t = {
         title: lang === 'tr' ? 'VO₂max Rehberi' : 'VO₂max Guide',
         subtitle: lang === 'tr' 
@@ -24,9 +24,9 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
             editor: lang === 'tr' ? 'Editörün Yorumu' : "Editor's Note"
         },
         cards: {
-            rst: { title: 'RST', desc: lang === 'tr' ? 'Max eforlu kısa sprintler (3-10sn). Kısa dinlenme (<60sn).' : 'Max effort short sprints (3-10s). Short rest (<60s).' },
-            hiit: { title: 'HIIT', desc: lang === 'tr' ? 'VO₂max hızında uzun intervaller (2-4dk).' : 'Long intervals at VO₂max speed (2-4min).' },
-            sit: { title: 'SIT', desc: lang === 'tr' ? '"All-out" sprintler (20-30sn). Uzun dinlenme.' : '"All-out" sprints (20-30s). Long rest.' }
+            rst: { title: 'RST', badge: lang === 'tr' ? 'En Yüksek Olasılık' : 'Highest Probability', desc: lang === 'tr' ? 'Maksimum eforlu kısa sprintler (3-10sn). Kısa dinlenme (<60sn).' : 'Max effort short sprints (3-10s). Short rest (<60s).', ex: lang === 'tr' ? 'Örnek: 10 x 40m Sprint / 30sn ara' : 'Ex: 10 x 40m Sprint / 30s rest' },
+            hiit: { title: 'HIIT', badge: lang === 'tr' ? 'Altın Standart' : 'Gold Standard', desc: lang === 'tr' ? 'VO₂max hızında uzun intervaller (2-4dk).' : 'Long intervals at VO₂max speed (2-4min).', ex: lang === 'tr' ? 'Örnek: 4dk Koşu / 3dk Jog' : 'Ex: 4min Run / 3min Jog' },
+            sit: { title: 'SIT', badge: lang === 'tr' ? 'Dikkatli Uygulanmalı' : 'Apply with Caution', desc: lang === 'tr' ? '"All-out" sprintler (20-30sn). Uzun dinlenme.' : '"All-out" sprints (20-30s). Long rest.', ex: lang === 'tr' ? 'Örnek: 30sn Max / 90sn ara' : 'Ex: 30s Max / 90s rest' }
         },
         charts: {
             effTitle: lang === 'tr' ? 'VO₂max Artış Etkisi (Hedges\' g)' : 'Effect Size (Hedges\' g)',
@@ -36,7 +36,8 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
             hiitCurve: lang === 'tr' ? 'HIIT: 140 Saniye Kuralı' : 'HIIT: 140 Second Rule',
             hiitDesc: lang === 'tr' ? 'Ters U Eğrisi: 140sn iş en verimlisi.' : 'Inverted U: 140s work is optimal.',
             sitCurve: lang === 'tr' ? 'SIT: 97 Saniye Sınırı' : 'SIT: 97 Second Threshold',
-            sitDesc: lang === 'tr' ? 'Dinlenme > 97sn olursa etki düşer.' : 'Effect drops if rest > 97s.'
+            sitDesc: lang === 'tr' ? 'Dinlenme > 97sn olursa etki düşer.' : 'Effect drops if rest > 97s.',
+            disclaimer: lang === 'tr' ? '*Şematik gösterimdir.' : '*Schematic representation.'
         },
         tabs: {
             rst: { 
@@ -62,15 +63,15 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
         warning: lang === 'tr' ? 'Uyarı: Yüksek yoğunluklu antrenman öncesi doktorunuza danışın.' : 'Warning: Consult a doctor before high-intensity training.'
     };
 
-    // --- GRAFİKLER (HTML Dosyasındaki Renkler ve Stil) ---
+    // --- GRAFİK BİLEŞENLERİ (HTML Dosyasındaki Renkler ve Stil) ---
     
-    // 1. Dikey Bar Chart (Effectiveness) - HTML stiline sadık
+    // 1. Dikey Bar Chart (Effectiveness) - Sabit HTML Renkleri
     const VerticalBarChart = () => (
-        <div className="h-64 w-full flex items-end justify-between gap-2 sm:gap-4 px-2 font-mono text-xs text-slate-400 relative">
+        <div className="h-64 w-full flex items-end justify-between gap-2 sm:gap-4 px-2 font-mono text-xs text-slate-400 relative mt-8">
             {/* Grid Lines */}
-            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20">
-                {[1.2, 0.9, 0.6, 0.3, 0].map(v => (
-                    <div key={v} className="w-full border-t border-slate-400 h-0 relative">
+            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20 z-0">
+                {[1.2, 0.9, 0.6, 0.3, 0].map((v, i) => (
+                    <div key={i} className="w-full border-t border-slate-400 h-0 relative">
                         <span className="absolute -left-6 -top-2 text-[9px]">{v}</span>
                     </div>
                 ))}
@@ -83,18 +84,18 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 { label: 'CT', val: 0.29, color: chartColors.ct.bg }
             ].map((d) => (
                 <div key={d.label} className="flex flex-col items-center justify-end h-full w-full relative group z-10">
-                    <span className="mb-2 text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6">{d.val}</span>
+                    <span className="mb-2 text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-slate-900 px-1 rounded border border-slate-700">{d.val}</span>
                     <div 
-                        className={`w-full max-w-[40px] rounded-t-md ${d.color} transition-all duration-1000 ease-out hover:opacity-90`} 
+                        className={`w-full max-w-[40px] rounded-t-md ${d.color} transition-all duration-1000 ease-out hover:opacity-90 shadow-lg`} 
                         style={{ height: `${(d.val / 1.2) * 100}%` }}
                     ></div>
-                    <span className="mt-2 font-bold">{d.label}</span>
+                    <span className="mt-2 font-bold text-slate-300">{d.label}</span>
                 </div>
             ))}
         </div>
     );
 
-    // 2. Yatay Bar Chart (Probability) - HTML stiline sadık
+    // 2. Yatay Bar Chart (Probability) - Sabit HTML Renkleri
     const ProbabilityChart = () => (
         <div className="flex flex-col gap-4 w-full font-mono text-xs">
             {[
@@ -116,74 +117,102 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
         </div>
     );
 
-    // 3. Line Charts (Sweet Spots) - SVG Implementation
-    const LineChart = ({ type }) => {
+    // 3. Line Charts (Sweet Spots) - Sabit HTML Renkleri & Düzeltilmiş Ölçek
+    const CurveChart = ({ type }) => {
         const isHiit = type === 'hiit';
         const color = isHiit ? chartColors.hiit.hex : chartColors.sit.hex;
-        // SVG Paths (Normalized 0-100)
+        
+        // SVG Paths (ViewBox 0 0 300 150)
+        // Y Ekseninde 0 üstte, 150 altta.
+        // Grafiği yukarı (yüksek etki) ve aşağı (düşük etki) doğru çizmek için Y koordinatlarını ayarladık.
+        // High Effect (Y=20), Low Effect (Y=130)
+        
         const pathData = isHiit 
-            ? "M0,90 Q20,80 50,20 Q70,0 90,40 Q100,80 100,80" // Inverted U shape
-            : "M0,10 L30,10 L45,10 L50,10 L55,80 L100,90"; // Threshold drop shape
+            // HIIT: Inverted U. Starts low, peaks at 140s, drops.
+            ? "M10,130 Q60,120 120,50 Q180,20 210,20 Q240,20 290,130" 
+            // SIT: High plateau, drops after threshold.
+            : "M10,20 L120,20 L150,20 L160,130 L290,130";
+
+        const markerX = isHiit ? 210 : 150;
+        const markerY = isHiit ? 20 : 20;
+        const markerLabel = isHiit ? "140s" : "97s";
+        const labelY = isHiit ? 10 : 10; // Text position above the marker
 
         return (
-            <div className="w-full h-40 relative">
-                <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                    {/* Grid */}
-                    <line x1="0" y1="100" x2="100" y2="100" stroke="#334155" strokeWidth="0.5" />
-                    <line x1="0" y1="0" x2="0" y2="100" stroke="#334155" strokeWidth="0.5" />
+            <div className="w-full h-48 relative bg-slate-800/50 rounded-xl border border-slate-700/50 p-2">
+                <svg viewBox="0 0 300 150" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                    {/* Grid Lines */}
+                    <line x1="0" y1="150" x2="300" y2="150" stroke="#334155" strokeWidth="1" />
+                    <line x1="0" y1="0" x2="0" y2="150" stroke="#334155" strokeWidth="1" />
                     
                     {/* Curve */}
                     <path 
                         d={pathData} 
                         fill="none" 
                         stroke={color} 
-                        strokeWidth="3" 
+                        strokeWidth="4" 
                         strokeLinecap="round" 
                         strokeLinejoin="round"
-                        className="drop-shadow-lg"
+                        className="drop-shadow-xl"
                     />
                     
-                    {/* Markers */}
-                    {isHiit ? (
-                        <g>
-                            <circle cx="70" cy="5" r="3" fill="#fff" />
-                            <text x="70" y="-5" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">140s</text>
-                            <line x1="70" y1="5" x2="70" y2="100" stroke="#fff" strokeWidth="0.5" strokeDasharray="2" opacity="0.5" />
-                        </g>
-                    ) : (
-                        <g>
-                            <circle cx="50" cy="10" r="3" fill="#ef4444" />
-                            <text x="50" y="0" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">97s</text>
-                            <line x1="50" y1="10" x2="50" y2="100" stroke="#ef4444" strokeWidth="0.5" strokeDasharray="2" opacity="0.8" />
-                        </g>
-                    )}
+                    {/* Marker Area (Dashed Line) */}
+                    <line x1={markerX} y1={markerY} x2={markerX} y2="150" stroke={color} strokeWidth="1" strokeDasharray="4" opacity="0.6" />
+                    
+                    {/* Marker Point */}
+                    <circle cx={markerX} cy={markerY} r="5" fill="#fff" stroke={color} strokeWidth="2" />
+                    
+                    {/* Label */}
+                    <text x={markerX} y={labelY} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="bold" className="drop-shadow-md">
+                        {markerLabel}
+                    </text>
                 </svg>
+                {/* X-Axis Labels (Manual for simplicity) */}
+                <div className="absolute bottom-0 left-0 w-full flex justify-between text-[10px] text-slate-500 px-2 pointer-events-none">
+                    <span>0s</span>
+                    <span>{isHiit ? '300s' : '180s'}</span>
+                </div>
             </div>
         );
     };
 
     return (
         <div className="animate-fade-in space-y-12 pb-10">
-            {/* Header - App Theme */}
+            {/* Header - App Theme (Primary) */}
             <div className="text-center space-y-4">
                 <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight">
                     <span className="text-primary">VO<sub>2</sub>max</span> {t.title.replace('VO₂max', '')}
                 </h1>
                 <p className="text-slate-400 text-lg max-w-2xl mx-auto">{t.subtitle}</p>
+                <div className="flex flex-wrap justify-center gap-3 text-xs font-mono text-slate-500">
+                    <span className="bg-slate-800 px-2 py-1 rounded border border-slate-700">Yang et al. (2025)</span>
+                    <span className="bg-slate-800 px-2 py-1 rounded border border-slate-700">Meta-Analysis</span>
+                </div>
             </div>
 
-            {/* Definitions Cards - App Theme */}
+            {/* Definitions Cards - App Theme (Primary) */}
             <section>
                 <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.sections.definitions}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {Object.keys(t.cards).map((key, i) => (
-                        <div key={key} className="bg-slate-800 border border-slate-700 p-6 rounded-2xl hover:border-primary/50 transition-all">
-                            <div className="flex justify-between items-start mb-3">
-                                <h3 className="text-xl font-black text-primary">{t.cards[key].title}</h3>
+                    {Object.keys(t.cards).map((key) => {
+                        // Use chart colors ONLY for the small badge background to distinguish types visually
+                        const badgeColorClass = key === 'rst' ? chartColors.rst.bg : key === 'hiit' ? chartColors.hiit.bg : chartColors.sit.bg;
+                        
+                        return (
+                            <div key={key} className="bg-slate-800 border border-slate-700 p-6 rounded-2xl hover:border-primary/50 transition-all group">
+                                <div className="flex justify-between items-start mb-3">
+                                    <h3 className="text-xl font-black text-white group-hover:text-primary transition-colors">{t.cards[key].title}</h3>
+                                    <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider text-white ${badgeColorClass}`}>
+                                        {t.cards[key].badge}
+                                    </span>
+                                </div>
+                                <p className="text-slate-400 text-sm leading-relaxed">{t.cards[key].desc}</p>
+                                <div className="pt-4 border-t border-slate-700/50 text-xs text-slate-500 font-mono mt-4">
+                                    {t.cards[key].ex}
+                                </div>
                             </div>
-                            <p className="text-slate-400 text-sm leading-relaxed">{t.cards[key].desc}</p>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </section>
 
@@ -192,7 +221,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 {/* Effectiveness */}
                 <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
                     <h3 className="text-lg font-bold text-white mb-1">{t.charts.effTitle}</h3>
-                    <p className="text-xs text-slate-500 mb-6">{t.charts.effSub}</p>
+                    <p className="text-xs text-slate-500">{t.charts.effSub}</p>
                     <VerticalBarChart />
                 </div>
                 {/* Probability */}
@@ -208,27 +237,32 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* HIIT Curve - Fixed Indigo */}
                     <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 relative overflow-hidden">
+                        {/* Background Glow */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                        
                         <h3 className="text-lg font-bold text-indigo-400 mb-2">{t.charts.hiitCurve}</h3>
                         <p className="text-sm text-slate-400 mb-6">{t.charts.hiitDesc}</p>
                         <LineChart type="hiit" />
-                        <div className="text-center mt-2 text-[10px] text-slate-600 italic">{t.charts.disclaimer}</div>
+                        <div className="text-center mt-4 text-[10px] text-slate-600 italic">{t.charts.disclaimer}</div>
                     </div>
                     {/* SIT Curve - Fixed Purple */}
                     <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 relative overflow-hidden">
+                        {/* Background Glow */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl"></div>
+                        
                         <h3 className="text-lg font-bold text-purple-400 mb-2">{t.charts.sitCurve}</h3>
                         <p className="text-sm text-slate-400 mb-6">{t.charts.sitDesc}</p>
                         <LineChart type="sit" />
-                        <div className="text-center mt-2 text-[10px] text-slate-600 italic">{t.charts.disclaimer}</div>
+                        <div className="text-center mt-4 text-[10px] text-slate-600 italic">{t.charts.disclaimer}</div>
                     </div>
                 </div>
             </section>
 
-            {/* Protocols Tabs - App Theme */}
+            {/* Protocols Tabs - App Theme (Primary) */}
             <section>
                 <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.sections.protocols}</h2>
                 
+                {/* Sekmeler: App Theme Primary Color */}
                 <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
                     {Object.keys(t.tabs).map(key => (
                         <button
@@ -265,17 +299,19 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                             </ul>
                         </div>
                         
-                        {/* Protocol Visualizer - App Theme (Primary) */}
+                        {/* Protocol Visualizer - App Theme (Primary) for Bars */}
                         <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 flex flex-col justify-center items-center h-full min-h-[200px]">
                             <div className="text-center w-full">
                                 <div className="text-5xl font-black text-white/10 mb-4 select-none">
                                     {activeTab === 'rst' ? '10x' : activeTab === 'hiit' ? '4x' : '6x'}
                                 </div>
                                 <div className="flex items-center justify-center gap-1 h-16 w-full max-w-xs mx-auto">
+                                    {/* Work Bar - Uses Primary Color */}
                                     <div className="h-full bg-primary rounded-l-lg flex items-center justify-center text-white font-bold text-xs relative group" style={{ width: activeTab === 'hiit' ? '45%' : '25%' }}>
                                         <span className="absolute -top-6 text-primary text-[10px] uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity">Work</span>
                                         {activeTab === 'rst' ? '6s' : activeTab === 'hiit' ? '140s' : '30s'}
                                     </div>
+                                    {/* Rest Bar - Uses Slate */}
                                     <div className="h-full bg-slate-700 rounded-r-lg flex items-center justify-center text-slate-400 font-bold text-xs relative group" style={{ width: activeTab === 'hiit' ? '55%' : '75%' }}>
                                         <span className="absolute -top-6 text-slate-500 text-[10px] uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity">Rest</span>
                                         {activeTab === 'rst' ? '24s' : activeTab === 'hiit' ? '165s' : '90s'}
