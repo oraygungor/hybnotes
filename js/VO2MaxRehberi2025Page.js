@@ -3,11 +3,12 @@ const { useState } = React;
 const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
     const [activeTab, setActiveTab] = useState('rst');
 
-    // --- Renk Sabitleri (Sadece Grafikler İçin - HTML'den) ---
+    // --- HTML Dosyasındaki Orijinal Renk Sabitleri ---
     const colors = {
-        rst: { main: '#0ea5e9', bg: 'bg-sky-500', text: 'text-sky-400', badgeBg: 'bg-sky-900', badgeText: 'text-sky-200', border: 'border-sky-500' }, 
-        hiit: { main: '#6366f1', bg: 'bg-indigo-500', text: 'text-indigo-400', badgeBg: 'bg-indigo-900', badgeText: 'text-indigo-200', border: 'border-indigo-500' }, 
-        sit: { main: '#a855f7', bg: 'bg-purple-500', text: 'text-purple-400', badgeBg: 'bg-purple-900', badgeText: 'text-purple-200', border: 'border-purple-500' }, 
+        rst: { hex: '#0ea5e9', bg: 'bg-sky-500', text: 'text-sky-400', badgeBg: 'bg-sky-900', badgeText: 'text-sky-200' },
+        hiit: { hex: '#6366f1', bg: 'bg-indigo-500', text: 'text-indigo-400', badgeBg: 'bg-indigo-900', badgeText: 'text-indigo-200' },
+        sit: { hex: '#a855f7', bg: 'bg-purple-500', text: 'text-purple-400', badgeBg: 'bg-purple-900', badgeText: 'text-purple-200' },
+        ct: { hex: '#64748b', bg: 'bg-slate-500', text: 'text-slate-400' }
     };
 
     // --- İçerik ve Çeviriler ---
@@ -95,15 +96,14 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
         warning: lang === 'tr' ? 'Uyarı: Yüksek yoğunluklu antrenmana başlamadan önce sağlık kontrolü yaptırınız.' : 'Warning: Consult a doctor before starting high-intensity training.'
     };
 
-    // --- Helper Components for Charts (SVG) ---
-    // BarChart: Renkler sabit (HTML stili), ancak yazı tipi ve container App.js'ten
+    // --- Helper Components for Charts (Sabit Renkler) ---
     const BarChart = () => (
         <div className="flex flex-col gap-3 w-full font-mono text-xs">
             {[
-                { label: 'RST', val: 1.04, color: 'bg-sky-500', width: '100%' },
-                { label: 'HIIT', val: 1.01, color: 'bg-indigo-500', width: '97%' },
-                { label: 'SIT', val: 0.69, color: 'bg-purple-500', width: '66%' },
-                { label: 'CT', val: 0.29, color: 'bg-slate-500', width: '28%' }
+                { label: 'RST', val: 1.04, bg: colors.rst.bg, width: '100%' },
+                { label: 'HIIT', val: 1.01, bg: colors.hiit.bg, width: '97%' },
+                { label: 'SIT', val: 0.69, bg: colors.sit.bg, width: '66%' },
+                { label: 'CT', val: 0.29, bg: colors.ct.bg, width: '28%' }
             ].map((d) => (
                 <div key={d.label} className="w-full">
                     <div className="flex justify-between mb-1 text-slate-300">
@@ -111,7 +111,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                         <span>{d.val}</span>
                     </div>
                     <div className="h-3 w-full bg-slate-700/50 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${d.color} transition-all duration-1000 ease-out`} style={{ width: d.width }}></div>
+                        <div className={`h-full rounded-full ${d.bg} transition-all duration-1000 ease-out`} style={{ width: d.width }}></div>
                     </div>
                 </div>
             ))}
@@ -123,14 +123,13 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
         </div>
     );
 
-    // RankingChart: Renkler sabit (HTML stili)
     const RankingChart = () => (
         <div className="flex flex-col gap-3 w-full font-mono text-xs">
             {[
-                { label: 'RST', val: '88%', width: '88%', color: 'bg-sky-500', text: 'text-sky-400' },
-                { label: 'HIIT', val: '85%', width: '85%', color: 'bg-indigo-500', text: 'text-indigo-400' },
-                { label: 'SIT', val: '51%', width: '51%', color: 'bg-purple-500', text: 'text-purple-400' },
-                { label: 'CT', val: '23%', width: '23%', color: 'bg-slate-500', text: 'text-slate-400' }
+                { label: 'RST', val: '88%', width: '88%', bg: colors.rst.bg, text: colors.rst.text },
+                { label: 'HIIT', val: '85%', width: '85%', bg: colors.hiit.bg, text: colors.hiit.text },
+                { label: 'SIT', val: '51%', width: '51%', bg: colors.sit.bg, text: colors.sit.text },
+                { label: 'CT', val: '23%', width: '23%', bg: colors.ct.bg, text: colors.ct.text }
             ].map((d) => (
                 <div key={d.label} className="w-full">
                     <div className="flex justify-between mb-1 text-slate-300">
@@ -138,19 +137,19 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                         <span className="text-white">{d.val}</span>
                     </div>
                     <div className="h-2 w-full bg-slate-700/50 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${d.color} transition-all duration-1000 ease-out`} style={{ width: d.width }}></div>
+                        <div className={`h-full rounded-full ${d.bg} transition-all duration-1000 ease-out`} style={{ width: d.width }}></div>
                     </div>
                 </div>
             ))}
         </div>
     );
 
-    // CurveChart: Renkler sabit (HTML stili)
+    // Simple SVG Line Chart for "Sweet Spot" (Sabit Renkler)
     const CurveChart = ({ type }) => {
         const hiitPoints = "0,100 20,80 50,20 70,0 90,40 100,80"; 
         const sitPoints = "0,5 30,5 48,5 50,5 52,90 100,95"; 
         const points = type === 'hiit' ? hiitPoints : sitPoints;
-        const color = type === 'hiit' ? colors.hiit.main : colors.sit.main;
+        const color = type === 'hiit' ? colors.hiit.hex : colors.sit.hex;
         
         return (
             <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
@@ -288,42 +287,65 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 {/* Başlık App Temasından */}
                 <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.sections.protocols}</h2>
                 
-                {/* Sekmeler App Temasından (Primary) */}
+                {/* Sekmeler: Sabit Renkler (Grafik mantığı) */}
                 <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-                    {Object.keys(t.tabs).map(key => (
-                        <button
-                            key={key}
-                            onClick={() => setActiveTab(key)}
-                            className={`px-6 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${
-                                activeTab === key 
-                                ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' 
-                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
-                            }`}
-                        >
-                            {t.tabs[key].label}
-                        </button>
-                    ))}
+                    {Object.keys(t.tabs).map(key => {
+                        let activeClass = '';
+                        // Tabs strictly use fixed colors as they select chart data
+                        if (activeTab === key) {
+                            if (key === 'rst') activeClass = 'bg-sky-500 text-white shadow-lg shadow-sky-500/20 scale-105';
+                            else if (key === 'hiit') activeClass = 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 scale-105';
+                            else if (key === 'sit') activeClass = 'bg-purple-500 text-white shadow-lg shadow-purple-500/20 scale-105';
+                        } else {
+                            activeClass = 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white';
+                        }
+
+                        return (
+                            <button
+                                key={key}
+                                onClick={() => setActiveTab(key)}
+                                className={`px-6 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeClass}`}
+                            >
+                                {t.tabs[key].label}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 md:p-8 animate-fade-in relative overflow-hidden">
-                    {/* Kenarlık Çizgisi App Temasından */}
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+                    {/* Kenarlık Çizgisi: Sabit Renkler */}
+                    <div 
+                        className={`absolute top-0 left-0 w-full h-1 opacity-50 bg-gradient-to-r from-transparent to-transparent ${
+                            activeTab === 'rst' ? 'via-sky-500' : activeTab === 'hiit' ? 'via-indigo-500' : 'via-purple-500'
+                        }`}
+                    ></div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                         <div>
-                            <h3 className="text-2xl font-black text-white mb-3">{t.tabs[activeTab].title}</h3>
-                            <p className="text-primary text-sm font-bold mb-6 bg-primary/10 inline-block px-3 py-1 rounded-lg border border-primary/20">
+                            <h3 className={`text-2xl font-black mb-3 ${
+                                activeTab === 'rst' ? colors.rst.text : activeTab === 'hiit' ? colors.hiit.text : colors.sit.text
+                            }`}>{t.tabs[activeTab].title}</h3>
+                            
+                            <p className={`text-sm font-bold mb-6 inline-block px-3 py-1 rounded-lg border ${
+                                activeTab === 'rst' ? 'bg-sky-900/30 text-sky-300 border-sky-500/30' : 
+                                activeTab === 'hiit' ? 'bg-indigo-900/30 text-indigo-300 border-indigo-500/30' : 
+                                'bg-purple-900/30 text-purple-300 border-purple-500/30'
+                            }`}>
                                 {t.tabs[activeTab].finding}
                             </p>
+                            
                             <ul className="space-y-4">
-                                {t.tabs[activeTab].steps.map((step, idx) => (
-                                    <li key={idx} className="flex items-start gap-4">
-                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-700 text-primary flex items-center justify-center text-xs font-bold border border-slate-600">
-                                            {idx + 1}
-                                        </span>
-                                        <span className="text-slate-300 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: step.replace(/\((.*?)\)/g, '<span class="text-slate-500 text-xs ml-1">($1)</span>') }}></span>
-                                    </li>
-                                ))}
+                                {t.tabs[activeTab].steps.map((step, idx) => {
+                                    const numColor = activeTab === 'rst' ? colors.rst.text : activeTab === 'hiit' ? colors.hiit.text : colors.sit.text;
+                                    return (
+                                        <li key={idx} className="flex items-start gap-4">
+                                            <span className={`flex-shrink-0 w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold border border-slate-600 ${numColor}`}>
+                                                {idx + 1}
+                                            </span>
+                                            <span className="text-slate-300 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: step.replace(/\((.*?)\)/g, '<span class="text-slate-500 text-xs ml-1">($1)</span>') }}></span>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </div>
                         
@@ -334,15 +356,15 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                                     {activeTab === 'rst' ? '10x' : activeTab === 'hiit' ? '4x' : '6x'}
                                 </div>
                                 <div className="flex items-center justify-center gap-1 h-16 w-full max-w-xs mx-auto">
-                                    {/* Work Bar - Sabit Renkler */}
+                                    {/* Work Bar */}
                                     <div 
                                         className={`h-full rounded-l-lg flex items-center justify-center text-white font-bold text-xs relative group ${
-                                            activeTab === 'rst' ? 'bg-sky-500' : activeTab === 'hiit' ? 'bg-indigo-500' : 'bg-purple-500'
+                                            activeTab === 'rst' ? colors.rst.bg : activeTab === 'hiit' ? colors.hiit.bg : colors.sit.bg
                                         }`}
                                         style={{ width: activeTab === 'hiit' ? '45%' : '25%' }}
                                     >
                                         <span className={`absolute -top-6 text-[10px] uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity ${
-                                            activeTab === 'rst' ? 'text-sky-400' : activeTab === 'hiit' ? 'text-indigo-400' : 'text-purple-400'
+                                            activeTab === 'rst' ? colors.rst.text : activeTab === 'hiit' ? colors.hiit.text : colors.sit.text
                                         }`}>Work</span>
                                         {activeTab === 'rst' ? '6s' : activeTab === 'hiit' ? '140s' : '30s'}
                                     </div>
