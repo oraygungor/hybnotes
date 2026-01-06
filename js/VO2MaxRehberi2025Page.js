@@ -1,69 +1,129 @@
-const { useState } = React;
- 
+const { useState, useEffect, useRef } = React;
+
 const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
     const [activeTab, setActiveTab] = useState('rst');
 
-    // --- Sadece Eğri Grafikleri İçin Sabit Renkler ---
-    const curveColors = {
-        hiit: { hex: '#6366f1', stroke: 'text-indigo-500', fill: 'bg-indigo-500' }, // Indigo
-        sit: { hex: '#a855f7', stroke: 'text-purple-500', fill: 'bg-purple-500' }   // Purple
+    // --- Sabit Renkler (Sadece Kritik Bulgular Grafikleri İçin) ---
+    const fixedCurveColors = {
+        hiit: { hex: '#6366f1', stroke: 'text-indigo-500', bg: 'bg-indigo-500' }, // Indigo
+        sit: { hex: '#a855f7', stroke: 'text-purple-500', bg: 'bg-purple-500' }   // Purple
     };
 
+    // --- İçerik Verisi ---
     const t = {
         title: lang === 'tr' ? 'VO₂max Rehberi' : 'VO₂max Guide',
         subtitle: lang === 'tr' 
             ? '"HIIT mi, Sprint mi, yoksa Tekrarlı Sprint mi?" sorusuna 1.261 atlet ve 51 çalışma ile verilen bilimsel yanıt.' 
             : 'The scientific answer to "HIIT, Sprint, or Repeated Sprint?" based on 1,261 athletes and 51 studies.',
+        meta: [
+            'Yang et al. (2025)',
+            'Meta-Analiz',
+            lang === 'tr' ? 'Hibrit Atlet Odaklı' : 'Hybrid Athlete Focused'
+        ],
         sections: {
-            definitions: lang === 'tr' ? 'Antrenman Türleri' : 'Training Types',
-            findings: lang === 'tr' ? 'Makale Bulguları' : 'Key Findings',
-            protocols: lang === 'tr' ? 'Örnek Protokoller' : 'Sample Protocols',
-            editor: lang === 'tr' ? 'Editörün Yorumu' : "Editor's Note"
+            definitions: lang === 'tr' ? 'Hangi antrenman türlerinden bahsediyoruz?' : 'Which training types are we talking about?',
+            findings: lang === 'tr' ? 'Makale Bulguları: Sayılar Ne Diyor?' : 'Study Findings: What Do The Numbers Say?',
+            sweetSpot: lang === 'tr' ? 'Kritik Bulgular: "Tatlı Nokta" Neresi?' : 'Critical Findings: Where is the "Sweet Spot"?',
+            protocols: lang === 'tr' ? 'Örnek Antrenman Protokolleri' : 'Sample Training Protocols',
+            editor: lang === 'tr' ? 'Editörün Yorumu: Hibrit Yaklaşım' : "Editor's Note: Hybrid Approach"
         },
         cards: {
-            rst: { title: 'RST', badge: lang === 'tr' ? 'En Yüksek Olasılık' : 'Highest Probability', desc: lang === 'tr' ? 'Maksimum eforlu kısa sprintler (3-10sn). Kısa dinlenme (<60sn).' : 'Max effort short sprints (3-10s). Short rest (<60s).', ex: lang === 'tr' ? 'Örnek: 10 x 40m Sprint / 30sn ara' : 'Ex: 10 x 40m Sprint / 30s rest' },
-            hiit: { title: 'HIIT', badge: lang === 'tr' ? 'Altın Standart' : 'Gold Standard', desc: lang === 'tr' ? 'VO₂max hızında uzun intervaller (2-4dk).' : 'Long intervals at VO₂max speed (2-4min).', ex: lang === 'tr' ? 'Örnek: 4dk Koşu / 3dk Jog' : 'Ex: 4min Run / 3min Jog' },
-            sit: { title: 'SIT', badge: lang === 'tr' ? 'Dikkatli Uygulanmalı' : 'Apply with Caution', desc: lang === 'tr' ? '"All-out" sprintler (20-30sn). Uzun dinlenme.' : '"All-out" sprints (20-30s). Long rest.', ex: lang === 'tr' ? 'Örnek: 30sn Max / 90sn ara' : 'Ex: 30s Max / 90s rest' }
-        },
-        charts: {
-            effTitle: lang === 'tr' ? 'VO₂max Artış Etkisi (Hedges\' g)' : 'Effect Size (Hedges\' g)',
-            effSub: lang === 'tr' ? 'Konvansiyonel antrenmana kıyasla' : 'Vs. conventional training',
-            probTitle: lang === 'tr' ? 'En İyi Olma Olasılığı' : 'Probability of Being Best',
-            sweetSpot: lang === 'tr' ? 'Kritik Bulgular: "Tatlı Nokta"' : 'Critical Findings: "Sweet Spot"',
-            hiitCurve: lang === 'tr' ? 'HIIT: 140 Saniye Kuralı' : 'HIIT: 140 Second Rule',
-            hiitDesc: lang === 'tr' ? 'Ters U Eğrisi: 140sn iş en verimlisi.' : 'Inverted U: 140s work is optimal.',
-            sitCurve: lang === 'tr' ? 'SIT: 97 Saniye Sınırı' : 'SIT: 97 Second Threshold',
-            sitDesc: lang === 'tr' ? 'Dinlenme > 97sn olursa etki düşer.' : 'Effect drops if rest > 97s.',
-            disclaimer: lang === 'tr' ? '*Şematik gösterimdir.' : '*Schematic representation.'
-        },
-        tabs: {
-            rst: { 
-                label: 'RST', title: 'RST', 
-                finding: lang === 'tr' ? 'Haftada 3 seans, 2 haftada sonuç.' : '3 sessions/week, results in 2 weeks.',
-                steps: ['6 sn Sprint (Max)', '24 sn Dinlenme (Pasif)', '10 Tekrar'] 
+            rst: {
+                title: 'RST',
+                badge: lang === 'tr' ? 'En Yüksek Olasılık*' : 'Highest Probability*',
+                sub: 'Repeated Sprint Training',
+                desc: lang === 'tr' ? 'Maksimum eforlu çok kısa sprintler (3-10 sn). Dinlenmeler kısa (<60 sn). Nabız neredeyse hiç düşmez.' : 'Maximal effort very short sprints (3-10 sec). Short rest periods (<60 sec). Heart rate almost never drops.',
+                ex: lang === 'tr' ? 'Örnek: 10 x 40m Sprint / 30sn ara' : 'Example: 10 x 40m Sprint / 30s rest'
             },
-            hiit: { 
-                label: 'HIIT', title: 'HIIT', 
-                finding: lang === 'tr' ? '140sn iş / 165sn dinlenme (Optimal).' : '140s work / 165s rest (Optimal).',
-                steps: ['140 sn Koşu (Yüksek Tempo)', '165 sn Jog (Aktif Dinlenme)', '4-6 Tekrar'] 
+            hiit: {
+                title: 'HIIT',
+                badge: lang === 'tr' ? 'Altın Standart' : 'Gold Standard',
+                sub: 'High-Intensity Interval Training',
+                desc: lang === 'tr' ? 'VO₂max hızına veya %90-95 nabza yakın uzun intervaller. Çalışma süresi genelde birkaç dakikadır.' : 'Long intervals near VO₂max speed. Work duration is usually several minutes.',
+                ex: lang === 'tr' ? 'Örnek: 4dk Koşu / 3dk Jog' : 'Example: 4min Run / 3min Jog'
             },
-            sit: { 
-                label: 'SIT', title: 'SIT', 
-                finding: lang === 'tr' ? 'Dinlenme < 97sn olmalı.' : 'Rest must be < 97s.',
-                steps: ['30 sn Sprint (All-out)', '90 sn Dinlenme', '4-6 Tekrar'] 
+            sit: {
+                title: 'SIT',
+                badge: lang === 'tr' ? 'Dikkatli Uygulanmalı' : 'Apply with Caution',
+                sub: 'Sprint Interval Training',
+                desc: lang === 'tr' ? '"All-out" (tükenene kadar) sprintler (20-30 sn). Genelde uzun dinlenme verilir ama bu makale aksini söylüyor!' : '"All-out" sprints (20-30 sec). Usually long rest is given but this study suggests otherwise!',
+                ex: lang === 'tr' ? 'Örnek: 30sn Airbike Max / 90sn ara' : 'Example: 30s Airbike Max / 90s rest'
             }
         },
-        editorNote: lang === 'tr' 
-            ? 'Bu derleme yöntemleri ayrı ayrı karşılaştırsa da, hibrit bir yaklaşım pratik olabilir. Örneğin haftada 1 HIIT’i 2 RST seansı ile tamamlamak, VO₂max uyaranını korurken toparlanma maliyetini yönetilebilir tutabilir.'
-            : 'Although reviewed separately, a hybrid approach may be practical. Complementing 1 HIIT with 2 RST sessions can maintain VO₂max stimulus while managing recovery costs.',
-        citation: 'Yang Q, et al. BMC Sports Sci Med Rehabil. 2025;17:156.',
-        warning: lang === 'tr' ? 'Uyarı: Yüksek yoğunluklu antrenman öncesi doktorunuza danışın.' : 'Warning: Consult a doctor before high-intensity training.'
+        charts: {
+            effTitle: lang === 'tr' ? 'VO₂max Artış Etkisi (Hedges\' g)' : 'VO₂max Improvement Effect (Hedges\' g)',
+            effSub: lang === 'tr' ? 'Konvansiyonel antrenmana (CON) kıyasla ne kadar etkili? (Yüksek daha iyi)' : 'Effectiveness vs conventional training (Higher is better)',
+            effNote: lang === 'tr' ? '*CT (Sürekli Koşu) anlamlı bir artış sağlamadı (g=0.29). RST ve HIIT açık ara önde.' : '*CT (Continuous Training) showed no significant increase (g=0.29). RST and HIIT are leading.',
+            probTitle: lang === 'tr' ? 'En İyi Olma Olasılığı (P-Score)' : 'Probability of Being Best (P-Score)',
+            probSub: lang === 'tr' ? 'İstatistiksel olarak "En İyi Yöntem" olma ihtimalleri.' : 'Statistical probability of being the "Best Method".',
+            probNote: lang === 'tr' ? '*Not: İstatistiksel olarak RST, HIIT ve SIT arasında anlamlı bir fark bulunmamıştır (p>0.05). RST sadece "olasılık" olarak ilk sıradadır.' : '*Note: No statistical difference between RST, HIIT, SIT (p>0.05). RST is first by "probability" only.',
+            hiitTitle: lang === 'tr' ? 'HIIT: 140 Saniye Kuralı' : 'HIIT: 140 Second Rule',
+            hiitDesc: lang === 'tr' ? 'Makale, HIIT süresi ve VO₂max artışı arasında "Ters U Eğrisi" buldu. Çok kısa veya çok uzun intervaller verimsiz.' : 'Study found an "Inverted U Curve" for HIIT duration. Too short or too long is inefficient.',
+            hiitBoxTitle: lang === 'tr' ? '🏆 Altın Formül (Bulgu):' : '🏆 Golden Formula (Finding):',
+            hiitBoxDesc: lang === 'tr' ? '140 sn Yüklenme / 165 sn Dinlenme (Oran: 0.85)' : '140s Work / 165s Rest (Ratio: 0.85)',
+            sitTitle: lang === 'tr' ? 'SIT: 97 Saniye Sınırı' : 'SIT: 97 Second Threshold',
+            sitDesc: lang === 'tr' ? 'Şaşırtıcı Bulgu: SIT yaparken dinlenmeyi çok uzatırsan aerobik sistem devre dışı kalıyor ve VO₂max gelişmiyor.' : 'Surprising: If rest > 97s in SIT, aerobic system disengages and VO₂max does not improve.',
+            sitBoxTitle: lang === 'tr' ? '⚠️ Kritik Uyarı:' : '⚠️ Critical Warning:',
+            sitBoxDesc: lang === 'tr' ? 'Dinlenme süresi > 97 sn olursa VO₂max etkisi anlamsızlaşıyor.' : 'If rest > 97s, VO₂max effect becomes insignificant.',
+            disclaimer: lang === 'tr' ? '*Şematik Gösterim: Makaledeki ilişkiyi temsil eder, ham veri değildir.' : '*Schematic Representation: Represents relationship, not raw data.'
+        },
+        tabs: {
+            desc: lang === 'tr' ? 'Makalenin bulgularına (süre, sıklık, mod) dayanarak hazırlanmış örnek reçetelerdir.' : 'Sample prescriptions based on study findings.',
+            rst: { 
+                label: 'RST (Örnek Seans)', 
+                title: 'RST: "2 Haftalık Boost"',
+                desc: lang === 'tr' ? 'Makale Bulgusu: Haftada 3 seans yapıldığında, 2 haftada sonuç verir. Protokol detayları (süre/dinlenme) makalede kritik fark yaratmamıştır.' : 'Finding: 3 sessions/week gives results in 2 weeks.',
+                sub: lang === 'tr' ? 'Aşağıdaki Yaygın Bir Örnektir:' : 'Common Example:',
+                steps: [
+                    lang === 'tr' ? 'Uzun ve iyi bir ısınma yap.' : 'Solid warm-up.',
+                    lang === 'tr' ? '6 saniye Maksimum Sprint (All-out).' : '6s Max Sprint.',
+                    lang === 'tr' ? '24 saniye Pasif Dinlenme (Dur).' : '24s Passive Rest.',
+                    lang === 'tr' ? 'Bunu 10 tekrar yap (Pratik Öneri).' : '10 reps (Recommendation).'
+                ],
+                visual: { count: '10x', work: '6 sn', rest: '24 sn' }
+            },
+            hiit: { 
+                label: lang === 'tr' ? 'HIIT (Optimize)' : 'HIIT (Optimized)', 
+                title: lang === 'tr' ? 'HIIT: "Makale Optimumu"' : 'HIIT: "Study Optimum"',
+                desc: lang === 'tr' ? 'Makale Bulgusu: En iyi verim 140sn iş ve ~165sn dinlenme ile alınmıştır. Haftada 3 gün, 3-6 hafta uygulanmalı.' : 'Finding: Best with 140s work / 165s rest. 3 days/week, 3-6 weeks.',
+                sub: '',
+                steps: [
+                    lang === 'tr' ? 'Isınma süresi uzun tutulmalı (Lineer pozitif ilişki).' : 'Long warm-up (Positive correlation).',
+                    lang === 'tr' ? '2 dk 20 sn (140s) Yüksek Tempo (%90-95 VO₂max).' : '140s High Intensity.',
+                    lang === 'tr' ? '2 dk 45 sn (165s) Aktif Dinlenme (Hafif Jog).' : '165s Active Rest.',
+                    lang === 'tr' ? 'Genelde 4-6 tekrar (Kondisyona göre ayarlanır).' : '4-6 reps.'
+                ],
+                visual: { count: '4-6x', work: '140 sn', rest: '165 sn' },
+                noteTitle: lang === 'tr' ? 'Mod Önerisi:' : 'Mode:',
+                noteDesc: lang === 'tr' ? 'Koşu (Running) modu genellikle olumlu sonuç vermektedir ancak diğer modlarla veri sınırlıdır.' : 'Running mode is generally positive.'
+            },
+            sit: { 
+                label: lang === 'tr' ? 'SIT (Pratik Uygulama)' : 'SIT (Practical)', 
+                title: lang === 'tr' ? 'SIT: "Yoğunluk Odaklı"' : 'SIT: "Intensity Focused"',
+                desc: lang === 'tr' ? 'Makale Bulgusu: Dinlenme süresi 97 saniyeyi aşmamalıdır. Koşu modu, bisikletten daha etkilidir.' : 'Finding: Rest must be < 97s. Running > Cycling.',
+                sub: '',
+                steps: [
+                    lang === 'tr' ? 'Çok sağlam ısınma (Sakatlık riski yüksek).' : 'Solid warm-up (Injury risk).',
+                    lang === 'tr' ? '30 saniye Maksimum Efor (All-Out).' : '30s Max Effort.',
+                    lang === 'tr' ? '90 saniye* Hafif Aktif Dinlenme.' : '90s* Light Active Rest.',
+                    lang === 'tr' ? '4-6 tekrar (Örnek).' : '4-6 reps.'
+                ],
+                visual: { count: '4-6x', work: '30 sn', rest: '90 sn' },
+                noteTitle: lang === 'tr' ? 'Mod ve Dinlenme Notu:' : 'Mode & Rest Note:',
+                noteDesc: lang === 'tr' ? 'Koşu bandı veya pist tercih edilmeli. *90sn dinlenme, "<97sn" kuralına uyan pratik bir uygulamadır.' : 'Treadmill or track. 90s fits the <97s rule.'
+            }
+        },
+        editorText: lang === 'tr' 
+            ? 'Bu derleme HIIT, SIT ve RST’yi ayrı ayrı karşılaştırsa da, yöntemlerin pratik uygulanabilirliği açısından hibrit bir yaklaşım makul bir çerçeve sunabilir. Örneğin haftada 1 HIIT’i 2 RST seansı ile tamamlamak, VO₂max uyaranını korurken antrenman süresi ve toparlanma maliyetini yönetilebilir tutmaya yardımcı olabilir; böylece koşu ekonomisi, eşik ve fizyolojik direnç gibi diğer performans bileşenlerine de alan açılır. Bu öneri doğrudan “kombinasyon çalışması”na değil, mevcut bulguların antrenman planlamasına uyarlanmasına dayanır; bireysel toparlanma ve sakatlık riskine göre kişiselleştirilmelidir.'
+            : 'Although reviewed separately, a hybrid approach may be practical. Complementing 1 HIIT with 2 RST sessions can maintain VO₂max stimulus while managing recovery costs, opening space for other components. This is a practical adaptation of findings, not a direct combination study result; personalize based on recovery.',
+        citation: 'Yang Q, Wang J, Guan D. Comparison of different interval training methods on athletes’ oxygen uptake: a systematic review with pairwise and network meta-analysis. BMC Sports Science, Medicine and Rehabilitation. 2025;17:156. doi:10.1186/s13102-025-01191-6',
+        warning: lang === 'tr' ? 'Uyarı: Herhangi bir yüksek yoğunluklu antrenman programına başlamadan önce sağlık durumunuzu kontrol ettiriniz.' : 'Warning: Check health status before high-intensity training.'
     };
 
     // --- GRAFİKLER ---
 
-    // 1. Dikey Bar Chart (Effectiveness) - APP THEME (PRIMARY)
-    const VerticalBarChart = () => (
+    // 1. Effectiveness Chart (Vertical Bar - Theme Colors)
+    const EffectivenessChart = () => (
         <div className="h-64 w-full flex items-end justify-between gap-2 sm:gap-4 px-2 font-mono text-xs text-slate-400 relative mt-8">
             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20 z-0">
                 {[1.2, 0.9, 0.6, 0.3, 0].map((v, i) => (
@@ -91,7 +151,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
         </div>
     );
 
-    // 2. Yatay Bar Chart (Probability) - APP THEME (PRIMARY)
+    // 2. Probability Chart (Horizontal Bar - Theme Colors)
     const ProbabilityChart = () => (
         <div className="flex flex-col gap-4 w-full font-mono text-xs">
             {[
@@ -113,30 +173,28 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
         </div>
     );
 
-    // 3. Line Charts (Sweet Spots) - ORIGINAL COLORS (Fixed)
+    // 3. Sweet Spot Line Charts (Fixed Colors & Correct Scales)
     const CurveChart = ({ type }) => {
         const isHiit = type === 'hiit';
-        const color = isHiit ? curveColors.hiit.hex : curveColors.sit.hex;
+        const color = isHiit ? fixedCurveColors.hiit.hex : fixedCurveColors.sit.hex;
         
-        // --- Corrected Scales ---
-        // ViewBox is 300px wide.
+        // Corrected Scales using ViewBox 0 0 300 150
+        // Y Axis: 0 is top, 150 is bottom. High impact = Y:20, Low impact = Y:130.
         
         // HIIT: Peak at 140s. Total X range is 0 to 300s.
-        // 140s is at (140 / 300) * 300px = 140px.
-        // Curve shape: Starts low (30s), peaks (140s), drops (240s).
+        // 140s on 300px scale = (140/300)*300 = 140px.
+        // Curve: Low start (30s=30px), Peak (140s=140px), Drop (240s=240px).
         const pathDataHiit = "M30,130 Q85,130 140,20 Q195,130 240,130"; 
 
         // SIT: Drop at 97s. Total X range is 0 to 180s.
-        // 97s is at (97 / 180) * 300px ≈ 161.6px -> Round to 162px.
-        // Curve shape: High flat until 97s, then drops sharply.
+        // 97s on 300px scale = (97/180)*300 = 161.6px ≈ 162px.
+        // Curve: High plateau until 97s, then drops.
         const pathDataSit = "M0,20 L162,20 L172,130 L300,130";
 
         const pathData = isHiit ? pathDataHiit : pathDataSit;
-        const markerX = isHiit ? 140 : 162; // Pixel positions
-        const markerY = 20; // High point Y position
+        const markerX = isHiit ? 140 : 162; 
+        const markerY = 20;
         const markerLabel = isHiit ? "140s" : "97s";
-        
-        // X-Axis End Label
         const xEndLabel = isHiit ? "300s" : "180s";
 
         return (
@@ -179,19 +237,25 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
 
     return (
         <div className="animate-fade-in space-y-12 pb-10">
-            {/* Header - App Theme */}
+            {/* Header */}
             <div className="text-center space-y-4">
                 <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight">
                     <span className="text-primary">VO<sub>2</sub>max</span> {t.title.replace('VO₂max', '')}
                 </h1>
-                <p className="text-slate-400 text-lg max-w-2xl mx-auto">{t.subtitle}</p>
-                <div className="flex flex-wrap justify-center gap-3 text-xs font-mono text-slate-500">
-                    <span className="bg-slate-800 px-2 py-1 rounded border border-slate-700">Yang et al. (2025)</span>
-                    <span className="bg-slate-800 px-2 py-1 rounded border border-slate-700">Meta-Analysis</span>
+                <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                    {t.subtitle}
+                </p>
+                <div className="flex flex-wrap justify-center gap-4 text-sm font-medium text-slate-400">
+                    {t.meta.map((tag, i) => (
+                        <div key={i} className="flex items-center">
+                            <span className={`w-2 h-2 rounded-full mr-2 ${i===0?'bg-green-500':i===1?'bg-blue-500':'bg-purple-500'}`}></span>
+                            {tag}
+                        </div>
+                    ))}
                 </div>
             </div>
 
-            {/* Definitions Cards - App Theme */}
+            {/* Definitions Cards */}
             <section>
                 <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.sections.definitions}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -203,6 +267,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                                     {t.cards[key].badge}
                                 </span>
                             </div>
+                            <p className="text-sm text-slate-300 mb-2 font-semibold">{t.cards[key].sub}</p>
                             <p className="text-slate-400 text-sm leading-relaxed">{t.cards[key].desc}</p>
                             <div className="pt-4 border-t border-slate-700/50 text-xs text-slate-500 font-mono mt-4">
                                 {t.cards[key].ex}
@@ -212,50 +277,65 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 </div>
             </section>
 
-            {/* Charts Section - App Theme (Primary Colors) */}
+            {/* Charts Section */}
             <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Effectiveness */}
                 <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
                     <h3 className="text-lg font-bold text-white mb-1">{t.charts.effTitle}</h3>
-                    <p className="text-xs text-slate-500">{t.charts.effSub}</p>
-                    <VerticalBarChart />
+                    <p className="text-xs text-slate-500 mb-6">{t.charts.effSub}</p>
+                    <EffectivenessChart />
+                    <div className="mt-4 p-3 bg-slate-800/50 rounded border border-slate-700">
+                        <p className="text-xs text-slate-500 mt-2 italic border-t border-slate-700/50 pt-2">{t.charts.effNote}</p>
+                    </div>
                 </div>
                 {/* Probability */}
                 <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-center">
                     <h3 className="text-lg font-bold text-white mb-6">{t.charts.probTitle}</h3>
+                    <p className="text-xs text-slate-400 mb-6">{t.charts.probSub}</p>
                     <ProbabilityChart />
+                    <div className="mt-4 p-3 bg-slate-800 rounded text-xs text-slate-400 border-l-2 border-primary">
+                        {t.charts.probNote}
+                    </div>
                 </div>
             </section>
 
-            {/* Sweet Spots Section - ORIGINAL COLORS (Fixed) */}
+            {/* Sweet Spots Section - FIXED COLORS */}
             <section>
-                <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.charts.sweetSpot}</h2>
+                <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.sections.sweetSpot}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* HIIT Curve - Fixed Indigo */}
+                    {/* HIIT Curve - Indigo */}
                     <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
-                        <h3 className="text-lg font-bold text-indigo-400 mb-2">{t.charts.hiitCurve}</h3>
+                        <h3 className="text-lg font-bold text-indigo-400 mb-2">{t.charts.hiitTitle}</h3>
                         <p className="text-sm text-slate-400 mb-6">{t.charts.hiitDesc}</p>
                         <CurveChart type="hiit" />
-                        <div className="text-center mt-4 text-[10px] text-slate-600 italic">{t.charts.disclaimer}</div>
+                        <div className="mt-4 bg-indigo-900/30 p-3 rounded border border-indigo-500/30">
+                            <p className="text-sm font-bold text-indigo-200">{t.charts.hiitBoxTitle}</p>
+                            <p className="text-xs text-slate-300">{t.charts.hiitBoxDesc}</p>
+                        </div>
                     </div>
-                    {/* SIT Curve - Fixed Purple */}
+                    {/* SIT Curve - Purple */}
                     <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl"></div>
-                        <h3 className="text-lg font-bold text-purple-400 mb-2">{t.charts.sitCurve}</h3>
+                        <h3 className="text-lg font-bold text-purple-400 mb-2">{t.charts.sitTitle}</h3>
                         <p className="text-sm text-slate-400 mb-6">{t.charts.sitDesc}</p>
                         <CurveChart type="sit" />
-                        <div className="text-center mt-4 text-[10px] text-slate-600 italic">{t.charts.disclaimer}</div>
+                        <div className="mt-4 bg-purple-900/30 p-3 rounded border border-purple-500/30">
+                            <p className="text-sm font-bold text-purple-200">{t.charts.sitBoxTitle}</p>
+                            <p className="text-xs text-slate-300">{t.charts.sitBoxDesc}</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* Protocols Tabs - App Theme */}
+            {/* Protocols Tabs */}
             <section>
                 <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.sections.protocols}</h2>
-                
+                <p className="text-slate-400 mb-8">{t.tabs.desc}</p>
+
+                {/* Tabs */}
                 <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-                    {Object.keys(t.tabs).map(key => (
+                    {Object.keys(t.tabs).filter(k => k !== 'desc').map(key => (
                         <button
                             key={key}
                             onClick={() => setActiveTab(key)}
@@ -270,59 +350,62 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                     ))}
                 </div>
 
+                {/* Protocol Content */}
                 <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 md:p-8 animate-fade-in relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <h3 className="text-2xl font-black text-white mb-3">{t.tabs[activeTab].title}</h3>
-                            <p className="text-primary text-sm font-bold mb-6 bg-primary/10 inline-block px-3 py-1 rounded-lg border border-primary/20">
-                                {t.tabs[activeTab].finding}
-                            </p>
-                            <ul className="space-y-4">
-                                {t.tabs[activeTab].steps.map((step, idx) => (
-                                    <li key={idx} className="flex items-start gap-4">
-                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-700 text-primary flex items-center justify-center text-xs font-bold border border-slate-600">
-                                            {idx + 1}
-                                        </span>
-                                        <span className="text-slate-300 text-sm leading-relaxed">{step}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        
-                        {/* Protocol Visualizer - App Theme */}
-                        <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 flex flex-col justify-center items-center h-full min-h-[200px]">
-                            <div className="text-center w-full">
-                                <div className="text-5xl font-black text-white/10 mb-4 select-none">
-                                    {activeTab === 'rst' ? '10x' : activeTab === 'hiit' ? '4x' : '6x'}
+                    {Object.keys(t.tabs).filter(k => k !== 'desc').map(key => (
+                        activeTab === key && (
+                            <div key={key} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center animate-fade-in">
+                                <div>
+                                    <h3 className="text-2xl font-black text-white mb-3">{t.tabs[key].title}</h3>
+                                    <p className="text-slate-300 mb-4 text-sm">{t.tabs[key].desc}</p>
+                                    <ul className="space-y-4">
+                                        {t.tabs[key].steps.map((step, idx) => (
+                                            <li key={idx} className="flex items-start gap-4">
+                                                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-700 text-primary flex items-center justify-center text-xs font-bold border border-slate-600">
+                                                    {idx + 1}
+                                                </span>
+                                                <span className="text-slate-300 text-sm leading-relaxed">{step}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
-                                <div className="flex items-center justify-center gap-1 h-16 w-full max-w-xs mx-auto">
-                                    <div className="h-full bg-primary rounded-l-lg flex items-center justify-center text-white font-bold text-xs relative group" style={{ width: activeTab === 'hiit' ? '45%' : '25%' }}>
-                                        <span className="absolute -top-6 text-primary text-[10px] uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity">Work</span>
-                                        {activeTab === 'rst' ? '6s' : activeTab === 'hiit' ? '140s' : '30s'}
+                                <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 flex flex-col justify-center items-center h-full min-h-[200px]">
+                                    <div className="text-center w-full">
+                                        <div className="text-5xl font-black text-white/10 mb-4 select-none">
+                                            {t.tabs[key].visual.count}
+                                        </div>
+                                        <div className="flex items-center justify-center gap-1 h-16 w-full max-w-xs mx-auto">
+                                            {/* Work Bar */}
+                                            <div className="h-full bg-primary rounded-l-lg flex items-center justify-center text-white font-bold text-xs relative group" style={{ width: key === 'hiit' ? '45%' : '25%' }}>
+                                                <span className="absolute -top-6 text-primary text-[10px] uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity">Work</span>
+                                                {t.tabs[key].visual.work}
+                                            </div>
+                                            {/* Rest Bar */}
+                                            <div className="h-full bg-slate-700 rounded-r-lg flex items-center justify-center text-slate-400 font-bold text-xs relative group" style={{ width: key === 'hiit' ? '55%' : '75%' }}>
+                                                <span className="absolute -top-6 text-slate-500 text-[10px] uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity">Rest</span>
+                                                {t.tabs[key].visual.rest}
+                                            </div>
+                                        </div>
+                                        <div className="mt-4 text-xs text-slate-500 font-mono uppercase tracking-widest">
+                                            1 Interval Cycle
+                                        </div>
                                     </div>
-                                    <div className="h-full bg-slate-700 rounded-r-lg flex items-center justify-center text-slate-400 font-bold text-xs relative group" style={{ width: activeTab === 'hiit' ? '55%' : '75%' }}>
-                                        <span className="absolute -top-6 text-slate-500 text-[10px] uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity">Rest</span>
-                                        {activeTab === 'rst' ? '24s' : activeTab === 'hiit' ? '165s' : '90s'}
-                                    </div>
-                                </div>
-                                <div className="mt-4 text-xs text-slate-500 font-mono uppercase tracking-widest">
-                                    1 Interval Cycle
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        )
+                    ))}
                 </div>
             </section>
 
-            {/* Editor's Note - App Theme */}
+            {/* Editor's Note */}
             <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-l-4 border-primary rounded-r-xl p-6 shadow-lg">
                 <h3 className="text-primary font-bold mb-2 flex items-center gap-2">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     {t.sections.editor}
                 </h3>
                 <p className="text-slate-300 text-sm italic leading-relaxed opacity-90">
-                    "{t.editorNote}"
+                    "{t.editorText}"
                 </p>
             </div>
 
