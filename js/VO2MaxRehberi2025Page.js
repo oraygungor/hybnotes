@@ -1,25 +1,19 @@
 const { useState, useEffect, useRef } = React;
 
 const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
-    const [activeTab, setActiveTab] = useState('rst');
-
-    // --- Sabit Renkler (Sadece Kritik Bulgular Grafikleri İçin) ---
+    
+    // --- Renkler (Sadece Kritik Bulgular Grafikleri İçin Sabit) ---
     const fixedCurveColors = {
-        hiit: { hex: '#6366f1', stroke: 'text-indigo-500', bg: 'bg-indigo-500' }, // Indigo
-        sit: { hex: '#a855f7', stroke: 'text-purple-500', bg: 'bg-purple-500' }   // Purple
+        hiit: { hex: '#6366f1' }, // Indigo
+        sit: { hex: '#a855f7' }   // Purple
     };
 
     // --- İçerik Verisi ---
     const t = {
         title: lang === 'tr' ? 'VO₂max Rehberi' : 'VO₂max Guide',
         subtitle: lang === 'tr' 
-            ? '"HIIT mi, Sprint mi, yoksa Tekrarlı Sprint mi?" sorusuna 1.261 atlet ve 51 çalışma ile verilen bilimsel yanıt.' 
-            : 'The scientific answer to "HIIT, Sprint, or Repeated Sprint?" based on 1,261 athletes and 51 studies.',
-        meta: [
-            'Yang et al. (2025)',
-            'Meta-Analiz',
-            lang === 'tr' ? 'Hibrit Atlet Odaklı' : 'Hybrid Athlete Focused'
-        ],
+            ? '"HIIT mi, Sprint mi, yoksa Tekrarlı Sprint mi?" sorusuna 1.261 atlet ve 51 çalışma ile verilen en kapsamlı bilimsel yanıt.'
+            : 'The comprehensive scientific answer to "HIIT, Sprint, or Repeated Sprint?" based on 1,261 athletes and 51 studies.',
         sections: {
             definitions: lang === 'tr' ? 'Hangi antrenman türlerinden bahsediyoruz?' : 'Which training types are we talking about?',
             findings: lang === 'tr' ? 'Makale Bulguları: Sayılar Ne Diyor?' : 'Study Findings: What Do The Numbers Say?',
@@ -120,129 +114,15 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
         warning: lang === 'tr' ? 'Uyarı: Herhangi bir yüksek yoğunluklu antrenman programına başlamadan önce sağlık durumunuzu kontrol ettiriniz.' : 'Warning: Check health status before high-intensity training.'
     };
 
-    // --- GRAFİKLER ---
+    // --- ALT BİLEŞENLER ---
 
-    // 1. Effectiveness Chart (Vertical Bar - Theme Colors)
-    const EffectivenessChart = () => (
-        <div className="h-64 w-full flex items-end justify-between gap-2 sm:gap-4 px-2 font-mono text-xs text-slate-400 relative mt-8">
-            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20 z-0">
-                {[1.2, 0.9, 0.6, 0.3, 0].map((v, i) => (
-                    <div key={i} className="w-full border-t border-slate-400 h-0 relative">
-                        <span className="absolute -left-6 -top-2 text-[9px]">{v}</span>
-                    </div>
-                ))}
-            </div>
-            
-            {[
-                { label: 'RST', val: 1.04, opacity: 'opacity-100' },
-                { label: 'HIIT', val: 1.01, opacity: 'opacity-80' },
-                { label: 'SIT', val: 0.69, opacity: 'opacity-60' },
-                { label: 'CT', val: 0.29, opacity: 'opacity-30' }
-            ].map((d) => (
-                <div key={d.label} className="flex flex-col items-center justify-end h-full w-full relative group z-10">
-                    <span className="mb-2 text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-slate-900 px-1 rounded border border-slate-700">{d.val}</span>
-                    <div 
-                        className={`w-full max-w-[40px] rounded-t-md bg-primary ${d.opacity} transition-all duration-1000 ease-out hover:opacity-100 shadow-lg`} 
-                        style={{ height: `${(d.val / 1.2) * 100}%` }}
-                    ></div>
-                    <span className={`mt-2 font-bold ${d.label === 'CT' ? 'text-slate-500' : 'text-primary'}`}>{d.label}</span>
-                </div>
-            ))}
-        </div>
-    );
-
-    // 2. Probability Chart (Horizontal Bar - Theme Colors)
-    const ProbabilityChart = () => (
-        <div className="flex flex-col gap-4 w-full font-mono text-xs">
-            {[
-                { label: 'RST', val: '88%', width: '88%', opacity: 'opacity-100' },
-                { label: 'HIIT', val: '85%', width: '85%', opacity: 'opacity-80' },
-                { label: 'SIT', val: '51%', width: '51%', opacity: 'opacity-50' },
-                { label: 'CT', val: '23%', width: '23%', opacity: 'opacity-20' }
-            ].map((d) => (
-                <div key={d.label} className="w-full">
-                    <div className="flex justify-between mb-1 text-slate-300">
-                        <span className={`font-bold ${d.label === 'CT' ? 'text-slate-500' : 'text-primary'}`}>{d.label}</span>
-                        <span className="text-white">{d.val}</span>
-                    </div>
-                    <div className="h-2 w-full bg-slate-700/50 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full bg-primary ${d.opacity}`} style={{ width: d.width }}></div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-
-    // 3. Sweet Spot Line Charts (Fixed Colors & Correct Scales)
-    const CurveChart = ({ type }) => {
-        const isHiit = type === 'hiit';
-        const color = isHiit ? fixedCurveColors.hiit.hex : fixedCurveColors.sit.hex;
-        
-        // Corrected Scales using ViewBox 0 0 300 150
-        // Y Axis: 0 is top, 150 is bottom. High impact = Y:20, Low impact = Y:130.
-        
-        // HIIT: Peak at 140s. Total X range is 0 to 300s.
-        // 140s on 300px scale = (140/300)*300 = 140px.
-        // Curve: Low start (30s=30px), Peak (140s=140px), Drop (240s=240px).
-        const pathDataHiit = "M30,130 Q85,130 140,20 Q195,130 240,130"; 
-
-        // SIT: Drop at 97s. Total X range is 0 to 180s.
-        // 97s on 300px scale = (97/180)*300 = 161.6px ≈ 162px.
-        // Curve: High plateau until 97s, then drops.
-        const pathDataSit = "M0,20 L162,20 L172,130 L300,130";
-
-        const pathData = isHiit ? pathDataHiit : pathDataSit;
-        const markerX = isHiit ? 140 : 162; 
-        const markerY = 20;
-        const markerLabel = isHiit ? "140s" : "97s";
-        const xEndLabel = isHiit ? "300s" : "180s";
-
-        return (
-            <div className="w-full h-48 relative bg-slate-800/50 rounded-xl border border-slate-700/50 p-2">
-                <svg viewBox="0 0 300 150" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                    {/* Grid Lines */}
-                    <line x1="0" y1="150" x2="300" y2="150" stroke="#334155" strokeWidth="1" />
-                    <line x1="0" y1="0" x2="0" y2="150" stroke="#334155" strokeWidth="1" />
-                    
-                    {/* Curve */}
-                    <path 
-                        d={pathData} 
-                        fill="none" 
-                        stroke={color} 
-                        strokeWidth="4" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                        className="drop-shadow-xl"
-                    />
-                    
-                    {/* Marker Area (Dashed Line) */}
-                    <line x1={markerX} y1={markerY} x2={markerX} y2="150" stroke={color} strokeWidth="1" strokeDasharray="4" opacity="0.6" />
-                    
-                    {/* Marker Point */}
-                    <circle cx={markerX} cy={markerY} r="5" fill="#fff" stroke={color} strokeWidth="2" />
-                    
-                    {/* Label */}
-                    <text x={markerX} y="10" textAnchor="middle" fill="#fff" fontSize="12" fontWeight="bold" className="drop-shadow-md">
-                        {markerLabel}
-                    </text>
-                </svg>
-                {/* X-Axis Labels */}
-                <div className="absolute bottom-0 left-0 w-full flex justify-between text-[10px] text-slate-500 px-2 pointer-events-none">
-                    <span>0s</span>
-                    <span>{xEndLabel}</span>
-                </div>
-            </div>
-        );
-    };
-
-    return (
-        <div className="animate-fade-in space-y-12 pb-10">
-            {/* Header */}
-            <div className="text-center space-y-4">
-                <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight">
+    const HeroSection = () => (
+        <header className="relative overflow-hidden py-20 sm:py-28 text-center">
+            <div className="relative z-10">
+                <h1 className="text-5xl sm:text-7xl font-extrabold mb-6 tracking-tight">
                     <span className="text-primary">VO<sub>2</sub>max</span> {t.title.replace('VO₂max', '')}
                 </h1>
-                <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
                     {t.subtitle}
                 </p>
                 <div className="flex flex-wrap justify-center gap-4 text-sm font-medium text-slate-400">
@@ -254,72 +134,212 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                     ))}
                 </div>
             </div>
+        </header>
+    );
 
-            {/* Definitions Cards */}
-            <section>
-                <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.sections.definitions}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {Object.keys(t.cards).map((key) => (
-                        <div key={key} className="bg-slate-800 border border-slate-700 p-6 rounded-2xl hover:border-primary/50 transition-all group">
-                            <div className="flex justify-between items-start mb-3">
-                                <h3 className="text-xl font-black text-white group-hover:text-primary transition-colors">{t.cards[key].title}</h3>
-                                <span className="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider text-primary bg-primary/10 border border-primary/20">
-                                    {t.cards[key].badge}
-                                </span>
-                            </div>
-                            <p className="text-sm text-slate-300 mb-2 font-semibold">{t.cards[key].sub}</p>
-                            <p className="text-slate-400 text-sm leading-relaxed">{t.cards[key].desc}</p>
-                            <div className="pt-4 border-t border-slate-700/50 text-xs text-slate-500 font-mono mt-4">
-                                {t.cards[key].ex}
-                            </div>
+    const DefinitionsSection = () => (
+        <section className="container mx-auto px-4 mb-16">
+            <h2 className="text-2xl font-bold mb-6 text-white border-l-4 border-primary pl-4">{t.sections.definitions}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* RST Card */}
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl hover:border-primary/50 transition-all group">
+                    <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">{t.cards.rst.title}</h3>
+                        <span className="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">{t.cards.rst.badge}</span>
+                    </div>
+                    <p className="text-sm text-slate-300 mb-2 font-semibold">{t.cards.rst.sub}</p>
+                    <p className="text-slate-400 text-sm leading-relaxed">{t.cards.rst.desc}</p>
+                    <div className="mt-4 pt-4 border-t border-slate-700/50 text-xs text-slate-500">{t.cards.rst.ex}</div>
+                </div>
+
+                {/* HIIT Card */}
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl hover:border-primary/50 transition-all group">
+                    <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">{t.cards.hiit.title}</h3>
+                        <span className="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">{t.cards.hiit.badge}</span>
+                    </div>
+                    <p className="text-sm text-slate-300 mb-2 font-semibold">{t.cards.hiit.sub}</p>
+                    <p className="text-slate-400 text-sm leading-relaxed">{t.cards.hiit.desc}</p>
+                    <div className="mt-4 pt-4 border-t border-slate-700/50 text-xs text-slate-500">{t.cards.hiit.ex}</div>
+                </div>
+
+                {/* SIT Card */}
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl hover:border-primary/50 transition-all group">
+                    <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">{t.cards.sit.title}</h3>
+                        <span className="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">{t.cards.sit.badge}</span>
+                    </div>
+                    <p className="text-sm text-slate-300 mb-2 font-semibold">{t.cards.sit.sub}</p>
+                    <p className="text-slate-400 text-sm leading-relaxed">{t.cards.sit.desc}</p>
+                    <div className="mt-4 pt-4 border-t border-slate-700/50 text-xs text-slate-500">{t.cards.sit.ex}</div>
+                </div>
+            </div>
+        </section>
+    );
+
+    const AnalysisSection = () => {
+        // Vertical Bar Chart (Effectiveness)
+        const EffectivenessChart = () => (
+            <div className="h-64 w-full flex items-end justify-between gap-2 sm:gap-4 px-2 font-mono text-xs text-slate-400 relative mt-8">
+                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20 z-0">
+                    {[1.2, 0.9, 0.6, 0.3, 0].map((v, i) => (
+                        <div key={i} className="w-full border-t border-slate-400 h-0 relative">
+                            <span className="absolute -left-6 -top-2 text-[9px]">{v}</span>
                         </div>
                     ))}
                 </div>
-            </section>
+                
+                {[
+                    { label: 'RST', val: 1.04, opacity: 'opacity-100' },
+                    { label: 'HIIT', val: 1.01, opacity: 'opacity-80' },
+                    { label: 'SIT', val: 0.69, opacity: 'opacity-60' },
+                    { label: 'CT', val: 0.29, opacity: 'opacity-30' }
+                ].map((d) => (
+                    <div key={d.label} className="flex flex-col items-center justify-end h-full w-full relative group z-10">
+                        <span className="mb-2 text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-slate-900 px-1 rounded border border-slate-700">{d.val}</span>
+                        <div 
+                            className={`w-full max-w-[40px] rounded-t-md bg-primary ${d.opacity} transition-all duration-1000 ease-out hover:opacity-100 shadow-lg`} 
+                            style={{ height: `${(d.val / 1.2) * 100}%` }}
+                        ></div>
+                        <span className={`mt-2 font-bold ${d.label === 'CT' ? 'text-slate-500' : 'text-primary'}`}>{d.label}</span>
+                    </div>
+                ))}
+            </div>
+        );
 
-            {/* Charts Section */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Effectiveness */}
-                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                    <h3 className="text-lg font-bold text-white mb-1">{t.charts.effTitle}</h3>
-                    <p className="text-xs text-slate-500 mb-6">{t.charts.effSub}</p>
-                    <EffectivenessChart />
-                    <div className="mt-4 p-3 bg-slate-800/50 rounded border border-slate-700">
-                        <p className="text-xs text-slate-500 mt-2 italic border-t border-slate-700/50 pt-2">{t.charts.effNote}</p>
+        // Horizontal Bar Chart (Probability)
+        const ProbabilityChart = () => (
+            <div className="flex flex-col gap-4 w-full font-mono text-xs">
+                {[
+                    { label: 'RST', val: '88%', width: '88%', opacity: 'opacity-100' },
+                    { label: 'HIIT', val: '85%', width: '85%', opacity: 'opacity-80' },
+                    { label: 'SIT', val: '51%', width: '51%', opacity: 'opacity-50' },
+                    { label: 'CT', val: '23%', width: '23%', opacity: 'opacity-20' }
+                ].map((d) => (
+                    <div key={d.label} className="w-full">
+                        <div className="flex justify-between mb-1 text-slate-300">
+                            <span className={`font-bold ${d.label === 'CT' ? 'text-slate-500' : 'text-primary'}`}>{d.label}</span>
+                            <span className="text-white">{d.val}</span>
+                        </div>
+                        <div className="h-2 w-full bg-slate-700/50 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full bg-primary ${d.opacity}`} style={{ width: d.width }}></div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+
+        return (
+            <section className="container mx-auto px-4 mb-16">
+                <h2 className="text-2xl font-bold mb-6 text-white border-l-4 border-primary pl-4">{t.sections.findings}</h2>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Chart 1: Effectiveness */}
+                    <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                        <h3 className="text-lg font-semibold mb-1 text-white">{t.charts.effTitle}</h3>
+                        <p className="text-xs text-slate-400 mb-4">{t.charts.effSub}</p>
+                        <EffectivenessChart />
+                        <div className="mt-4 p-3 bg-slate-800/50 rounded border border-slate-700">
+                            <p className="text-xs text-slate-500 mt-2 italic border-t border-slate-700/50 pt-2">
+                                {t.charts.effNote}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Chart 2: Ranking Probability */}
+                    <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 flex flex-col justify-center">
+                        <h3 className="text-lg font-semibold mb-2 text-white">{t.charts.probTitle}</h3>
+                        <p className="text-xs text-slate-400 mb-6">{t.charts.probSub}</p>
+                        <ProbabilityChart />
+                        <div className="mt-4 p-3 bg-slate-800 rounded text-xs text-slate-400 border-l-2 border-primary">
+                            {t.charts.probNote}
+                        </div>
                     </div>
                 </div>
-                {/* Probability */}
-                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-center">
-                    <h3 className="text-lg font-bold text-white mb-6">{t.charts.probTitle}</h3>
-                    <p className="text-xs text-slate-400 mb-6">{t.charts.probSub}</p>
-                    <ProbabilityChart />
-                    <div className="mt-4 p-3 bg-slate-800 rounded text-xs text-slate-400 border-l-2 border-primary">
-                        {t.charts.probNote}
+            </section>
+        );
+    };
+
+    const OptimizationSection = () => {
+        // Curve Chart Logic (SVG)
+        const CurveChart = ({ type }) => {
+            const isHiit = type === 'hiit';
+            const color = isHiit ? fixedCurveColors.hiit.hex : fixedCurveColors.sit.hex;
+            
+            // --- Corrected Scales (0-300px ViewBox) ---
+            // HIIT: Peak at 140s. X range 0-300s. 140s = 140px.
+            const pathDataHiit = "M30,130 Q85,130 140,20 Q195,130 240,130"; 
+            // SIT: Drop at 97s. X range 0-180s. 97s = (97/180)*300 ≈ 162px.
+            const pathDataSit = "M0,20 L162,20 L172,130 L300,130";
+
+            const pathData = isHiit ? pathDataHiit : pathDataSit;
+            const markerX = isHiit ? 140 : 162; 
+            const markerY = 20;
+            const markerLabel = isHiit ? "140s" : "97s";
+            const xEndLabel = isHiit ? "300s" : "180s";
+
+            return (
+                <div className="w-full h-48 relative bg-slate-800/50 rounded-xl border border-slate-700/50 p-2">
+                    <svg viewBox="0 0 300 150" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                        {/* Grid */}
+                        <line x1="0" y1="150" x2="300" y2="150" stroke="#334155" strokeWidth="1" />
+                        <line x1="0" y1="0" x2="0" y2="150" stroke="#334155" strokeWidth="1" />
+                        
+                        {/* Curve */}
+                        <path 
+                            d={pathData} 
+                            fill="none" 
+                            stroke={color} 
+                            strokeWidth="4" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                            className="drop-shadow-xl"
+                        />
+                        
+                        {/* Marker Area */}
+                        <line x1={markerX} y1={markerY} x2={markerX} y2="150" stroke={color} strokeWidth="1" strokeDasharray="4" opacity="0.6" />
+                        <circle cx={markerX} cy={markerY} r="5" fill="#fff" stroke={color} strokeWidth="2" />
+                        
+                        {/* Label */}
+                        <text x={markerX} y="10" textAnchor="middle" fill="#fff" fontSize="12" fontWeight="bold" className="drop-shadow-md">
+                            {markerLabel}
+                        </text>
+                    </svg>
+                    {/* X-Axis Labels */}
+                    <div className="absolute bottom-0 left-0 w-full flex justify-between text-[10px] text-slate-500 px-2 pointer-events-none">
+                        <span>0s</span>
+                        <span>{xEndLabel}</span>
                     </div>
                 </div>
-            </section>
+            );
+        };
 
-            {/* Sweet Spots Section - FIXED COLORS */}
-            <section>
-                <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.sections.sweetSpot}</h2>
+        return (
+            <section className="container mx-auto px-4 mb-16">
+                <h2 className="text-2xl font-bold mb-6 text-white border-l-4 border-green-500 pl-4">{t.sections.sweetSpot}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* HIIT Curve - Indigo */}
-                    <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
-                        <h3 className="text-lg font-bold text-indigo-400 mb-2">{t.charts.hiitTitle}</h3>
-                        <p className="text-sm text-slate-400 mb-6">{t.charts.hiitDesc}</p>
+                    
+                    {/* HIIT Sweet Spot */}
+                    <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                        <h3 className="text-lg font-semibold text-indigo-400 mb-2">{t.charts.hiitTitle}</h3>
+                        <p className="text-sm text-slate-400 mb-4">{t.charts.hiitDesc}</p>
                         <CurveChart type="hiit" />
+                        <div className="mt-2 text-center">
+                            <span className="text-[0.7rem] text-slate-500 italic">{t.charts.disclaimer}</span>
+                        </div>
                         <div className="mt-4 bg-indigo-900/30 p-3 rounded border border-indigo-500/30">
                             <p className="text-sm font-bold text-indigo-200">{t.charts.hiitBoxTitle}</p>
                             <p className="text-xs text-slate-300">{t.charts.hiitBoxDesc}</p>
                         </div>
                     </div>
-                    {/* SIT Curve - Purple */}
-                    <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl"></div>
-                        <h3 className="text-lg font-bold text-purple-400 mb-2">{t.charts.sitTitle}</h3>
-                        <p className="text-sm text-slate-400 mb-6">{t.charts.sitDesc}</p>
+
+                    {/* SIT Warning */}
+                    <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                        <h3 className="text-lg font-semibold text-purple-400 mb-2">{t.charts.sitTitle}</h3>
+                        <p className="text-sm text-slate-400 mb-4">{t.charts.sitDesc}</p>
                         <CurveChart type="sit" />
+                        <div className="mt-2 text-center">
+                            <span className="text-[0.7rem] text-slate-500 italic">{t.charts.disclaimer}</span>
+                        </div>
                         <div className="mt-4 bg-purple-900/30 p-3 rounded border border-purple-500/30">
                             <p className="text-sm font-bold text-purple-200">{t.charts.sitBoxTitle}</p>
                             <p className="text-xs text-slate-300">{t.charts.sitBoxDesc}</p>
@@ -327,16 +347,19 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                     </div>
                 </div>
             </section>
+        );
+    };
 
-            {/* Protocols Tabs */}
-            <section>
-                <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-primary pl-4">{t.sections.protocols}</h2>
+    const ProtocolSection = () => {
+        return (
+            <section className="container mx-auto px-4 mb-16">
+                <h2 className="text-2xl font-bold mb-6 text-white border-l-4 border-pink-500 pl-4">{t.sections.protocols}</h2>
                 <p className="text-slate-400 mb-8">{t.tabs.desc}</p>
 
                 {/* Tabs */}
                 <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
                     {Object.keys(t.tabs).filter(k => k !== 'desc').map(key => (
-                        <button
+                        <button 
                             key={key}
                             onClick={() => setActiveTab(key)}
                             className={`px-6 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${
@@ -350,7 +373,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                     ))}
                 </div>
 
-                {/* Protocol Content */}
+                {/* Content */}
                 <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 md:p-8 animate-fade-in relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
                     {Object.keys(t.tabs).filter(k => k !== 'desc').map(key => (
@@ -358,7 +381,9 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                             <div key={key} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center animate-fade-in">
                                 <div>
                                     <h3 className="text-2xl font-black text-white mb-3">{t.tabs[key].title}</h3>
-                                    <p className="text-slate-300 mb-4 text-sm">{t.tabs[key].desc}</p>
+                                    <p className="text-primary text-sm font-bold mb-6 bg-primary/10 inline-block px-3 py-1 rounded-lg border border-primary/20">
+                                        {t.tabs[key].finding}
+                                    </p>
                                     <ul className="space-y-4">
                                         {t.tabs[key].steps.map((step, idx) => (
                                             <li key={idx} className="flex items-start gap-4">
@@ -397,23 +422,44 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                     ))}
                 </div>
             </section>
+        );
+    };
 
-            {/* Editor's Note */}
-            <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-l-4 border-primary rounded-r-xl p-6 shadow-lg">
-                <h3 className="text-primary font-bold mb-2 flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+    const EditorsNote = () => (
+        <section className="container mx-auto px-4 mb-24">
+            <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-l-4 border-primary rounded-r-xl p-6 sm:p-8 shadow-lg">
+                <h3 className="text-primary font-bold mb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
                     {t.sections.editor}
                 </h3>
-                <p className="text-slate-300 text-sm italic leading-relaxed opacity-90">
+                <p className="text-slate-300 italic leading-relaxed text-sm sm:text-base">
                     "{t.editorText}"
                 </p>
             </div>
+        </section>
+    );
 
-            {/* Footer */}
-            <div className="text-center border-t border-slate-800 pt-8">
-                <p className="text-slate-500 text-xs mb-4 px-4 font-mono leading-relaxed">{t.citation}</p>
-                <div className="inline-block bg-red-500/10 text-red-400 text-xs px-4 py-2 rounded-full font-bold border border-red-500/20">{t.warning}</div>
-            </div>
+    const Footer = () => (
+        <footer className="container mx-auto px-4 py-8 text-center text-xs border-t border-slate-800">
+            <p className="text-slate-500 mb-4">{t.citation}</p>
+            <p className="text-red-400 font-semibold bg-red-900/10 p-2 rounded inline-block">
+                {t.warning}
+            </p>
+        </footer>
+    );
+
+    // --- Ana Render ---
+    return (
+        <div className="w-full min-h-screen animate-fade-in">
+            <HeroSection />
+            <DefinitionsSection />
+            <AnalysisSection />
+            <OptimizationSection />
+            <ProtocolSection />
+            <EditorsNote />
+            <Footer />
         </div>
     );
 };
