@@ -149,7 +149,7 @@ const THEMES = [
     { id: 'emerald', name: 'Zümrüt', rgb: '16 185 129', hex: '#10b981' },
 ];
 
-const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery', 'kosu_dili', 'caffeine_perf','beetroot_nitrate','running_economy'];
+const VALID_PAGES = ['home', 'research', 'hyrox_calc', 'running_perf', 'caffeine', 'utmb_lottery', 'kosu_dili', 'caffeine_perf','beetroot_nitrate','running_economy','vo2max_guide'];
 const PARENT_REDIRECTS = {
     'hyrox': 'hyrox_calc',
     'running': 'running_perf',
@@ -220,6 +220,7 @@ const App = () => {
     research: `HybLib - Research | ${baseTitle}`,
     hyrox_calc: `HYROX Calculator | ${baseTitle}`,
     running_perf: `Running Performance | ${baseTitle}`,
+    vo2max_guide: `VO2Max Guide | ${baseTitle}`,
     caffeine: `Caffeine Strategy | ${baseTitle}`,
     caffeine_perf: `Caffeine & Performance | ${baseTitle}`, 
     running_economy: `Running Economy | ${baseTitle}`,
@@ -650,9 +651,11 @@ const switchLang = (newLang) => {
                 icon: RunningLogo,
                 type: 'dropdown',
                 children: [
-                         { id: 'kosu_dili', title: lang === 'tr' ? 'Koşu Dili 101' : 'Running Lingo 101', icon: Icons.BookOpen },
+                    { id: 'kosu_dili', title: lang === 'tr' ? 'Koşu Dili 101' : 'Running Lingo 101', icon: Icons.BookOpen },
                     { id: 'running_economy', title: lang === 'tr' ? 'Koşu Ekonomisi' : 'Running Economy', icon: IconTrendDot}, 
                     { id: 'running_perf', title: lang === 'tr' ? 'Performansın Temeli' : 'Performance Fundamentals', icon: Icons.Activity },
+                    { id: 'vo2max_guide', title: lang === 'tr' ? 'VO2max Rehberi' : 'VO2max Guide', icon: Icons.Headphones },
+ 
                
                 ]
             },
@@ -775,11 +778,11 @@ const switchLang = (newLang) => {
             case 'research': return readingArticle ? <ArticleDetail article={readingArticle} lang={lang} /> : <ResearchPage posts={posts} lang={lang} />;
             case 'utmb_lottery': return window.UTMBLotteryPage ? <window.UTMBLotteryPage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'caffeine': return window.CaffeinePage ? <window.CaffeinePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
-  case 'caffeine_perf': return window.CaffeinePerformancePage ? <window.CaffeinePerformancePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
-case 'beetroot_nitrate':  return window.BeetrootNitratePage ? <window.BeetrootNitratePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
-case 'running_economy': return window.RunningEconomyPage ? <window.RunningEconomyPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
-                
+            case 'caffeine_perf': return window.CaffeinePerformancePage ? <window.CaffeinePerformancePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
+            case 'beetroot_nitrate':  return window.BeetrootNitratePage ? <window.BeetrootNitratePage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
+            case 'running_economy': return window.RunningEconomyPage ? <window.RunningEconomyPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;    
             case 'running_perf': return window.RunningPerformancePage ? <window.RunningPerformancePage lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
+            case 'vo2max_guide': return window.VO2MaxRehberi2025Page ? <window.VO2MaxRehberi2025Page lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'hyrox_calc': return window.HyroxCalculatorPage ? <window.HyroxCalculatorPage lang={lang} activeTheme={activeTheme} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             case 'kosu_dili': return window.KosuDili101Page ? <window.KosuDili101Page lang={lang} /> : <div className="text-center p-10 text-slate-500">Loading module...</div>;
             default: return <HomePage posts={posts} lang={lang} currentFact={currentFact} />;
