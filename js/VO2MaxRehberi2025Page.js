@@ -1,5 +1,5 @@
 const { useState } = React;
-
+ 
 const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
     const [activeTab, setActiveTab] = useState('rst');
 
