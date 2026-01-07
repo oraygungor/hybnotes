@@ -32,7 +32,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 title: 'Makale Bulguları: Sayılar Ne Diyor?',
                 chart1: { title: 'VO₂max Artış Etkisi (Hedges\' g)', subtitle: 'Konvansiyonel antrenmana (CON) kıyasla ne kadar etkili? (Yüksek daha iyi)' },
                 legend: { title: '📊 Değerler Ne Anlama Geliyor?', small: 'Küçük Etki', medium: 'Orta Etki', large: 'Büyük Etki', note: 'Burada RST (1.04) ve HIIT (1.01) "Çok Büyük Etki" sınıfına girerken, CT (0.29) "Küçük Etki"de kalıyor.' },
-                chart2: { title: 'En İyi Olma Olasılığı (P-Score)', subtitle: 'İstatistiksel olarak "En İyi Yöntem" olma ihtimalleri.', note: '<strong>*Not:</strong> İstatistiksel olarak RST, HIIT ve SIT arasında anlamlı bir fark bulunmamıştır (p>0.05). RST sadece "olasılık" olarak ilk sıradadır.' }
+                chart2: { title: 'En İyi Olma Olasılığı (P-Score)', subtitle: 'İstatistiksel olarak "En İyi Yöntem" olma ihtimalleri.', note: '<strong>*Not:</strong> İstatistiksel olarak RST, HIIT ve SIT arasında anlamlı bir fark bulunmamıştır (p>0.05). Yüzdelik değerler makale grafiklerinden temsili olarak okunmuştur.' }
             },
             common: {
                 sprint: '(Tekrarlı Sprint)',
@@ -54,8 +54,8 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 subtitle: 'Makalenin bulgularına (süre, sıklık, mod) dayanarak hazırlanmış <strong>örnek</strong> reçetelerdir.',
                 example_header: 'Aşağıdaki Yaygın Bir Örnektir:',
                 rst: { 
-                    title: 'RST: "2 Week Boost"', 
-                    desc: '<strong>Makale Bulgusu:</strong> Haftada 3 seans yapıldığında, 2 haftada sonuç verir. Protokol detayları makalede kritik fark yaratmamıştır.',
+                    title: 'RST: "2 Haftalık Boost"', 
+                    desc: '<strong>Makale Bulgusu:</strong> Haftada 3 seans yapıldığında, 2 haftada sonuç verir. RST protokolleri literatürde değişkendir; aşağıdaki protokol makalenin dayattığı standart değil, <strong>yaygın bir örnektir</strong>.',
                     step1: 'Uzun ve iyi bir ısınma yap.',
                     step2_bold: '6 sn', step2_text: 'Maksimum Sprint (All-out).',
                     step3_bold: '24 sn', step3_text: 'Pasif Dinlenme (Dur).',
@@ -75,14 +75,14 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                     desc: '<strong>Makale Bulgusu:</strong> Dinlenme süresi 97 saniyeyi aşmamalıdır. Koşu modu, bisikletten daha etkilidir.',
                     step1: 'Çok sağlam ısınma (Sakatlık riski yüksek).',
                     step2: 'Maksimum Efor (All-Out).',
-                    step3: 'Hafif Aktif Dinlenme.',
+                    step3: 'Light Active Rest.',
                     step4: '(Örnek).',
                     mode_title: 'Mod ve Dinlenme Notu:', mode_desc: 'Koşu bandı veya pist tercih edilmeli. *90sn dinlenme, "<97sn" kuralına uyan pratik bir uygulamadır.'
                 }
             },
             editor: {
                 title: 'Editörün Yorumu: Hibrit Yaklaşım',
-                text: '"Bu derleme HIIT, SIT ve RST’yi ayrı ayrı karşılaştırsa da, yöntemlerin pratik uygulanabilirliği açısından hibrit bir yaklaşım makul bir çerçeve sunabilir. Örneğin haftada 1 HIIT’i 2 RST seansı ile tamamlamak, VO₂max uyaranını korurken antrenman süresi ve toparlanma maliyetini yönetilebilir tutmaya yardımcı olabilir; böylece koşu ekonomisi, eşik ve fizyolojik direnç gibi diğer performans bileşenlerine de alan açılır."'
+                text: '"Bu derleme HIIT, SIT ve RST’yi ayrı ayrı karşılaştırmaktadır; hibrit programlar doğrudan test edilmemiştir. Bununla birlikte pratik yük yönetimi açısından, haftada 1 HIIT’i 2–3 kısa RST seansı ile tamamlamak, VO₂max uyaranını sürdürürken toparlanma ve zaman maliyetini daha yönetilebilir tutabilir; böylece koşu ekonomisi, eşik ve fizyolojik direnç gibi diğer performans bileşenlerine de alan açılabilir."'
             },
             footer: {
                 warning: 'Uyarı: Herhangi bir yüksek yoğunluklu antrenman programına başlamadan önce sağlık durumunuzu kontrol ettiriniz.'
@@ -103,7 +103,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 title: 'Study Findings: What Do the Numbers Say?',
                 chart1: { title: 'Effect on VO₂max (Hedges\' g)', subtitle: 'How effective compared to Conventional Training (CON)? (Higher is better)' },
                 legend: { title: '📊 What Do Values Mean?', small: 'Small Effect', medium: 'Medium Effect', large: 'Large Effect', note: 'Here RST (1.04) and HIIT (1.01) are "Very Large Effect", while CT (0.29) remains "Small Effect".' },
-                chart2: { title: 'Probability of Being Best (P-Score)', subtitle: 'Statistical probability of being the "Best Method".', note: '<strong>*Note:</strong> Statistically, there was no significant difference between RST, HIIT, and SIT (p>0.05). RST ranks first only in "probability".' }
+                chart2: { title: 'Probability of Being Best (P-Score)', subtitle: 'Statistical probability of being the "Best Method".', note: '<strong>*Note:</strong> Statistically, there was no significant difference between RST, HIIT, and SIT (p>0.05). Percentage values are representative readings from the article figures.' }
             },
             common: {
                 sprint: '(Repeated Sprint)',
@@ -126,7 +126,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 example_header: 'Common Example Below:',
                 rst: { 
                     title: 'RST: "2 Week Boost"', 
-                    desc: '<strong>Paper Finding:</strong> Yields results in 2 weeks when done 3 times/week. Protocol details were less critical in the analysis.',
+                    desc: '<strong>Paper Finding:</strong> Yields results in 2 weeks when done 3 times/week. RST protocols vary in literature; the protocol below is a <strong>common example</strong>, not a strict standard enforced by the paper.',
                     step1: 'Perform a long and good warm-up.',
                     step2_bold: '6 s', step2_text: 'Max Sprint (All-out).',
                     step3_bold: '24 s', step3_text: 'Passive Rest (Stop).',
@@ -153,7 +153,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
             },
             editor: {
                 title: 'Editor\'s Note: Hybrid Approach',
-                text: '"Although this review compares HIIT, SIT, and RST separately, a hybrid approach may offer a reasonable framework for practical applicability. For instance, complementing 1 HIIT session with 2 RST sessions per week could help maintain the VO₂max stimulus while keeping training duration and recovery costs manageable; thus opening space for other performance components like running economy, threshold, and physiological resilience."'
+                text: '"This review compares HIIT, SIT, and RST separately; hybrid programs have not been directly tested. However, for practical load management, complementing 1 HIIT session with 2–3 short RST sessions per week could help maintain the VO₂max stimulus while keeping recovery and time costs manageable; thus opening space for other performance components like running economy, threshold, and physiological resilience."'
             },
             footer: {
                 warning: 'Warning: Please consult your physician before starting any high-intensity training program.'
