@@ -54,7 +54,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 subtitle: 'Makalenin bulgularına (süre, sıklık, mod) dayanarak hazırlanmış <strong>örnek</strong> reçetelerdir.',
                 example_header: 'Aşağıdaki Yaygın Bir Örnektir:',
                 rst: { 
-                    title: 'RST: "2 Haftalık Boost"', 
+                    title: 'RST: "2 Week Boost"', 
                     desc: '<strong>Makale Bulgusu:</strong> Haftada 3 seans yapıldığında, 2 haftada sonuç verir. Protokol detayları makalede kritik fark yaratmamıştır.',
                     step1: 'Uzun ve iyi bir ısınma yap.',
                     step2_bold: '6 sn', step2_text: 'Maksimum Sprint (All-out).',
@@ -253,21 +253,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
         };
     }, [lang]); // Dil değişince grafikleri yeniden oluştur
 
-    // Özel CSS stilleri (Inline olarak)
-    const gradientTextStyle = {
-        background: 'linear-gradient(to right, #38bdf8, #818cf8)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        display: 'inline-block',
-        paddingBottom: '0.2em',
-        lineHeight: '1.3'
-    };
-
-    const gradientTextSubStyle = {
-         WebkitTextFillColor: '#38bdf8',
-         color: '#38bdf8'
-    };
-    
+    // Diğer stiller (Card, Stamp vs.)
     const cardStyle = {
         background: 'rgba(30, 41, 59, 0.7)',
         backdropFilter: 'blur(10px)',
@@ -291,8 +277,8 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
             <header className="relative overflow-hidden py-20 sm:py-28">
                 <div className="container mx-auto px-4 text-center relative z-10">
                     <h1 className="text-5xl sm:text-7xl font-extrabold mb-6 tracking-tight">
-                        <span style={gradientTextStyle}>
-                            VO<sub style={gradientTextSubStyle}>2</sub>max
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60 inline-block pb-[0.2em] leading-[1.3]">
+                            VO<sub className="text-primary" style={{ WebkitTextFillColor: 'currentColor' }}>2</sub>max
                         </span> {currentT.hero.titleSuffix}
                     </h1>
                     <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
