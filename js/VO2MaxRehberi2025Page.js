@@ -1,18 +1,21 @@
-const { useState, useEffect, useRef } = React;
-
 const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
+    // React hook'larını doğrudan React nesnesinden alıyoruz (Güvenlik için)
+    const { useState, useEffect, useRef } = React;
+
     const [activeTab, setActiveTab] = useState('rst');
     
     // Grafik referansları
     const effChartRef = useRef(null);
     const hiitChartRef = useRef(null);
     const sitChartRef = useRef(null);
+    const rstChartRef = useRef(null); // YENİ EKLENDİ
     
     // Grafik instance'larını tutmak için (cleanup için)
     const chartInstances = useRef({
         eff: null,
         hiit: null,
-        sit: null
+        sit: null,
+        rst: null // YENİ EKLENDİ
     });
 
     // Çeviri Verisi
@@ -32,7 +35,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 title: 'Makale Bulguları: Sayılar Ne Diyor?',
                 chart1: { title: 'VO₂max Artış Etkisi (Hedges\' g)', subtitle: 'Konvansiyonel antrenmana (CON) kıyasla ne kadar etkili? (Yüksek daha iyi)' },
                 legend: { title: '📊 Değerler Ne Anlama Geliyor?', small: 'Küçük Etki', medium: 'Orta Etki', large: 'Büyük Etki', note: 'Burada RST (1.04) ve HIIT (1.01) "Çok Büyük Etki" sınıfına girerken, CT (0.29) "Küçük Etki"de kalıyor.' },
-                chart2: { title: 'En İyi Olma Olasılığı (P-Score)', subtitle: 'İstatistiksel olarak "En İyi Yöntem" olma ihtimalleri.', note: '<strong>*Not:</strong> İstatistiksel olarak RST, HIIT ve SIT arasında anlamlı bir fark bulunmamıştır (p>0.05). Yüzdelik değerler makale grafiklerinden temsili olarak okunmuştur.' }
+                chart2: { title: 'En İyi Olma Olasılığı (P-Score)', subtitle: 'İstatistiksel olarak "En İyi Yöntem" olma ihtimalleri.', note: '<strong>*Not:</strong> İstatistiksel olarak RST, HIIT ve SIT arasında anlamlı bir fark bulunmamıştır (p>0.05). RST sadece "olasılık" olarak ilk sıradadır.' }
             },
             common: {
                 sprint: '(Tekrarlı Sprint)',
@@ -47,15 +50,21 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
             opt: {
                 title: 'Kritik Bulgular: "Tatlı Nokta" Neresi?',
                 hiit: { title: 'HIIT: 140 Saniye Kuralı', desc: 'Makale, HIIT süresi ve VO₂max artışı arasında "Ters U Eğrisi" buldu. Çok kısa veya çok uzun intervaller verimsiz.', formula_title: '🏆 Altın Formül (Bulgu):', formula_desc: '140 sn Yüklenme / 165 sn Dinlenme (Oran: 0.85)' },
-                sit: { title: 'SIT: 97 Saniye Sınırı', desc: 'Şaşırtıcı Bulgu: SIT yaparken dinlenmeyi çok uzatırsan aerobik sistem devre dışı kalıyor ve VO₂max gelişmiyor.', warning_title: '⚠️ Kritik Uyarı:', warning_desc: 'Dinlenme süresi > 97 sn olursa VO₂max etkisi anlamsızlaşıyor.' }
+                sit: { title: 'SIT: 97 Saniye Sınırı', desc: 'Şaşırtıcı Bulgu: SIT yaparken dinlenmeyi çok uzatırsan aerobik sistem devre dışı kalıyor ve VO₂max gelişmiyor.', warning_title: '⚠️ Kritik Uyarı:', warning_desc: 'Dinlenme süresi > 97 sn olursa VO₂max etkisi anlamsızlaşıyor.' },
+                // YENİ EKLENDİ
+                rst: { 
+                    title: 'RST: Uygulanabilir “Minimum Doz”', 
+                    desc: 'Makale, RST’de net bir “optimum oran” eğrisi yerine; haftalık frekans ve kısa süreli uygulamanın yeterli olabileceğini öne çıkarıyor.', 
+                    note: '*Not: Bu grafik dose–response “optimumu” değil, çalışmanın raporladığı alt-grup bulgularını özetler.' 
+                }
             },
             protocols: {
                 title: 'Örnek Antrenman Protokolleri',
                 subtitle: 'Makalenin bulgularına (süre, sıklık, mod) dayanarak hazırlanmış <strong>örnek</strong> reçetelerdir.',
                 example_header: 'Aşağıdaki Yaygın Bir Örnektir:',
                 rst: { 
-                    title: 'RST: "2 Haftalık Boost"', 
-                    desc: '<strong>Makale Bulgusu:</strong> Haftada 3 seans yapıldığında, 2 haftada sonuç verir. RST protokolleri literatürde değişkendir; aşağıdaki protokol makalenin dayattığı standart değil, <strong>yaygın bir örnektir</strong>.',
+                    title: 'RST: "2 Week Boost"', 
+                    desc: '<strong>Makale Bulgusu:</strong> Haftada 3 seans yapıldığında, 2 haftada sonuç verir. Protokol detayları makalede kritik fark yaratmamıştır.',
                     step1: 'Uzun ve iyi bir ısınma yap.',
                     step2_bold: '6 sn', step2_text: 'Maksimum Sprint (All-out).',
                     step3_bold: '24 sn', step3_text: 'Pasif Dinlenme (Dur).',
@@ -63,7 +72,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 },
                 hiit: {
                     title: 'HIIT: "Makale Optimumu"',
-                    desc: '<strong>Makale Bulgusu:</strong> En iyi verim 140sn iş ve ~165sn dinlenme ile alınmıştır. Haftada 3 gün, 3-6 hafta uygulanmalı.',
+                    desc: '<strong>Paper Finding:</strong> Best efficiency found with 140s work and ~165s rest. Apply 3 days/week for 3-6 weeks.',
                     step1: 'Isınma süresi uzun tutulmalı (Lineer pozitif ilişki).',
                     step2: 'Yüksek Tempo (%90-95 VO₂max).',
                     step3: 'Aktif Dinlenme (Hafif Jog).',
@@ -75,17 +84,17 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                     desc: '<strong>Makale Bulgusu:</strong> Dinlenme süresi 97 saniyeyi aşmamalıdır. Koşu modu, bisikletten daha etkilidir.',
                     step1: 'Çok sağlam ısınma (Sakatlık riski yüksek).',
                     step2: 'Maksimum Efor (All-Out).',
-                    step3: 'Light Active Rest.',
+                    step3: 'Hafif Aktif Dinlenme.',
                     step4: '(Örnek).',
                     mode_title: 'Mod ve Dinlenme Notu:', mode_desc: 'Koşu bandı veya pist tercih edilmeli. *90sn dinlenme, "<97sn" kuralına uyan pratik bir uygulamadır.'
                 }
             },
             editor: {
-                title: 'Editörün Yorumu: Hibrit Yaklaşım',
-                text: '"Bu derleme HIIT, SIT ve RST’yi ayrı ayrı karşılaştırmaktadır; hibrit programlar doğrudan test edilmemiştir. Bununla birlikte pratik yük yönetimi açısından, haftada 1 HIIT’i 2–3 kısa RST seansı ile tamamlamak, VO₂max uyaranını sürdürürken toparlanma ve zaman maliyetini daha yönetilebilir tutabilir; böylece koşu ekonomisi, eşik ve fizyolojik direnç gibi diğer performans bileşenlerine de alan açılabilir."'
+                title: 'Editor\'s Note: Hybrid Approach',
+                text: '"Although this review compares HIIT, SIT, and RST separately, a hybrid approach may offer a reasonable framework for practical applicability. For instance, complementing 1 HIIT session with 2 RST sessions per week could help maintain the VO₂max stimulus while keeping training duration and recovery costs manageable; thus opening space for other performance components like running economy, threshold, and physiological resilience."'
             },
             footer: {
-                warning: 'Uyarı: Herhangi bir yüksek yoğunluklu antrenman programına başlamadan önce sağlık durumunuzu kontrol ettiriniz.'
+                warning: 'Warning: Please consult your physician before starting any high-intensity training program.'
             }
         },
         en: {
@@ -103,7 +112,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 title: 'Study Findings: What Do the Numbers Say?',
                 chart1: { title: 'Effect on VO₂max (Hedges\' g)', subtitle: 'How effective compared to Conventional Training (CON)? (Higher is better)' },
                 legend: { title: '📊 What Do Values Mean?', small: 'Small Effect', medium: 'Medium Effect', large: 'Large Effect', note: 'Here RST (1.04) and HIIT (1.01) are "Very Large Effect", while CT (0.29) remains "Small Effect".' },
-                chart2: { title: 'Probability of Being Best (P-Score)', subtitle: 'Statistical probability of being the "Best Method".', note: '<strong>*Note:</strong> Statistically, there was no significant difference between RST, HIIT, and SIT (p>0.05). Percentage values are representative readings from the article figures.' }
+                chart2: { title: 'Probability of Being Best (P-Score)', subtitle: 'Statistical probability of being the "Best Method".', note: '<strong>*Note:</strong> Statistically, there was no significant difference between RST, HIIT, and SIT (p>0.05). RST ranks first only in "probability".' }
             },
             common: {
                 sprint: '(Repeated Sprint)',
@@ -118,7 +127,13 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
             opt: {
                 title: 'Critical Findings: Where is the "Sweet Spot"?',
                 hiit: { title: 'HIIT: 140 Second Rule', desc: 'The paper found an "Inverted-U Curve" between HIIT duration and VO₂max gain. Too short or too long is inefficient.', formula_title: '🏆 Golden Formula (Finding):', formula_desc: '140s Work / 165s Rest (Ratio: 0.85)' },
-                sit: { title: 'SIT: 97 Second Limit', desc: 'Surprising Finding: If you extend rest too much in SIT, the aerobic system disengages and VO₂max does not improve.', warning_title: '⚠️ Critical Warning:', warning_desc: 'If rest duration > 97s, the VO₂max effect becomes insignificant.' }
+                sit: { title: 'SIT: 97 Second Limit', desc: 'Surprising Finding: If you extend rest too much in SIT, the aerobic system disengages and VO₂max does not improve.', warning_title: '⚠️ Critical Warning:', warning_desc: 'If rest duration > 97s, the VO₂max effect becomes insignificant.' },
+                // YENİ EKLENDİ
+                rst: { 
+                    title: 'RST: Practical “Minimum Dose”', 
+                    desc: 'Rather than a clear “optimal ratio” curve, the paper highlights frequency and short-duration sufficiency for RST.', 
+                    note: '*Note: This summarizes subgroup findings, not a dose–response optimum.' 
+                }
             },
             protocols: {
                 title: 'Sample Training Protocols',
@@ -126,7 +141,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 example_header: 'Common Example Below:',
                 rst: { 
                     title: 'RST: "2 Week Boost"', 
-                    desc: '<strong>Paper Finding:</strong> Yields results in 2 weeks when done 3 times/week. RST protocols vary in literature; the protocol below is a <strong>common example</strong>, not a strict standard enforced by the paper.',
+                    desc: '<strong>Paper Finding:</strong> Yields results in 2 weeks when done 3 times/week. Protocol details were less critical in the analysis.',
                     step1: 'Perform a long and good warm-up.',
                     step2_bold: '6 s', step2_text: 'Max Sprint (All-out).',
                     step3_bold: '24 s', step3_text: 'Passive Rest (Stop).',
@@ -153,7 +168,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
             },
             editor: {
                 title: 'Editor\'s Note: Hybrid Approach',
-                text: '"This review compares HIIT, SIT, and RST separately; hybrid programs have not been directly tested. However, for practical load management, complementing 1 HIIT session with 2–3 short RST sessions per week could help maintain the VO₂max stimulus while keeping recovery and time costs manageable; thus opening space for other performance components like running economy, threshold, and physiological resilience."'
+                text: '"Although this review compares HIIT, SIT, and RST separately, a hybrid approach may offer a reasonable framework for practical applicability. For instance, complementing 1 HIIT session with 2 RST sessions per week could help maintain the VO₂max stimulus while keeping training duration and recovery costs manageable; thus opening space for other performance components like running economy, threshold, and physiological resilience."'
             },
             footer: {
                 warning: 'Warning: Please consult your physician before starting any high-intensity training program.'
@@ -169,6 +184,7 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
         if (chartInstances.current.eff) chartInstances.current.eff.destroy();
         if (chartInstances.current.hiit) chartInstances.current.hiit.destroy();
         if (chartInstances.current.sit) chartInstances.current.sit.destroy();
+        if (chartInstances.current.rst) chartInstances.current.rst.destroy();
 
         // Chart.js global nesnesi kontrolü
         if (typeof Chart === 'undefined') {
@@ -246,10 +262,57 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
             });
         }
 
+        // --- Chart 4: RST Curve (Dose/Frequency) ---
+        if (rstChartRef.current) {
+            chartInstances.current.rst = new Chart(rstChartRef.current, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        lang === 'tr' ? '2 seans/hafta' : '2 sessions/week',
+                        lang === 'tr' ? '3 seans/hafta' : '3 sessions/week',
+                        lang === 'tr' ? '2 hafta' : '2 weeks',
+                        lang === 'tr' ? '>6 hafta' : '>6 weeks'
+                    ],
+                    datasets: [{
+                        label: lang === 'tr' ? 'RST – etki (Hedges g)' : 'RST – effect (Hedges g)',
+                        data: [0.89, 1.04, 1.03, 0.92],
+                        backgroundColor: ['rgba(56, 189, 248, 0.3)', 'rgba(56, 189, 248, 0.8)', 'rgba(56, 189, 248, 0.8)', 'rgba(56, 189, 248, 0.5)'],
+                        borderColor: '#38bdf8',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                             callbacks: {
+                                afterLabel: (ctx) => {
+                                    const i = ctx.dataIndex;
+                                    const l = lang;
+                                    if(i===0) return l==='tr' ? 'Anlamlı değil (p≈0.22)' : 'Not significant (p≈0.22)';
+                                    if(i===1) return l==='tr' ? 'Anlamlı (p<0.01)' : 'Significant (p<0.01)';
+                                    if(i===2) return l==='tr' ? 'Anlamlı (p<0.01)' : 'Significant (p<0.01)';
+                                    if(i===3) return l==='tr' ? 'Anlamlı (p<0.05), az çalışma' : 'Significant (p<0.05), few studies';
+                                    return '';
+                                }
+                             }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#e2e8f0', font: { weight: 'bold', size: 10 } } }
+                    }
+                }
+            });
+        }
+
         return () => {
              if (chartInstances.current.eff) chartInstances.current.eff.destroy();
              if (chartInstances.current.hiit) chartInstances.current.hiit.destroy();
              if (chartInstances.current.sit) chartInstances.current.sit.destroy();
+             if (chartInstances.current.rst) chartInstances.current.rst.destroy();
         };
     }, [lang]); // Dil değişince grafikleri yeniden oluştur
 
@@ -429,8 +492,20 @@ const VO2MaxRehberi2025Page = ({ lang = 'tr' }) => {
                 <h2 className="text-2xl font-bold mb-6 text-white border-l-4 border-green-500 pl-4">
                     {currentT.opt.title}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     
+                    {/* RST Min Dose (NEW) */}
+                    <div className="p-6 rounded-xl" style={cardStyle}>
+                        <h3 className="text-lg font-semibold text-sky-400 mb-2">{currentT.opt.rst.title}</h3>
+                        <p className="text-sm text-slate-400 mb-4">{currentT.opt.rst.desc}</p>
+                        <div className="relative h-[250px] w-full">
+                            <canvas ref={rstChartRef}></canvas>
+                        </div>
+                        <div className="mt-2 text-center">
+                            <span className="text-[0.7rem] text-slate-400 italic">{currentT.opt.rst.note}</span>
+                        </div>
+                    </div>
+
                     {/* HIIT Sweet Spot */}
                     <div className="p-6 rounded-xl" style={cardStyle}>
                         <h3 className="text-lg font-semibold text-indigo-400 mb-2">{currentT.opt.hiit.title}</h3>
