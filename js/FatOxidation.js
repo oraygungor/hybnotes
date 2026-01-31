@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
-// --- ICONS (Lucide-React Style) ---
-const Icons = {
+// --- ICONS (Daha benzersiz bir isim kullanarak çakışmayı önlüyoruz) ---
+const FatOxIcons = {
   BookOpen: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 1-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
   Calculator: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>,
   Activity: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
@@ -228,7 +228,7 @@ const FAQItemFatOx = ({ question, answer, onRefClick, primaryColor }) => {
     <div className="glass-card-fatox rounded-2xl overflow-hidden mb-3 border border-slate-700/50">
       <button onClick={() => setIsOpen(!isOpen)} className="w-full flex justify-between items-center p-5 text-left min-h-[56px]">
         <span className="font-bold text-slate-200 text-sm md:text-base pr-4">{question}</span>
-        <Icons.ChevronDown 
+        <FatOxIcons.ChevronDown 
           className={`w-5 h-5 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} 
           style={{ color: primaryColor }}
         />
@@ -256,12 +256,13 @@ const FatOxPage = ({ lang, activeTheme }) => {
   const [intensity, setIntensity] = useState('z2');
   const [calcResults, setCalcResults] = useState({ diff: 0, gels: 0, range: [0, 0] });
 
+  // Tab Icon Mapping - Using FatOxIcons to avoid naming collisions
   const tabIcons = {
-    education: Icons.BookOpen,
-    faq: Icons.Brain,
-    calculator: Icons.Calculator,
-    methods: Icons.Zap,
-    plan: Icons.Calendar
+    education: FatOxIcons.BookOpen,
+    faq: FatOxIcons.Brain,
+    calculator: FatOxIcons.Calculator,
+    methods: FatOxIcons.Zap,
+    plan: FatOxIcons.Calendar
   };
 
   const handleRefClick = (id) => {
@@ -278,8 +279,8 @@ const FatOxPage = ({ lang, activeTheme }) => {
       z3: { normal: [0.15, 0.25], sleepLow: [0.35, 0.55], keto: [0.65, 0.95] }
     };
     const c = COEFFS[intensity];
-    const wFactor = weight / 70;
-    const mins = duration * 60;
+    const wFactor = parseFloat(weight) / 70;
+    const mins = parseFloat(duration) * 60;
     const normalAvg = ((c.normal[0] + c.normal[1]) / 2) * wFactor * mins;
     const adaptedAvg = ((strategy === 'keto' ? c.keto : c.sleepLow).reduce((a,b)=>a+b)/2) * wFactor * mins;
     const diffGrams = Math.max(0, adaptedAvg - normalAvg);
@@ -331,7 +332,7 @@ const FatOxPage = ({ lang, activeTheme }) => {
           <div className="animate-enter-fatox space-y-6">
             <div className="glass-card-fatox p-6 md:p-8 rounded-3xl">
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                <Icons.BookOpen className="w-5 h-5" style={{ color: primaryColor }} /> {t.edu.title}
+                <FatOxIcons.BookOpen className="w-5 h-5" style={{ color: primaryColor }} /> {t.edu.title}
               </h2>
               <p className="text-slate-400 text-sm md:text-base mb-8">{t.edu.intro}</p>
               <div className="grid md:grid-cols-2 gap-6">
@@ -385,7 +386,7 @@ const FatOxPage = ({ lang, activeTheme }) => {
             <div className="glass-card-fatox p-6 md:p-8 rounded-3xl border-t-4" style={{ borderTopColor: primaryColor }}>
               <div className="flex items-center gap-4 mb-8">
                 <div className="p-3 bg-emerald-500/10 rounded-xl" style={{ color: primaryColor }}>
-                  <Icons.Calculator className="w-8 h-8" />
+                  <FatOxIcons.Calculator className="w-8 h-8" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-white">{t.calc.title}</h2>
@@ -454,7 +455,7 @@ const FatOxPage = ({ lang, activeTheme }) => {
                   </div>
                 </div>
                 <div className="p-4 rounded-xl border flex items-center gap-4 shadow-inner" style={{ backgroundColor: `${primaryColor}1A`, borderColor: `${primaryColor}33` }}>
-                  <Icons.Zap className="w-6 h-6 flex-shrink-0" style={{ color: primaryColor }} />
+                  <FatOxIcons.Zap className="w-6 h-6 flex-shrink-0" style={{ color: primaryColor }} />
                   <div>
                     <p className="text-xs md:text-sm text-slate-300">{t.calc.result} <span className="text-white font-bold">~{calcResults.diff} kcal</span></p>
                     <p className="text-[10px] font-bold mt-1" style={{ color: primaryColor }}>{t.calc.gelEquiv} {calcResults.gels} Gels</p>
@@ -475,7 +476,7 @@ const FatOxPage = ({ lang, activeTheme }) => {
                 <div key={idx} className="glass-card-fatox p-5 rounded-2xl border border-slate-800 flex flex-col h-full hover:border-slate-700 transition-colors">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="font-bold text-white text-base">{card.t}</h3>
-                    <Icons.TrendingUp className="w-4 h-4" style={{ color: primaryColor }} />
+                    <FatOxIcons.TrendingUp className="w-4 h-4" style={{ color: primaryColor }} />
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed mb-4 flex-grow">{card.d}</p>
                   <div className="flex gap-2 flex-wrap">
@@ -494,7 +495,7 @@ const FatOxPage = ({ lang, activeTheme }) => {
           <div className="animate-enter-fatox space-y-6">
             <div className="glass-card-fatox p-6 md:p-8 rounded-3xl">
               <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <Icons.Calendar style={{ color: primaryColor }} /> {t.plan.title}
+                <FatOxIcons.Calendar style={{ color: primaryColor }} /> {t.plan.title}
               </h2>
               <div className="relative border-l-2 border-slate-800 ml-4 pl-8 space-y-10">
                 <div className="relative">
