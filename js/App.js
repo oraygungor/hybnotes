@@ -1,4 +1,4 @@
-const { useState, useEffect, useMemo, useRef } = React;
+const { useState, useEffect, useMemo, useRef } = React; 
 
 // Canonical host (keep ONE; match your Search Console preference)
 const CANONICAL_ORIGIN = "https://www.hybnotes.com";
