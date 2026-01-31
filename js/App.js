@@ -80,18 +80,12 @@ const PulseBarLogo = ({ size = 24, className = "" }) => (
     </svg>
 );   
 
- const Faticon = ({ size = 24, className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={size}
-    height={size}
-    viewBox="0 0 512 512"
-    fill="currentColor"
-    className={className}
-  >
+const Faticon = ({ size = 24, className = "" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 512 512" fill="currentColor" className={className}>
     <path d="M164.803 436.846q25.188 8.773 59.822 11.544V491h-59.822v-54.154zM292.843 491h59.822v-54.574q-26.763 8.826-59.822 11.702V491zM255.606 21c-27.066 0-49.011 28.547-49.011 63.757 0 35.211 21.945 63.758 49.011 63.758 27.067 0 49.012-28.547 49.012-63.758 0-35.21-21.945-63.757-49.012-63.757zm220.68 286.337c0-89.733-68.092-165.906-160.71-189.205a83.226 83.226 0 0 1-11.997 21.945c-12.32 16.036-29.806 25.188-47.962 25.188-18.156 0-35.683-9.194-47.962-25.188a83.184 83.184 0 0 1-11.933-21.777c-92.283 23.498-160.008 99.524-160.008 189.037H68.25a144.202 144.202 0 0 1 15.931-66.193 148.578 148.578 0 0 0-3.232 30.803c0 88.893 30.635 160.92 175.068 160.92 153.332 0 175.068-72.08 175.068-160.972a148.075 148.075 0 0 0-3.233-30.761 144.17 144.17 0 0 1 15.9 66.203h32.535z" />
   </svg>
 );
+
 
 const IconCoffee = ({ size = 24, className = "" }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -667,7 +661,7 @@ const switchLang = (newLang) => {
                 children: [
                     { id: 'kosu_dili', title: lang === 'tr' ? 'Koşu Dili 101' : 'Running Lingo 101', icon: Icons.BookOpen },
                     { id: 'running_economy', title: lang === 'tr' ? 'Koşu Ekonomisi' : 'Running Economy', icon: IconTrendDot}, 
-                     { id: 'fat_ox', title: lang === 'tr' ? 'Yağ Oksidasyonu' : 'Fat Oxidation', icon: faticon}, 
+                     { id: 'fat_ox', title: lang === 'tr' ? 'Yağ Oksidasyonu' : 'Fat Oxidation', icon: Faticon}, 
                     { id: 'running_perf', title: lang === 'tr' ? 'Performansın Temeli' : 'Performance Fundamentals', icon: Icons.Activity },
                     { id: 'vo2max_guide', title: lang === 'tr' ? 'VO2max Rehberi' : 'VO2max Guide', icon: Icons.Headphones },
  
