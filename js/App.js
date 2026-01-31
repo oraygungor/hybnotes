@@ -80,7 +80,7 @@ const PulseBarLogo = ({ size = 24, className = "" }) => (
     </svg>
 );   
 
-export const Faticon = ({ size = 24, className = "" }) => (
+ const Faticon = ({ size = 24, className = "" }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
