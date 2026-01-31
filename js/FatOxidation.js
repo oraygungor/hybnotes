@@ -228,12 +228,12 @@ const FatOxPage = ({ lang, activeTheme }) => {
               <p className="text-slate-400 text-sm md:text-base mb-8 leading-relaxed">{t.edu.intro}</p>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-slate-900/50 p-5 rounded-2xl border border-rose-500/20">
-                  <div className="flex justify-between mb-2"><span className="text-rose-400 font-bold text-xs uppercase">{t.edu.glycogen}</span><span className="text-rose-400 text-[10px] font-bold">~2.000 kcal</span></div>
+                  <div className="flex justify-between items-center mb-2"><span className="text-rose-400 font-bold text-xs uppercase">{t.edu.glycogen}</span><span className="text-rose-400 text-[10px] font-bold">~2.000 kcal</span></div>
                   <div className="h-3 bg-slate-800 rounded-full mb-3"><div className="h-full bg-rose-500 w-[12%] rounded-full"></div></div>
                   <p className="text-xs text-slate-500 leading-relaxed">{t.edu.glycogenDesc}</p>
                 </div>
                 <div className="bg-slate-900/50 p-5 rounded-2xl border border-emerald-500/20">
-                  <div className="flex justify-between mb-2"><span className="text-emerald-400 font-bold text-xs uppercase">{t.edu.fat}</span><span className="text-emerald-400 text-[10px] font-bold">100.000+ kcal</span></div>
+                  <div className="flex justify-between items-center mb-2"><span className="text-emerald-400 font-bold text-xs uppercase">{t.edu.fat}</span><span className="text-emerald-400 text-[10px] font-bold">100.000+ kcal</span></div>
                   <div className="h-3 bg-slate-800 rounded-full mb-3"><div className="h-full bg-emerald-500 w-full rounded-full animate-pulse"></div></div>
                   <p className="text-xs text-slate-500 leading-relaxed">{t.edu.fatDesc}</p>
                 </div>
@@ -316,7 +316,9 @@ const FatOxPage = ({ lang, activeTheme }) => {
         {activeTab === 'plan' && (
           <div className="animate-enter-fatox space-y-6">
             <div className="fatox-glass p-6 md:p-10 rounded-3xl shadow-2xl">
-              <h2 className="text-xl font-bold text-white mb-10 flex items-center gap-2"><FatOxIcons.Calendar style={{ color: primaryColor }} /> {t.plan.title}</h2>
+              <h2 className="text-xl font-bold text-white mb-10 flex items-center gap-2">
+                <FatOxIcons.Calendar className="w-6 h-6" style={{ color: primaryColor }} /> {t.plan.title}
+              </h2>
               <div className="relative border-l-2 border-slate-800 ml-4 pl-8 space-y-12">
                 <div className="relative">
                   <div className="absolute -left-[41px] top-1 w-5 h-5 bg-slate-950 border-2 rounded-full shadow-lg" style={{ borderColor: primaryColor }}></div>
