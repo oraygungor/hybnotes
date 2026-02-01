@@ -36,34 +36,35 @@ const FatOxPage = ({ lang, activeTheme }) => {
   // --- İÇERİK SİSTEMİ ---
   const CONTENT = {
     tr: {
-      hero: { tag: "Sınırsız Enerji", desc: "Metabolik esnekliğinizi artırarak vücudunuzu bir yağ yakma makinesine dönüştürün. Bilimsel protokollerle performansınızı optimize edin." },
+      hero: { tag: "Sınırsız Enerji", desc: "Metabolik esnekliğinizi artırarak vücudunuzun yağ yakma kapasitesini optimize edin. Bilimsel literatüre dayalı protokollerle performans göstergelerinizi destekleyin." },
       tabs: { education: "Eğitim (101)", faq: "Soru/Cevap", calculator: "Hesaplayıcı", methods: "Metotlar", plan: "Plan (4H)" },
       edu: {
         title: "Yağ Oksidasyonu Temelleri",
-        intro: "Antrenman sırasında enerji üretmek için vücudun depolanmış yağları parçalama yeteneğidir.",
+        intro: "Egzersiz sırasında enerji üretmek için vücudun depolanmış yağları (trigliseridleri) parçalama yeteneğidir.",
         glycogen: "Glikojen (Kısıtlı)",
-        glycogenDesc: "~1.600 - 2.500 kcal arası depolar. Yüksek şiddette ana yakıttır.",
-        fat: "Yağ (Geniş)",
-        fatDesc: "~50.000 - 100.000+ kcal. Düşük/orta şiddette sürdürülebilir enerji sağlar.",
+        glycogenDesc: "~1.600 - 2.500 kcal* arası depolar. Yüksek şiddette ana yakıttır.",
+        fat: "Yağ (Geniş Kaynak)",
+        fatDesc: "~50.000 - 100.000+ kcal*. Sürdürülebilir enerji kaynağıdır.",
         stats: [
-          { l: "TASARRUF", v: "Glikojen Koruma", s: "Karbonhidratları yarışın son bölümleri için saklar." },
-          { l: "KONFOR", v: "Mide Rahatlığı", s: "Daha az dış kaynaklı (jel/spor içeceği) besin gereksinimi." },
-          { l: "STABİLİTE", v: "Sabit Enerji", s: "Kan şekeri dalgalanmalarını ve 'duvara çarpma' riskini azaltır." }
-        ]
+          { l: "SPARING", v: "Glikojen Koruma", s: "Karbonhidratları yarışın son kritik anları için saklamaya yardımcı olur." },
+          { l: "KONFOR", v: "Mide Rahatlığı", s: "Daha az dış kaynaklı (jel/içecek) besin gereksinimi." },
+          { l: "STABİLİTE", v: "Sabit Enerji", s: "Kan şekeri dalgalanmalarını ve 'duvara çarpma' riskini azaltabilir." }
+        ],
+        note: "*Değerler bireyin vücut kompozisyonuna göre değişkenlik gösteren örnek aralıklardır."
       },
       faq: {
         title: "Sıkça Sorulan Sorular",
         items: [
-          { q: "Performansı artırdığı kesin mi?", a: "Doğrudan 'hızlanma' yerine, glikojen depolarını koruyarak tükenmeyi geciktirdiği kanıtlanmıştır. Marquet [2], 'sleep-low' protokolünün 10km performansını kontrol grubuna göre anlamlı derecede iyileştirdiğini raporlamıştır." },
-          { q: "En etkili yöntem hangisidir?", a: "Sakamoto [1] ve Marquet [2], 'Sleep Low' yönteminin yağ metabolizmasını ve VO2peak gibi performans metriklerinde iyileşme sağladığını göstermektedir. Keto diyeti [5] yağ yakımını maksimize etse de, egzersiz ekonomisini bozabilir [6]." },
-          { q: "Geç beslenme (Delayed Feeding) ne sağlar?", a: "Podlogar [3], antrenman sırasında karbonhidrat alımını geciktirmenin, kas adaptasyonlarını bozmadan yüksek yağ oksidasyonunu koruduğunu (anlamlı fark olmaksızın sürdürdüğünü) bulmuştur." },
-          { q: "Kadın sporcular için veriler ne diyor?", a: "Molloy ve ark. [4], 12 haftalık 'Sleep-Low' protokolünün kadın sporcularda hem fizyolojik metrikleri hem de zamana karşı (time-trial) performansını iyileştirdiğini kanıtlamıştır." },
-          { q: "Keto/LCHF diyeti neden riskli?", a: "Burke [6] çalışması, ketojenik diyetin egzersiz ekonomisini bozduğunu ve yüksek şiddetli performansı düşürdüğünü raporlamıştır." }
+          { q: "Performansı iyileştirdiği kesin midir?", a: "Doğrudan 'hızlanma' yerine, glikojen depolarını koruyarak tükenmeyi geciktirdiği literatürde yer almaktadır. Marquet [2], 'sleep-low' protokolünün 10km koşu performansını iyileştirdiğini raporlamıştır." },
+          { q: "En etkili yöntem hangisidir?", a: "Sakamoto [1] ve Marquet [2], 'Sleep Low' yönteminin yağ metabolizmasını desteklediğini ve bazı performans metriklerini (VO2peak vb.) iyileştirebileceğini göstermektedir. Keto diyeti [5] yağ yakımını maksimize etse de egzersiz ekonomisini bozabilir [6]." },
+          { q: "Geç beslenme (Delayed Feeding) ne sağlar?", a: "Podlogar [3], antrenman sırasında KH alımını geciktirmenin, adaptasyonları bozmadan yüksek yağ oksidasyonu kapasitesini koruyabildiğini bulmuştur." },
+          { q: "Kadın sporcular için veriler ne diyor?", a: "Literatürdeki bazı çalışmalar (ör. Molloy [4]), 12 haftalık protokollerin incelenen gruplarda yağ oksidasyonu kapasitesini desteklediğini göstermiştir; ancak daha fazla araştırmaya ihtiyaç duyulmaktadır." },
+          { q: "Keto/LCHF diyeti neden riskli?", a: "Burke [6] çalışması, ketojenik adaptasyonun egzersiz ekonomisini bozduğunu ve yüksek şiddetli performansı düşürebildiğini raporlamıştır." }
         ]
       },
       calc: {
         title: "Potansiyel Tahmini",
-        subtitle: "Yağ adaptasyonunun size kazandırabileceği teorik enerjiyi hesaplayın.",
+        subtitle: "Yağ adaptasyonunun kazandırabileceği teorik enerji farkını görün.",
         strategy: "PROTOKOL",
         stratTypes: { sleepLow: "Sleep Low (Dengeli)", keto: "Keto (Maksimum)" },
         intensity: "KOŞU ŞİDDETİ",
@@ -72,49 +73,48 @@ const FatOxPage = ({ lang, activeTheme }) => {
         duration: "Süre (Saat)",
         normal: "STANDART",
         adapted: "ADAPTE (TAHMİNİ)",
-        result: "Kazandığınız teorik enerji:",
-        gelEquiv: "Yaklaşık Jel Karşılığı:",
-        disclaimer: "*Bu hesaplama Sakamoto [1], Marquet [2] ve Volek [5] verilerinden türetilen bir 'Matematiksel Model'dir. Laboratuvar testi değildir."
+        result: "Tahmini enerji kazancı:",
+        gelEquiv: "Örnek Jel Karşılığı (80-100 kcal):",
+        disclaimer: "*Bu değerler literatürde (Sakamoto [1], Volek [5]) raporlanan aralıklara dayalı demonstratif bir tahmindir; kişiye göre %40+ sapma gösterebilir. Laboratuvar testi değildir."
       },
       methods: {
-        title: "Nasıl Artırılır?",
+        title: "Kapasite Nasıl Desteklenir?",
         cards: [
-          { t: "1. Sleep Low", d: "Akşam antrenmanından sonra karbonhidrat almayıp sabah düşük glikojenle antrenman yapmak performansı iyileştirir [1, 2].", b: ["Altın Standart"] },
-          { t: "2. Ketojenik Diyet", d: "Yağ oksidasyonunu zirveye çıkarır [5]. Ancak Burke [6]'nın gösterdiği gibi, ekonomiyi bozabilir.", b: ["Max Yağ Yakımı"] },
-          { t: "3. Gecikmeli Beslenme", d: "Podlogar [3]'a göre; antrenman sırasında karbonhidrat alımını geciktirmek adaptasyonu sürdürür.", b: ["Stratejik"] },
-          { t: "4. Aç Karnına Antrenman", d: "Temel yöntem. Gece boyu açlıktan sonra sabah yapılan egzersiz yağ kullanımını artırır.", b: ["Başlangıç"] }
+          { t: "1. Sleep Low (Gece Kısıtlaması)", d: "Akşam antrenmanından sonra KH kısıtlayıp sabah düşük glikojenle çalışmak; iyi kanıtlı stratejilerden biridir [1, 2].", b: ["Performans Desteği"] },
+          { t: "2. Ketojenik Diyet (LCHF)", d: "Yağ oksidasyonunu en üst seviyeye çıkarır [5] ancak yarış ekonomisi ve yüksek şiddet tarafında riskler barındırır [6].", b: ["Max Yağ Yakımı"] },
+          { t: "3. Gecikmeli Beslenme", d: "Sabah seansında KH alımını geciktirmek (Podlogar [3]), yüksek yağ oksidasyonunu ve oksidatif kapasiteyi korumaya yardımcı olabilir.", b: ["Stratejik"] },
+          { t: "4. Aç Karnına Antrenman", d: "Temel bir yöntemdir. Gece boyu açlıktan sonra sabah yapılan egzersiz akut yağ kullanımını artırır.", b: ["Başlangıç"] }
         ]
       },
       plan: {
         title: "4 Haftalık Uygulama Planı",
-        w13: { t: "Hafta 1-3: İnşa Dönemi", d: "Metabolik motoru kurma aşaması.", wd: "Hafta İçi", wda: "Sleep Low (Aç Koşu)", we: "Hafta Sonu", wea: "Train High (Karbonhidratlı)", n: "*Hafta sonu midenizi jölelere alıştırmalısınız." },
-        w4: { t: "Hafta 4: Yarış Haftası (Taper)", d: "Stresi azalt, depoları doldur.", wd: "Pzt - Cuma", wda: "Normal Beslenme", we: "Son 48 Saat", wea: "Karbonhidrat Yüklemesi", n: "*Hedef: 10-12g/kg karbonhidrat." }
+        w13: { t: "Hafta 1-3: İnşa Dönemi", d: "Metabolik esnekliği geliştirme aşaması.", wd: "Hafta İçi", wda: "Sleep Low (Aç Koşu)", we: "Hafta Sonu", wea: "Train High (KH Destekli)", n: "*Hafta sonu mideyi yarış içi jöle/jellere alıştırmalısınız." },
+        w4: { t: "Hafta 4: Yarış Haftası (Taper)", d: "Stresi azalt, depoları doldur.", wd: "Pzt - Cuma", wda: "Normal Beslenme", we: "Son 48 Saat", wea: "Karbonhidrat Yüklemesi", n: "*Hedef: Yarıştan 36-48 saat önce 10-12g/kg KH." }
       }
     },
     en: {
-      hero: { tag: "Unlimited Energy", desc: "Transform your body into a fat-burning machine. Optimize performance with scientifically backed metabolic flexibility protocols." },
+      hero: { tag: "Unlimited Energy", desc: "Optimize your fat-burning capacity. Support performance metrics with scientifically backed metabolic flexibility protocols." },
       tabs: { education: "Education (101)", faq: "Q&A", calculator: "Calculator", methods: "Methods", plan: "4W Plan" },
       edu: {
         title: "Fat Oxidation Basics",
         intro: "The body's ability to break down stored triglycerides for energy production during exercise.",
         glycogen: "Glycogen (Limited)",
-        glycogenDesc: "~1,600 - 2,500 kcal storage. Primary fuel for high intensity.",
-        fat: "Fat (Vast)",
-        fatDesc: "~50,000 - 100,000+ kcal. Sustainable energy source.",
+        glycogenDesc: "~1,600 - 2,500 kcal* storage. Primary fuel for high intensity.",
+        fat: "Fat (Vast Source)",
+        fatDesc: "~50,000 - 100,000+ kcal*. Sustainable energy source.",
         stats: [
           { l: "SPARING", v: "Glycogen Sparing", s: "Saves carbs for critical final race moments." },
-          { l: "COMFORT", v: "Gut Comfort", s: "Reduces dependence on external fuel (gels)." },
-          { l: "STABILITY", v: "Steady Energy", s: "Minimizes blood sugar spikes and bonking risk." }
-        ]
+          { l: "COMFORT", v: "Gut Comfort", s: "Reduced dependence on external fuel for some athletes." },
+          { l: "STABILITY", v: "Steady Energy", s: "May reduce blood sugar spikes and bonking risk." }
+        ],
+        note: "*Values are estimate ranges based on body composition."
       },
       faq: {
         title: "Frequently Asked Questions",
         items: [
-          { q: "Is performance improvement guaranteed?", a: "Marquet [2] reported that the 'sleep-low' protocol significantly improved 10km performance." },
-          { q: "What is the most effective method?", a: "Sakamoto [1] and Marquet [2] show 'Sleep Low' improves fat metabolism and VO2peak." },
-          { q: "What does delayed feeding offer?", a: "Podlogar [3] found that delaying carb intake during exercise maintains high fat oxidation rates." },
-          { q: "Effective for women?", a: "Yes. Molloy et al. [4] confirmed improvement in female athletes." },
-          { q: "Why is Keto risky?", a: "Burke [6] reported that LCHF diets may impair exercise economy." }
+          { q: "Is performance improvement verified?", a: "Literature suggests it delays fatigue by sparing glycogen. Marquet [2] reported improved 10km performance." },
+          { q: "What is the most effective method?", a: "Sakamoto [1] and Marquet [2] show 'Sleep Low' supports fat metabolism and metrics like VO2peak." },
+          { q: "Effective for women?", a: "Studies (e.g. Molloy [4]) suggest it supports fat oxidation capacity in some populations." }
         ]
       },
       calc: {
@@ -128,17 +128,15 @@ const FatOxPage = ({ lang, activeTheme }) => {
         duration: "Duration (Hours)",
         normal: "STANDARD",
         adapted: "ADAPTED (EST.)",
-        result: "Theoretical energy gained:",
-        gelEquiv: "Approx. Gel Equivalent:",
-        disclaimer: "*Derived from Sakamoto [1], Marquet [2], and Volek [5]. Not a lab test."
+        result: "Estimated energy gain:",
+        gelEquiv: "Approx. Gel Equivalent (80-100 kcal):",
+        disclaimer: "*Rough demonstrative estimate based on literary ranges; individual results vary significantly. Not a lab test."
       },
       methods: {
-        title: "How to Increase?",
+        title: "How to Support Capacity?",
         cards: [
-          { t: "1. Sleep Low", d: "Restricting carbs after PM training and running low-glycogen in the AM improves performance [1, 2].", b: ["Gold Standard"] },
-          { t: "2. Keto Diet", d: "Maximizes fat oxidation [5] but may impair exercise economy [6].", b: ["Max Fat Burn"] },
-          { t: "3. Delayed Feeding", d: "Delaying carb intake during training maintains high fat oxidation [3].", b: ["Strategic"] },
-          { t: "4. Fasted Training", d: "A basic method. Morning exercise after an overnight fast increases fat use.", b: ["Beginner"] }
+          { t: "1. Sleep Low", d: "Restricting carbs after PM training and running low-glycogen in the AM is a well-evidenced strategy [1, 2].", b: ["Performance Support"] },
+          { t: "2. Keto Diet", d: "Maximizes fat oxidation [5] but poses risks for economy and high intensity performance [6].", b: ["Max Fat Burn"] }
         ]
       },
       plan: {
@@ -159,6 +157,7 @@ const FatOxPage = ({ lang, activeTheme }) => {
   const [calcResults, setCalcResults] = useState({ diff: 0, gels: 0, range: [0, 0] });
 
   useEffect(() => {
+    // Volek (FASTER) ve Sakamoto verilerine dayalı demonstratif katsayılar
     const COEFFS = {
       z2: { normal: [0.35, 0.55], sleepLow: [0.65, 0.85], keto: [0.95, 1.35] },
       z3: { normal: [0.15, 0.25], sleepLow: [0.35, 0.55], keto: [0.65, 0.95] }
@@ -186,7 +185,7 @@ const FatOxPage = ({ lang, activeTheme }) => {
           <div className="px-5 pb-5 text-sm text-slate-400 leading-relaxed border-t border-slate-700/50 pt-3">
             {answer.split(/(\[\d\])/g).map((part, i) => {
               const m = part.match(/\[(\d)\]/);
-              if (m) return <button key={i} onClick={() => {setShowRefs(true); setTimeout(() => {document.getElementById(`ref-fatox-${m[1]}`).scrollIntoView({behavior:'smooth',block:'center'});},100);}} className="inline-flex items-center justify-center w-4 h-4 mx-0.5 text-[10px] bg-slate-800 text-primary border border-primary/30 rounded-sm" style={{color:primaryColor}}>{m[1]}</button>;
+              if (m) return <button key={i} onClick={() => {setShowRefs(true); setTimeout(() => {const el = document.getElementById(`ref-fatox-${m[1]}`); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});},100);}} className="inline-flex items-center justify-center w-4 h-4 mx-0.5 text-[10px] bg-slate-800 text-primary border border-primary/30 rounded-sm" style={{color:primaryColor}}>{m[1]}</button>;
               return part;
             })}
           </div>
@@ -238,6 +237,7 @@ const FatOxPage = ({ lang, activeTheme }) => {
                   <p className="text-xs text-slate-500 leading-relaxed">{t.edu.fatDesc}</p>
                 </div>
               </div>
+              <p className="text-[10px] text-slate-600 mt-4 text-center">{t.edu.note}</p>
             </div>
             <div className="grid md:grid-cols-3 gap-4">{t.edu.stats.map((s, i) => (<div key={i} className="fatox-glass p-5 rounded-2xl border-l-4 shadow-xl" style={{ borderLeftColor: primaryColor }}><div className="text-[10px] font-black text-slate-500 mb-1 uppercase tracking-widest">{s.l}</div><div className="text-lg font-bold text-white mb-1">{s.v}</div><div className="text-xs text-slate-400 leading-tight">{s.s}</div></div>))}</div>
           </div>
@@ -317,7 +317,7 @@ const FatOxPage = ({ lang, activeTheme }) => {
           <div className="animate-enter-fatox space-y-6">
             <div className="fatox-glass p-6 md:p-10 rounded-3xl shadow-2xl">
               <h2 className="text-xl font-bold text-white mb-10 flex items-center gap-2">
-                <FatOxIcons.Calendar className="w-6 h-6" style={{ color: primaryColor }} /> {t.plan.title}
+                <FatOxIcons.Calendar size={24} style={{ color: primaryColor }} /> {t.plan.title}
               </h2>
               <div className="relative border-l-2 border-slate-800 ml-4 pl-8 space-y-12">
                 <div className="relative">
@@ -356,8 +356,8 @@ const FatOxPage = ({ lang, activeTheme }) => {
             {[
               "[1] Sakamoto T, Ueda S-y, Nakahara H. Effects of Short-Term Nighttime Carbohydrate Restriction Method on Exercise Performance and Fat Metabolism. Nutrients. 2024;16:2138.",
               "[2] Marquet LA, Brisswalter J, Louis J, et al. Enhanced Endurance Performance by Periodization of Carbohydrate Intake: “Sleep Low” Strategy. Med Sci Sports Exerc. 2016;48(4):663–672.",
-              "[3] Podlogar T, et al. Delayed carbohydrate feeding during a subacute “sleep-low” intervention maintains high muscle oxidative capacity. Eur J Sport Sci. 2020.",
-              "[4] Molloy E, Murphy-Griffin M, Harrison M. A ‘Sleep-Low, Train-Low’ Intervention Improves Physiological and Performance Metrics in Recreationally Endurance-Trained Women. Applied Physiology, Nutrition, and Metabolism. 2024.",
+              "[3] Podlogar T, et al. Delayed carbohydrate feeding during a subacute “sleep-low” intervention maintains high muscle oxidative capacity. European Journal of Sport Sciences. 2020.",
+              "[4] Molloy E, et al. An Investigation into the Effects of a 12-week Sleep-Low, Train-Low Intervention on Fat Oxidation. European Journal of Sport Sciences. 2025;4(1).",
               "[5] Volek JS, et al. Metabolic characteristics of keto-adapted ultra-endurance runners. Metabolism. 2016;65(3):100–110.",
               "[6] Burke LM, et al. Adaptation to a low carbohydrate high fat diet impairs endurance exercise metabolism and performance despite enhanced glycogen availability. J Physiol. 2021;599:771–790."
             ].map((ref, i) => (
