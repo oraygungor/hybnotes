@@ -14,13 +14,13 @@
     <script src="https://unpkg.com/@babel/standalone@7.26.10/babel.min.js"></script>
 
     <script>
-    Babel.registerPreset("hyb-react-classic", {
-        presets: [
-            [Babel.availablePresets["env"], { targets: "defaults" }],
-            [Babel.availablePresets["react"], { runtime: "classic" }]
-        ]
-    });
-</script>
+        Babel.registerPreset("hyb-react-classic", {
+            presets: [
+                [Babel.availablePresets["env"], { targets: "defaults" }],
+                [Babel.availablePresets["react"], { runtime: "classic" }]
+            ]
+        });
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -72,20 +72,16 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* --- RICH TEXT CONTENT STYLES (Admin Paneli Stilleri) --- */
-        
         .rich-text-content {
             color: #cbd5e1;
             line-height: 1.8;
             font-size: 1.1rem;
         }
 
-        /* --- YENİ EKLENEN KISIM: GÖRSEL STİLLERİ --- */
-        /* Hem Quill'den gelen img etiketlerini hem de özel sınıfımızı yakalar */
         .rich-text-content img, 
         .custom-responsive-img {
             display: block !important;
-            margin: 2rem auto !important; /* Ortalar */
+            margin: 2rem auto !important;
             border-radius: 12px !important;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
             max-width: 100% !important;
@@ -98,7 +94,6 @@
             transform: scale(1.01);
             border: 1px solid rgba(var(--primary-rgb), 0.5);
         }
-        /* ------------------------------------------- */
 
         .rich-text-content h2 { 
             font-size: 1.8em; 
@@ -173,25 +168,32 @@
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(var(--primary-rgb), 0.3); }
         .pulse-path { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawPath 3s linear infinite; }
-        @keyframes drawPath { 0% { stroke-dashoffset: 100; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+
+        @keyframes drawPath {
+            0% { stroke-dashoffset: 100; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0; }
+        }
     </style>
 </head>
+
 <body class="font-sans antialiased">
     <div id="root"></div>
 
-<script type="text/babel" data-presets="hyb-react-classic" src="js/Shared.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/Data.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/KosuDiliData.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/KosuDili101.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/RunningEconomyPage.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/VO2MaxRehberi2025Page.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/BeetrootNitratePage.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/FatOxidation.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/UTMBLottery.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/CaffeineAndPerformance.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/CaffeineStrategy.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/RunningPerformance.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/HyroxCalculator.js"></script>
-<script type="text/babel" data-presets="hyb-react-classic" src="js/App.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/Shared.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/Data.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/KosuDiliData.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/KosuDili101.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/RunningEconomyPage.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/VO2MaxRehberi2025Page.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/BeetrootNitratePage.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/FatOxidation.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/UTMBLottery.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/CaffeineAndPerformance.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/CaffeineStrategy.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/RunningPerformance.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/HyroxCalculator.js"></script>
+    <script type="text/babel" data-presets="hyb-react-classic" src="js/App.js"></script>
 </body>
 </html>
