@@ -181,19 +181,69 @@
 <body class="font-sans antialiased">
     <div id="root"></div>
 
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/Shared.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/Data.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/KosuDiliData.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/KosuDili101.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/RunningEconomyPage.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/VO2MaxRehberi2025Page.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/BeetrootNitratePage.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/FatOxidation.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/UTMBLottery.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/CaffeineAndPerformance.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/CaffeineStrategy.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/RunningPerformance.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/HyroxCalculator.js"></script>
-    <script type="text/babel" data-presets="hyb-react-classic" src="js/App.js"></script>
+<script>
+    const hybScripts = [
+        "js/Shared.js",
+        "js/Data.js",
+        "js/KosuDiliData.js",
+        "js/KosuDili101.js",
+        "js/RunningEconomyPage.js",
+        "js/VO2MaxRehberi2025Page.js",
+        "js/BeetrootNitratePage.js",
+        "js/FatOxidation.js",
+        "js/UTMBLottery.js",
+        "js/CaffeineAndPerformance.js",
+        "js/CaffeineStrategy.js",
+        "js/RunningPerformance.js",
+        "js/HyroxCalculator.js",
+        "js/App.js"
+    ];
+
+    async function loadHybScript(src) {
+        const response = await fetch(src, { cache: "no-cache" });
+
+        if (!response.ok) {
+            throw new Error(`Failed to load ${src}: ${response.status}`);
+        }
+
+        const source = await response.text();
+
+        const compiled = Babel.transform(source, {
+            sourceType: "script",
+            presets: [
+                ["env", { targets: "defaults" }]
+            ],
+            plugins: [
+                ["transform-react-jsx", {
+                    runtime: "classic",
+                    pragma: "React.createElement",
+                    pragmaFrag: "React.Fragment"
+                }]
+            ]
+        }).code;
+
+        if (compiled.includes("react/jsx-runtime") || compiled.includes("import { jsx")) {
+            throw new Error(`${src} still produced react/jsx-runtime import`);
+        }
+
+        const script = document.createElement("script");
+
+        script.textContent =
+            `//# sourceURL=${src}\n` +
+            `(function () {\n${compiled}\n})();`;
+
+        document.body.appendChild(script);
+    }
+
+    (async function bootHybNotes() {
+        for (const src of hybScripts) {
+            await loadHybScript(src);
+        }
+    })().catch((error) => {
+        console.error("HybNotes boot failed:", error);
+        document.getElementById("root").innerHTML =
+            '<div style="padding:2rem;color:#f87171;font-family:sans-serif">App failed to load. Check console.</div>';
+    });
+</script>
 </body>
 </html>
