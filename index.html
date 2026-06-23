@@ -12,6 +12,15 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script>
+    Babel.registerPreset("hyb-react-classic", {
+        presets: [
+            [Babel.availablePresets["env"], { targets: "defaults" }],
+            [Babel.availablePresets["react"], { runtime: "classic" }]
+        ]
+    });
+</script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -170,19 +179,19 @@
 <body class="font-sans antialiased">
     <div id="root"></div>
 
-    <script type="text/babel" src="js/Shared.js"></script>
-    <script type="text/babel" src="js/Data.js"></script>
-    <script type="text/babel" src="js/KosuDiliData.js"></script> 
-    <script type="text/babel" src="js/KosuDili101.js"></script>
-    <script type="text/babel" src="js/RunningEconomyPage.js"></script>
-    <script type="text/babel" src="js/VO2MaxRehberi2025Page.js"></script>
-    <script type="text/babel" src="js/BeetrootNitratePage.js"></script>
-    <script type="text/babel" src="js/FatOxidation.js"></script>
-    <script type="text/babel" src="js/UTMBLottery.js"></script>
-    <script type="text/babel" src="js/CaffeineAndPerformance.js"></script>
-    <script type="text/babel" src="js/CaffeineStrategy.js"></script>
-    <script type="text/babel" src="js/RunningPerformance.js"></script>
-    <script type="text/babel" src="js/HyroxCalculator.js"></script>
-    <script type="text/babel" src="js/App.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/Shared.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/Data.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/KosuDiliData.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/KosuDili101.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/RunningEconomyPage.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/VO2MaxRehberi2025Page.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/BeetrootNitratePage.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/FatOxidation.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/UTMBLottery.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/CaffeineAndPerformance.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/CaffeineStrategy.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/RunningPerformance.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/HyroxCalculator.js"></script>
+<script type="text/babel" data-presets="hyb-react-classic" src="js/App.js"></script>
 </body>
 </html>
