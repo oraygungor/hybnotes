@@ -1,27 +1,612 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HYROX Lab Support</title><meta name="description" content="Support information for HYROX Lab.">
-<style>
-:root{color-scheme:dark;--bg:#050505;--panel:#101114;--text:#f6f7f9;--muted:#a7adb7;--border:rgba(255,255,255,.12);--yellow:#ffd400;--soft:rgba(255,212,0,.14)}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg)}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text);line-height:1.65;background:radial-gradient(circle at 20% 0%,rgba(255,212,0,.12),transparent 34rem),linear-gradient(180deg,#090a0d 0%,#050505 100%)}a{color:var(--yellow);font-weight:700;text-decoration:none}a:hover{text-decoration:underline}main{width:min(960px,calc(100% - 32px));margin:0 auto;padding:48px 0 64px}.hero,section{border:1px solid var(--border);background:rgba(16,17,20,.88);box-shadow:0 24px 80px rgba(0,0,0,.35)}.hero{border-radius:28px;padding:32px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025))}section{margin-top:22px;border-radius:22px;padding:24px}.brand{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px;background:var(--soft);border:1px solid rgba(255,212,0,.26);color:var(--yellow);font-weight:800;font-size:13px;letter-spacing:.14em;text-transform:uppercase}.dot{width:10px;height:10px;border-radius:999px;background:var(--yellow);box-shadow:0 0 20px rgba(255,212,0,.72)}h1{margin:22px 0 8px;font-size:clamp(36px,7vw,64px);letter-spacing:-.05em;line-height:1}.subtitle{margin:0;color:var(--yellow);font-weight:800;letter-spacing:.18em;text-transform:uppercase;font-size:13px}.lead{max-width:760px;margin:22px 0 0;color:var(--muted);font-size:18px}nav{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0 0}nav a{display:inline-flex;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);border-radius:999px;padding:9px 13px;font-size:14px}h2{margin:0 0 12px;font-size:22px;letter-spacing:-.02em}p{margin:0 0 12px;color:var(--muted)}ul{margin:0;padding-left:20px;color:var(--muted)}li{margin:8px 0}strong{color:var(--text)}.meta{color:#777f8d;font-size:14px;margin-top:8px}.notice{border-color:rgba(255,212,0,.28);background:rgba(255,212,0,.08)}.footer{margin-top:24px;color:#777f8d;font-size:13px;text-align:center}@media(max-width:720px){main{padding:28px 0 44px}.hero,section{padding:22px;border-radius:22px}.lead{font-size:16px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>HYROX Lab Support</title>
+  <meta name="description" content="Support information for HYROX Lab.">
+  <link rel="icon" href="./assets/images/favicon.png">
+  <style>
+    :root {
+      --bg: #050505;
+      --surface: #101010;
+      --surface-2: #151515;
+      --border: #2d2d2d;
+      --border-soft: #242424;
+      --text: #ffffff;
+      --muted: #a6a6a6;
+      --soft: #d6d6d6;
+      --primary: #ffd400;
+      --primary-pressed: #e0b900;
+      --blue: #38d5ff;
+      --pink: #ff4d6d;
+      --green: #39d98a;
+      --max: 1040px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--bg);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(180deg, #0a0a0a 0%, #050505 42%, #050505 100%);
+      background-size: 48px 48px, 48px 48px, auto;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(255, 212, 0, 0.08), transparent 28%),
+        linear-gradient(90deg, rgba(56, 213, 255, 0.05), transparent 32%, transparent 68%, rgba(255, 77, 109, 0.05));
+      opacity: 0.9;
+    }
+
+    a {
+      color: var(--primary);
+      font-weight: 800;
+      text-decoration: none;
+      text-underline-offset: 4px;
+    }
+
+    a:hover {
+      color: var(--primary-pressed);
+      text-decoration: underline;
+    }
+
+    .shell {
+      position: relative;
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 0 28px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      color: var(--text);
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
+    }
+
+    .brand-mark {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      line-height: 1;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+    }
+
+    .brand-subtitle {
+      margin-top: 6px;
+      color: var(--primary);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(16, 16, 16, 0.76);
+      color: var(--soft);
+      font-size: 13px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .pill.primary {
+      border-color: rgba(255, 212, 0, 0.48);
+      background: rgba(255, 212, 0, 0.1);
+      color: var(--primary);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 36px;
+      align-items: end;
+      padding: 56px 0 42px;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 22px rgba(255, 212, 0, 0.64);
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: clamp(42px, 8vw, 86px);
+      font-weight: 980;
+      line-height: 0.94;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 720px;
+      margin: 24px 0 0;
+      color: var(--soft);
+      font-size: clamp(17px, 2.4vw, 21px);
+      line-height: 1.55;
+    }
+
+    .contact-panel {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(16, 16, 16, 0.82);
+      padding: 18px;
+    }
+
+    .panel-kicker {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .panel-value {
+      display: block;
+      margin-top: 8px;
+      color: var(--primary);
+      font-size: 17px;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .panel-note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .accent-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .accent {
+      height: 4px;
+      border-radius: 999px;
+      background: var(--primary);
+    }
+
+    .accent:nth-child(2) {
+      background: var(--blue);
+    }
+
+    .accent:nth-child(3) {
+      background: var(--pink);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 42px;
+      align-items: start;
+      padding-top: 36px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 18px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(16, 16, 16, 0.84);
+      padding: 14px;
+    }
+
+    .toc-title {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .toc a {
+      display: block;
+      padding: 8px 10px;
+      border-radius: 6px;
+      color: var(--soft);
+      font-size: 13px;
+      font-weight: 780;
+    }
+
+    .toc a:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .support {
+      border-top: 1px solid var(--border-soft);
+    }
+
+    section {
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border-soft);
+      scroll-margin-top: 24px;
+    }
+
+    section.notice {
+      margin-top: 28px;
+      padding: 24px;
+      border: 1px solid rgba(255, 212, 0, 0.38);
+      border-radius: 8px;
+      background: rgba(255, 212, 0, 0.08);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      color: var(--text);
+      font-size: clamp(23px, 3vw, 32px);
+      font-weight: 940;
+      line-height: 1.14;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 13px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    li {
+      margin: 9px 0;
+      padding-left: 2px;
+    }
+
+    strong {
+      color: var(--text);
+      font-weight: 880;
+    }
+
+    .topic-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .topic {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(16, 16, 16, 0.64);
+      padding: 14px;
+    }
+
+    .topic h3 {
+      margin: 0 0 6px;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .topic p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding-top: 28px;
+      color: #777f8d;
+      font-size: 13px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    @media (max-width: 820px) {
+      .shell {
+        width: min(100% - 28px, var(--max));
+        padding-top: 18px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .top-actions {
+        justify-content: flex-start;
+        width: 100%;
+      }
+
+      .hero,
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        gap: 24px;
+        padding: 38px 0 32px;
+      }
+
+      .toc {
+        position: static;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        background-size: 36px 36px, 36px 36px, auto;
+      }
+
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+      }
+
+      .brand-title {
+        font-size: 15px;
+      }
+
+      .pill {
+        width: 100%;
+      }
+
+      .topic-grid {
+        grid-template-columns: 1fr;
+      }
+
+      section.notice {
+        padding: 18px;
+      }
+    }
+  </style>
 </head>
 <body>
-<main>
-<header class="hero">
-<div class="brand"><span class="dot" aria-hidden="true"></span>HYROX LAB</div>
-<h1>Support</h1>
-<p class="subtitle">TRACK.RACE.ANALYZE</p>
-<p class="lead">Help and contact information for HYROX Lab, an independent companion app for race availability, ticket alerts, event discovery, and race performance analysis.</p>
-<nav><a href="/privacy.html">Privacy Policy</a><a href="mailto:oray.gungor@gmail.com">Contact support</a></nav>
-</header>
-<section><h2>Contact support</h2><p>For support, questions, feedback, account requests, or bug reports, email:</p><p><a href="mailto:oray.gungor@gmail.com">oray.gungor@gmail.com</a></p><p>Support requests are reviewed as soon as reasonably possible.</p></section>
-<section><h2>What to include</h2><p>To help investigate an issue, please include:</p><ul><li>Your device model and iOS version.</li><li>The app screen or feature where the issue happened.</li><li>A short description of what you expected and what happened.</li><li>Any relevant screenshots, if available.</li><li>The email address used to sign in, if the issue is account-related.</li></ul></section>
-<section><h2>Common support topics</h2><ul><li>Ticket alert setup, expiry, cancellation, and push notifications.</li><li>Race availability, restock, low-stock, and sold-out information.</li><li>HYRESULT import and saved race analysis.</li><li>Account access and notification permissions.</li><li>Bug reports and feature feedback.</li></ul></section>
-<section class="notice"><h2>Independent app</h2><p>HYROX Lab is an independent companion app and is not the official HYROX app.</p></section>
-<p class="footer">© 2026 Oray Gungor. All rights reserved.</p>
-</main>
+  <main class="shell">
+    <header class="topbar" aria-label="HYROX Lab">
+      <a class="brand" href="./" aria-label="HYROX Lab home">
+        <img class="brand-logo" src="./assets/hyrox-radar-logo.svg" alt="HYROX Lab logo">
+        <span class="brand-mark">
+          <span class="brand-title">HYROX LAB</span>
+          <span class="brand-subtitle">TRACK.RACE.ANALYZE</span>
+        </span>
+      </a>
+      <nav class="top-actions" aria-label="Support links">
+        <a class="pill" href="./privacy.html">Privacy Policy</a>
+        <a class="pill primary" href="mailto:oray.gungor@gmail.com">Contact support</a>
+      </nav>
+    </header>
+
+    <section class="hero" aria-labelledby="support-title">
+      <div>
+        <p class="eyebrow">Support</p>
+        <h1 id="support-title">Help for HYROX Lab users.</h1>
+        <p class="lead">
+          Get support for race discovery, ticket alerts, live market updates, HYROX Analyzer,
+          maps, account access, notifications, and profile requests.
+        </p>
+        <div class="accent-row" aria-hidden="true">
+          <span class="accent"></span>
+          <span class="accent"></span>
+          <span class="accent"></span>
+        </div>
+      </div>
+      <aside class="contact-panel" aria-label="Support contact">
+        <div class="panel-kicker">Support Email</div>
+        <a class="panel-value" href="mailto:oray.gungor@gmail.com">oray.gungor@gmail.com</a>
+        <p class="panel-note">Support requests are reviewed as soon as reasonably possible.</p>
+      </aside>
+    </section>
+
+    <div class="content">
+      <aside class="toc" aria-label="Support sections">
+        <p class="toc-title">Sections</p>
+        <a href="#contact">Contact support</a>
+        <a href="#include">What to include</a>
+        <a href="#topics">Support topics</a>
+        <a href="#account">Account and data</a>
+        <a href="#notifications">Notifications</a>
+        <a href="#status">Accuracy and availability</a>
+        <a href="#independent">Independent app</a>
+      </aside>
+
+      <article class="support">
+        <section id="contact">
+          <h2>Contact support</h2>
+          <p>For support, questions, feedback, account requests, or bug reports, email:</p>
+          <p><a href="mailto:oray.gungor@gmail.com">oray.gungor@gmail.com</a></p>
+          <p>Support requests are reviewed as soon as reasonably possible.</p>
+        </section>
+
+        <section id="include">
+          <h2>What to include</h2>
+          <p>To help investigate an issue quickly, please include:</p>
+          <ul>
+            <li>Your device model and iOS version.</li>
+            <li>The app version, if visible in the app or App Store build.</li>
+            <li>The screen or feature where the issue happened.</li>
+            <li>A short description of what you expected and what happened.</li>
+            <li>Any relevant screenshots or screen recordings, if available.</li>
+            <li>The email address used to sign in, if the issue is account-related.</li>
+            <li>The event name, race category, or HYRESULT link/code if the issue is race or ticket related.</li>
+          </ul>
+        </section>
+
+        <section id="topics">
+          <h2>Common support topics</h2>
+          <p>HYROX Lab support can help with the main areas of the app.</p>
+          <div class="topic-grid">
+            <div class="topic">
+              <h3>Onboarding and guest browsing</h3>
+              <p>Explore-first flow, sign-in prompts, and restricted actions that require an account.</p>
+            </div>
+            <div class="topic">
+              <h3>Google and Apple sign-in</h3>
+              <p>Account access, provider issues, private relay email behavior, and sign-out questions.</p>
+            </div>
+            <div class="topic">
+              <h3>Tickets and alerts</h3>
+              <p>Ticket alert setup, expiry, cancellation, stock changes, restocks, and low-stock notices.</p>
+            </div>
+            <div class="topic">
+              <h3>Live Market and News</h3>
+              <p>Live availability signals, event updates, new race visibility, and market movement questions.</p>
+            </div>
+            <div class="topic">
+              <h3>Event Search and Global Finder</h3>
+              <p>Finding events, filtering races, locating categories, and understanding event results.</p>
+            </div>
+            <div class="topic">
+              <h3>Event Dashboard</h3>
+              <p>Event detail pages, race categories, stock states, and dashboard display issues.</p>
+            </div>
+            <div class="topic">
+              <h3>HYROX Analyzer</h3>
+              <p>HYRESULT imports, saved races, split analysis, radar charts, and race history.</p>
+            </div>
+            <div class="topic">
+              <h3>Map</h3>
+              <p>Country/event map behavior, visible event counts, locations, and navigation issues.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="account">
+          <h2>Account and data requests</h2>
+          <p>
+            HYROX Lab supports account-related requests including sign-in help, profile questions,
+            notification settings, and account deletion requests.
+          </p>
+          <p>
+            If your request is related to an account, include the email address used to sign in.
+            If you used Sign in with Apple and chose a private relay email, include that relay
+            address if it is available to you.
+          </p>
+          <p>
+            For privacy details, see the <a href="./privacy.html">HYROX Lab Privacy Policy</a>.
+          </p>
+        </section>
+
+        <section id="notifications">
+          <h2>Notifications</h2>
+          <p>
+            HYROX Lab may send push notifications for ticket alerts, restocks, low-stock changes,
+            sold-out changes, new event availability, alert expiry, and relevant app updates.
+          </p>
+          <p>
+            If notifications are not arriving, check iOS notification permissions first, then contact
+            support with your device model, iOS version, app version, and the event or alert involved.
+          </p>
+        </section>
+
+        <section id="status">
+          <h2>Accuracy and availability</h2>
+          <p>
+            HYROX Lab aims to show useful race, event, ticket, and availability information, but
+            availability can change quickly and may differ from the official purchase or event source.
+          </p>
+          <p>
+            For final ticket purchases, race registration, event rules, or official event decisions,
+            always rely on the official HYROX or ticketing source.
+          </p>
+        </section>
+
+        <section class="notice" id="independent">
+          <h2>Independent app</h2>
+          <p>
+            HYROX Lab is an independent companion app and is not the official HYROX app.
+          </p>
+          <p>
+            HYROX names, events, and related references are used to describe app functionality
+            and race-related information.
+          </p>
+        </section>
+      </article>
+    </div>
+
+    <footer class="footer">
+      <span>© 2026 Oray Gungor. All rights reserved.</span>
+      <span>HYROX Lab is an independent companion app.</span>
+    </footer>
+  </main>
 </body>
 </html>
