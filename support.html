@@ -95,9 +95,12 @@
 
     .brand-logo {
       display: block;
-      width: min(260px, 62vw);
-      height: auto;
-      filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.38));
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
     }
 
     .brand-mark {
@@ -417,7 +420,12 @@
       }
 
       .brand-logo {
-        width: min(238px, 78vw);
+        width: 40px;
+        height: 40px;
+      }
+
+      .brand-title {
+        font-size: 15px;
       }
 
       .pill {
@@ -438,55 +446,16 @@
   <main class="shell">
     <header class="topbar" aria-label="HYROX Lab">
       <a class="brand" href="./" aria-label="HYROX Lab home">
-        <svg class="brand-logo" viewBox="0 0 720 172" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="hyrox-logo-title hyrox-logo-desc">
-          <title id="hyrox-logo-title">HYROX Lab</title>
-          <desc id="hyrox-logo-desc">HYROX Lab logo with flame icon and Track Race Analyze tagline.</desc>
-          <defs>
-            <linearGradient id="hyrox-logo-gold" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0" stop-color="#fff36a"/>
-              <stop offset="0.32" stop-color="#ffd400"/>
-              <stop offset="0.68" stop-color="#f5b301"/>
-              <stop offset="1" stop-color="#b77700"/>
-            </linearGradient>
-            <linearGradient id="hyrox-logo-icon-fill" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0" stop-color="#202226"/>
-              <stop offset="0.55" stop-color="#090a0d"/>
-              <stop offset="1" stop-color="#000000"/>
-            </linearGradient>
-            <radialGradient id="hyrox-logo-icon-glow" cx="50%" cy="50%" r="58%">
-              <stop offset="0" stop-color="#ffd400" stop-opacity="0.52"/>
-              <stop offset="0.58" stop-color="#ffd400" stop-opacity="0.18"/>
-              <stop offset="1" stop-color="#ffd400" stop-opacity="0"/>
-            </radialGradient>
-            <linearGradient id="hyrox-logo-flame-white" x1="82" x2="124" y1="44" y2="130">
-              <stop offset="0" stop-color="#ffffff"/>
-              <stop offset="0.66" stop-color="#f7f8fa"/>
-              <stop offset="1" stop-color="#cfd3d8"/>
-            </linearGradient>
-            <filter id="hyrox-logo-gold-glow" x="-18%" y="-35%" width="136%" height="170%" color-interpolation-filters="sRGB">
-              <feGaussianBlur stdDeviation="3.5" result="blur"/>
-              <feColorMatrix in="blur" type="matrix" values="1 0 0 0 1  0 0.78 0 0 0.58  0 0 0 0 0  0 0 0 0.72 0" result="glow"/>
-              <feMerge>
-                <feMergeNode in="glow"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-            <filter id="hyrox-logo-soft-shadow" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
-              <feDropShadow dx="0" dy="14" stdDeviation="15" flood-color="#000000" flood-opacity="0.46"/>
-            </filter>
-          </defs>
-          <rect width="720" height="172" fill="none"/>
-          <circle cx="84" cy="86" r="78" fill="url(#hyrox-logo-icon-glow)"/>
-          <rect x="25" y="27" width="118" height="118" rx="29" fill="url(#hyrox-logo-icon-fill)" stroke="url(#hyrox-logo-gold)" stroke-width="2.7" filter="url(#hyrox-logo-soft-shadow)"/>
-          <path d="M84 48c25 28 42 51 42 76 0 26-18 42-42 42s-42-16-42-42c0-18 10-34 25-51-2 16 5 28 17 35 9-15 11-35 0-60z" fill="url(#hyrox-logo-flame-white)"/>
-          <path d="M84 105c12 13 18 24 18 35 0 11-7 19-18 19s-18-8-18-19c0-10 7-21 18-35z" fill="url(#hyrox-logo-gold)"/>
-          <g filter="url(#hyrox-logo-gold-glow)">
-            <text x="174" y="91" fill="url(#hyrox-logo-gold)" font-family="Arial Black, Impact, Inter, system-ui, sans-serif" font-size="58" font-weight="900" letter-spacing="3">HYROX LAB</text>
-          </g>
-          <line x1="176" y1="121" x2="221" y2="121" stroke="url(#hyrox-logo-gold)" stroke-width="3" stroke-linecap="round"/>
-          <text x="238" y="129" fill="#d6d6d6" font-family="Inter, Arial, system-ui, sans-serif" font-size="17" font-weight="800" letter-spacing="9">TRACK.RACE.ANALYZE</text>
-          <line x1="595" y1="121" x2="640" y2="121" stroke="url(#hyrox-logo-gold)" stroke-width="3" stroke-linecap="round"/>
+        <svg class="brand-logo" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="hyrox-radar-logo-title">
+          <title id="hyrox-radar-logo-title">HYROX Lab logo</title>
+          <rect width="256" height="256" rx="56" fill="#0E1116"/>
+          <path d="M128 54c34 38 58 70 58 104 0 35-25 58-58 58s-58-23-58-58c0-24 14-47 34-70-2 22 7 38 24 48 13-20 16-48 0-82z" fill="#F8FAFC"/>
+          <path d="M128 132c16 18 24 32 24 48 0 15-10 26-24 26s-24-11-24-26c0-14 9-29 24-48z" fill="#F5B301"/>
         </svg>
+        <span class="brand-mark">
+          <span class="brand-title">HYROX LAB</span>
+          <span class="brand-subtitle">TRACK.RACE.ANALYZE</span>
+        </span>
       </a>
       <nav class="top-actions" aria-label="Support links">
         <a class="pill" href="./privacy.html">Privacy Policy</a>
